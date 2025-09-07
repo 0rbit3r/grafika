@@ -1,0 +1,55 @@
+{
+  "name": "grafika",
+  "version": "0.0.0",
+  "description": "Beautiful general purpose graph engine",
+  "private": true,
+  "repository": {
+    "type": "git",
+    "url": "todo"
+  },
+  "keywords": [
+    "graph",
+    "view",
+    "engine",
+    "vertices",
+    "edges",
+    "animation",
+    "data",
+    "visualization",
+    "fdl",
+    "force",
+    "directed",
+    "layout"
+  ],
+  "author": "0rbit3r",
+  "license": "MIT",
+  "type": "module",
+  "files": [
+    "dist"
+  ],
+  "main": "./dist/index.umd.js",
+  "module": "./dist/index.js",
+  "types": "./dist/types/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/types.d.ts",
+      "import": "./dist/index.js",
+      "require": "./dist/index.umd.js"
+    }
+  },
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build && tsc",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "nanostores": "^1.0.1",
+    "pixi.js": "^7.4.3",
+    "tinycolor2": "^1.6.0"
+  },
+  "devDependencies": {
+    "@types/tinycolor2": "^1.4.6",
+    "typescript": "~5.8.3",
+    "vite": "^7.1.2"
+  }
+}
