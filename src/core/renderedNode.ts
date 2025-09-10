@@ -1,10 +1,11 @@
-import { RenderedEdge } from "./renderedEdge";
-import {NodeShape, NodeEffect, GraphNode} from "../api/graphNode";
+import { RenderedEdge } from "../core/renderedEdge";
+import {NodeShape, NodeEffect, GraphNode} from "../api/publicTypes";
 import {Container, Graphics, TextStyle, Text} from "pixi.js";
 import { DEFAULT_RADIUS, THOUGHT_BORDER_THICKNESS } from "../core/defaultGraphOptions";
 import { GraphStoresContainer } from "../state/storesContainer";
-import { TEXT_Z } from "./zIndexes";
-import {drawNode} from "./drawNode";
+import { TEXT_Z } from "../graphics/zIndexes";
+import {drawNode} from "../graphics/drawNode";
+import { XAndY } from "./innerTypes";
 
 export interface RenderedNode {
     id: number;
@@ -27,6 +28,9 @@ export interface RenderedNode {
     
     // counts the number of frames since the node appeared
     framesAlive: number;
+
+    forces: XAndY;
+    momentum: XAndY;
     
     // redraw the sprite when dirty
     dirty: boolean;
@@ -54,7 +58,9 @@ export const initializeRenderedNode = (node: GraphNode, $states: GraphStoresCont
         hovered: false,
         dirty: false,
         dragged: false,
-        framesAlive: 0
+        framesAlive: 0,
+        forces: {x: 0, y: 0},
+        momentum: {x: 0, y: 0}
     };
     drawNode(renderedNode, $states);
 

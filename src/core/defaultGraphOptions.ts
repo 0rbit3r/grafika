@@ -1,5 +1,3 @@
-export const MAX_THOUGHTS_ON_SCREEN_FOR_LOGGED_OUT = 4000;
-
 // simulation container
 export const SIM_WIDTH = 30000;
 export const SIM_HEIGHT = 30000;
@@ -13,31 +11,23 @@ export const SLOW_SIM_EVERY_N_FRAMES = 3000;
 // How many frames to allow the nodes to overlap
 export const FRAMES_WITH_OVERLAP = 0;
 
-// Cache thought positions every N frames
-export const THOUGHTS_CACHE_FRAME = 1000;
-// Limits how many thought positions are saved in the browser
-export const THOUGHTS_CACHE_SIZE = 1000;
-
 // size and positions of nodes
 export const DEFAULT_RADIUS = 60;
 
 // Radius of the initial positions circle
-export const INITIAL_POSITIONS_RADIUS = 3000;
+export const INITIAL_POSITIONS_RADIUS = 9000;
 
 // forces simulation
-export const IDEAL_LINKED_DISTANCE = 350;
+export const DEFAULT_EDGE_LENGTH = 350;
 // N > 1 make the connected nodes' push force weaker than the pull force and vice versa
-export const EDGE_COMPRESSIBILITY_FACTOR = 0.7;
+export const EDGE_COMPRESSIBILITY_FACTOR = 1;
 
 export const MAX_PULL_FORCE = 100;
 
-export const VIRTUAL_EDGE_PULL_FORCE_MULTIPLIER = 0.05;
-export const VIRTUAL_EDGE_LINKED_DIST_MULTIPLIER = 2;
 // can only increase the thought (ie. first few sizes will default to 1 if set under 1)
 export const IDEAL_DIST_SIZE_MULTIPLIER = 0.1;//0.01;
 
-export const PUSH_THRESH = 7000;
-export const BORDERLESS_MODE_PUSH_THRESH_MULTIPLICATOR = 5;
+export const PUSH_THRESH = 5000;
 export const MAX_PUSH_FORCE = 100;
 
 export const GRAVITY_FREE_RADIUS = 40000;
@@ -45,14 +35,14 @@ export const GRAVITY_FREE_RADIUS = 40000;
 // When thoughts "appear" on screen they should not immediatelly start influencing other thoughts.
 // This parameter is the length of the "ease-in" period for influencing other thoughts
 export const INFLUENCE_FADE_IN = 250;
-export const FRAMES_WITH_NO_INFLUENCE = 40;
+export const FRAMES_WITH_NO_INFLUENCE = 20;
 
 // Slows the simulation but makes it more stable
-export const MAX_MOMENTUM_DAMPENING = 2; //1.55
+export const MAX_MOMENTUM_DAMPENING = 1.7; //1.55
 
 // These parameters are the ease-in starting value for the momentum dampening rate
 export const MOMENTUM_DAMPENING_START_AT = 1.5;
-export const MOMENTUM_DAMPENING_EASE_IN_FRAMES = 400;
+export const MOMENTUM_DAMPENING_EASE_IN_FRAMES = 40;
 
 // A movement cap of nodes to prevent them from moving too fast
 export const MAX_MOVEMENT_SPEED = 200;
@@ -84,7 +74,7 @@ export const BACKDROP_ZOOM_THRESHOLD_HIDDEN = 0.1;
 // zoom
 export const MAX_ZOOM = 5;
 export const MIN_ZOOM = 0.004;
-export const INITIAL_ZOOM = 0.05;
+export const INITIAL_ZOOM = 0.025;
 // Titles are visible when the zoom is bigger than this value
 export const ZOOM_TEXT_VISIBLE_THRESHOLD = 0.2;
 // Constants for controlling the zoop step on mouse wheel
@@ -98,12 +88,12 @@ export const NEIGHBORHOOD_DEPTH = 2;
 export const pushForce = (borderDist: number) => {
 
     if (borderDist === 0) {
-        return 0;
+        return -borderDist;
     }
     if (borderDist < 0) {
         return -borderDist;
     }
-    const computed = 10 / Math.sqrt(borderDist);
+    const computed = 30 / Math.sqrt(borderDist);
     return Math.min(MAX_PUSH_FORCE, computed);
 };
 
@@ -114,9 +104,7 @@ export const pullForce = (borderDist: number, idealDistance: number) => {
         return -MAX_PULL_FORCE;
     }
 
-    
-
-    const computed = 0.02 * (borderDist - idealDistance);
+    const computed = 0.01 * (borderDist - idealDistance);
     const limited = computed > MAX_PULL_FORCE
         ? MAX_PULL_FORCE
         : computed < -MAX_PULL_FORCE

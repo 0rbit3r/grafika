@@ -1,7 +1,5 @@
 export interface GraphNode {
     id: number;
-    links: number[];
-
 
     x?: number;
     y?: number;
@@ -27,4 +25,22 @@ export enum NodeEffect {
     Hollow = 0,
     Aura = 1,
     Blinking = 2
-} 
+}
+
+export interface GraphEdge {
+    sourceId: number;
+    targetId: number;
+
+    color?: string;
+    type?: EdgeType;
+
+    weight?: number;
+}
+
+export enum EdgeType{
+    None = 0,
+    Line = 1,
+    Arrow = 2,
+    Tapered = 3,
+    // Animated = 4 animated edges will be pain to optimize...
+}

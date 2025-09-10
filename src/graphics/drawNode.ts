@@ -1,13 +1,13 @@
 import tinycolor from "tinycolor2";
-import { NodeShape, NodeEffect } from "../api/graphNode";
+import { NodeShape, NodeEffect } from "../api/publicTypes";
 import { THOUGHT_BORDER_THICKNESS } from "../core/defaultGraphOptions";
 import { GraphStoresContainer } from "../state/storesContainer";
-import { RenderedNode } from "./renderedNode";
+import { RenderedNode } from "../core/renderedNode";
 
 export const drawNode = (node: RenderedNode, $states: GraphStoresContainer) => {
     // const graphState = useGraphStore.getState();
-    const $simState = $states.simulation.get();
-    const $graphicsState = $states.graphics.get();
+    // const $simState = $states.simulation.get();
+    // const $graphicsState = $states.graphics.get();
 
     const TimeAffectedRadius = node.radius
     //  * (1 - THOUGHT_BORDER_THICKNESS / 2))                           TODO - this is another dynamic effect - move this logic into the runner along with blinking and use scale of the Graphics
@@ -19,7 +19,7 @@ export const drawNode = (node: RenderedNode, $states: GraphStoresContainer) => {
         console.log("warning: attempted to render thought with unanitialized graphics")
         return;
     }
-    const nodeGraphics = node.graphics!
+    const nodeGraphics = node.graphics;
 
     // circle.clear();
     // const stateViewport = graphState.viewport;
@@ -153,7 +153,7 @@ export const drawNode = (node: RenderedNode, $states: GraphStoresContainer) => {
 
 
     if (node.effects.includes(NodeEffect.Hollow)) {
-        nodeGraphics.beginFill("black", 1);
+        nodeGraphics.beginFill($states.graphics.get().app.renderer.background.backgroundColor.toHex(), 1);
         nodeGraphics.lineStyle(node.radius * 0.1, tinycolor(node.color).lighten(15).toString(), 1);
         nodeGraphics.drawCircle(0, 0, (TimeAffectedRadius * 0.5));
         nodeGraphics.endFill();

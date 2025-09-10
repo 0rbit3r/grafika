@@ -1,34 +1,35 @@
 import { Application, Assets, Container, Graphics, Sprite, TextStyle, Text, DisplayObject } from "pixi.js";
 import { addDraggableViewport } from "./viewport"
 import { DEFAULT_RADIUS, BACKDROP_ZOOM_THRESHOLD_FULLY_VISIBLE, BACKDROP_ZOOM_THRESHOLD_HIDDEN, NEW_NODE_INVISIBLE_FOR, ZOOM_TEXT_VISIBLE_THRESHOLD, NEW_NODE_FADE_IN_FRAMES, GRAVITY_FREE_RADIUS, SIM_HEIGHT, THOUGHT_BORDER_THICKNESS } from "../core/defaultGraphOptions";
-import { NODES_Z, TEXT_Z } from "./zIndexes";
-import { GraphNode, NodeEffect, NodeShape as NodeShape } from "../api/graphNode";
+import { EDGES_Z, NODES_Z, TEXT_Z } from "./zIndexes";
+import { GraphNode, NodeEffect, NodeShape as NodeShape } from "../api/publicTypes";
 import tinycolor from "tinycolor2";
 import { GraphStoresContainer } from "../state/storesContainer";
-import {RenderedNode} from "./renderedNode";
-import {initializeRenderedNode} from "./renderedNode";
 
-export const initGraphics = (app: Application, $state: GraphStoresContainer) => {
+export const initGraphics = (app: Application, $states: GraphStoresContainer) => {
     app.stage.eventMode = 'static';
     const zSortedContainer = new Container();
     zSortedContainer.sortableChildren = true;
     app.stage.addChild(zSortedContainer);
 
-    const nodeContainer = $state.graphics.get().nodeContainer;
-    const textContainer = $state.graphics.get().textContainer;
+    const nodeContainer = $states.graphics.get().nodeContainer;
+    const textContainer = $states.graphics.get().textContainer;
+    const edgeContainer = $states.graphics.get().edgeContainer;
 
-    const viewport = $state.graphics.get().viewport;
+    const viewport = $states.graphics.get().viewport;
 
     zSortedContainer.addChild(viewport.dragContainer);
 
     // nodeGraphics.sortableChildren = true;
     nodeContainer.zIndex = NODES_Z;
+    textContainer.zIndex = TEXT_Z;
+    edgeContainer.zIndex = EDGES_Z;
 
     zSortedContainer.addChild(nodeContainer);
-
-    textContainer.zIndex = TEXT_Z;
-
     zSortedContainer.addChild(textContainer);
+    zSortedContainer.addChild(edgeContainer);
+
+    zSortedContainer.sortChildren();
 
     //     const initializeGraphicsForEdge = (edge: RenderedEdge) => {
 
@@ -54,12 +55,11 @@ export const initGraphics = (app: Application, $state: GraphStoresContainer) => 
     //     backdropTexture.zIndex = -1;
     // zSortedContainer.addChild(backdropTexture);
 
-    zSortedContainer.sortChildren();
-
     const renderGraph = () => {
-        const simState = $state.simulation.get();
-        const settingsState = $state.debug.get();
-        const graphicsState = $state.graphics.get();
+        const simState = $states.simulation.get();
+        const settingsState = $states.debug.get();
+        const graphicsState = $states.graphics.get();
+        const contextState = $states.context.get();
 
         // clear textContainer
         textContainer.removeChildren();
@@ -132,17 +132,8 @@ export const initGraphics = (app: Application, $state: GraphStoresContainer) => 
         //             initializeGraphicsForThought(t);
         //         })
 
-        const $dataContext = $state.context.get();
-
-        $dataContext.newNodes.forEach(n => {
-            $dataContext.renderedNodes.push(
-                initializeRenderedNode(n, $state)
-            )
-        });
-        $state.context.setKey("newNodes", []);
-
         // render thoughts on screen
-        $state.context.get().renderedNodes
+        contextState.renderedNodes
             .forEach(node => {
                 const pos = graphicsState.viewport.toViewportCoordinates({ x: node.x, y: node.y });
                 node.graphics.setTransform(pos.x, pos.y, graphicsState.viewport.zoom, graphicsState.viewport.zoom);
@@ -196,6 +187,23 @@ export const initGraphics = (app: Application, $state: GraphStoresContainer) => 
                 //             //         }
                 //             //     });
             });
+
+        contextState.renderedEdges.forEach(edge => {
+
+            const src = graphicsState.viewport.toViewportCoordinates({ x: edge.source.x, y: edge.source.y });
+            const tgt = graphicsState.viewport.toViewportCoordinates({ x: edge.target.x, y: edge.target.y });
+
+            const dx = tgt.x - src.x;
+            const dy = tgt.y - src.y;
+            const length = Math.hypot(dx, dy);         // length in viewport (pixels)
+            const scaleX = length / 1000;              // base line is 1000 units long
+            const angle = Math.atan2(dy, dx);          // radians
+
+            // NOTE: scaleY = 1 keeps the stroke thickness constant in screen pixels
+            edge.graphics.setTransform(src.x, src.y, scaleX, graphicsState.viewport.zoom, angle);
+            // const pos = graphicsState.viewport.toViewportCoordinates({ x: edge.source.x, y: edge.source.y });
+            // edge.graphics.setTransform(pos.x, pos.y, graphicsState.viewport.zoom, graphicsState.viewport.zoom)
+        })
         //         // lastZoom = graphState.viewport.zoom;
 
         //         // boundaries

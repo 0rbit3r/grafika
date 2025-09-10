@@ -1,6 +1,6 @@
 import { Application, Container, Rectangle } from "pixi.js";
 import { INITIAL_ZOOM, GRAVITY_FREE_RADIUS, MIN_ZOOM, ZOOM_STEP_MULTIPLICATOR_BUTTONS, MAX_ZOOM, ZOOM_STEP_MULTIPLICATOR_WHEEL } from "../core/defaultGraphOptions";
-import { XAndY } from "../core/types";
+import { XAndY } from "../core/innerTypes";
 
 
 export class Viewport {

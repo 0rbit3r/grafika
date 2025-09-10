@@ -1,13 +1,14 @@
 import { map } from "nanostores";
 import { addDraggableViewport, Viewport } from "../graphics/viewport";
-import { XAndY } from "../core/types";
+import { XAndY } from "../core/innerTypes";
 import { GraphicsSettings } from "../api/settings";
 import { Graphics, Container, Application, DisplayObject } from "pixi.js";
 
 export interface GraphicsStore {
   viewport: Viewport;
   app: Application;
-  nodeContainer: Graphics;
+  nodeContainer: Graphics; //todo - this probably should be container as well... 
+  edgeContainer: Container<DisplayObject>;
   textContainer: Container<DisplayObject>;
 }
 
@@ -16,5 +17,6 @@ export const createGraphicsStore = (app: Application, settings?: GraphicsSetting
     viewport: addDraggableViewport({ x: app.screen.width, y: app.screen.height }),
     app: app,
     nodeContainer: new Graphics(),
-    textContainer: new Container()
+    textContainer: new Container(),
+    edgeContainer: new Container()
   })

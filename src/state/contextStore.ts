@@ -1,15 +1,18 @@
 import { map } from "nanostores";
-import { GraphNode, NodeShape } from "../api/graphNode";
-import { RenderedNode } from "../graphics/renderedNode";
+import { GraphEdge } from "../api/publicTypes";
+import { RenderedNode } from "../core/renderedNode";
+import { GraphData } from "../api/settings";
+import { RenderedEdge } from "../core/renderedEdge";
 
 export interface ContextStore{
     renderedNodes: RenderedNode[];
-    // new nodes have been added, but not yet transformed into renderedNodes
-    newNodes: GraphNode[];
+    renderedEdges: RenderedEdge[];
+    notRenderedEdges: GraphEdge[]; // edges that are defined, but missing either source or target node
 }
 
-export const createContextStore = (nodes?: GraphNode[]) =>
+export const createContextStore = (data?: GraphData) =>
     map<ContextStore>({
         renderedNodes: [],
-        newNodes: nodes ?? []
+        renderedEdges: [],
+        notRenderedEdges: []
     });
