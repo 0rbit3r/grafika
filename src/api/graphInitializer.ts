@@ -1,38 +1,12 @@
 import { Application } from "pixi.js";
 import { initGraphics } from "../graphics/initGraphics";
-import { GraphNode, NodeShape } from "./publicTypes";
-import {GraphData, GraphSettings} from "./settings";
-import {createGraphStores} from "../state/storesContainer";
-import {addData} from "../core/contextManager/addData";
-import {simulate_one_frame_of_FDL} from "../simulation/forcesSimulation";
-
-
-export interface GraphInstance {
-    // data management
-    addData: (data: GraphData) => void;
-    removeData: (data: GraphData) => void;
-
-    // Renders a single frame
-    render: () => void;
-    // Ticks the ticker one time
-    tick: () => void;
-
-    // starts/stops the internal ticker (needed for panning, zooming, dragging etc.)
-    start: () => void;
-    stop: () => void;
-
-    // starts/stops the force simulation    
-    simStart: () => void;
-    simStop: () => void;
-}
-
-export interface GraphCallbacks {
-    onNodeSelected?: (id: number) => void;
-    onNodeDragged?: (x: number, y: number) => void;
-    onViewportMoved?: (x: number, y: number) => void;
-    onViewportZoom?: (zoom: number) => void;
-    onNextFrame?: (frame: number) => void;
-}
+import { GraphNode, NodeShape } from "./dataTypes";
+import { GraphData, GraphSettings } from "./settings";
+import { createGraphStores } from "../state/storesContainer";
+import { addData } from "../core/contextManager/addData";
+import { removeData } from "../core/contextManager/removeData";
+import { simulate_one_frame_of_FDL } from "../simulation/forcesSimulation";
+import {GraphInstance, GraphCallbacks} from "./controlTypes";
 
 export function addGraph(element: HTMLElement, settings: GraphSettings, hooks: GraphCallbacks): GraphInstance {
 
@@ -46,11 +20,11 @@ export function addGraph(element: HTMLElement, settings: GraphSettings, hooks: G
 
     element.appendChild(app.view as HTMLCanvasElement);
 
-    const $states = createGraphStores(app, settings);
+    const $states = createGraphStores(app, settings, hooks);
 
     const renderGraph = initGraphics(app, $states);
 
-    addData($states, settings.data ?? {edges: [], nodes: []});
+    addData($states, settings.data ?? { edges: [], nodes: [] });
 
     app.ticker.stop();
 
@@ -106,9 +80,9 @@ export function addGraph(element: HTMLElement, settings: GraphSettings, hooks: G
 
         // // force simulation
         // const frame = graphState.frame;
-        // if (frame < SIMULATION_FRAMES) {
+        if ($states.simulation.get().simulationEnabled) {
             simulate_one_frame_of_FDL($states);
-        // }
+        }
 
         // graphState.fadeOutThoughts.forEach(thought => {
         //     thought.timeOnScreen -= 2;
@@ -129,18 +103,21 @@ export function addGraph(element: HTMLElement, settings: GraphSettings, hooks: G
 
     return {
         addData: (data: GraphData) => addData($states, data),
-        removeData: () => { },
+        removeData: (data: GraphData) => removeData($states, data),
 
         start: () => app.ticker.start(),
         stop: () => app.ticker.stop(),
 
-        simStart: () => $states.simulation.setKey("simulationEnabled", true),  
+        simStart: () => $states.simulation.setKey("simulationEnabled", true),
         simStop: () => $states.simulation.setKey("simulationEnabled", false),
 
         render: () => {
             renderGraph();
             app.renderer.render(app.stage);
         },
-        tick: () => handleTick()
+        tick: (frames: number) => { 
+            for(let i = 0; i <= frames; i++) handleTick();
+            app.renderer.render(app.stage);
+        }
     };
 }

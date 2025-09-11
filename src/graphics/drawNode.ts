@@ -1,5 +1,5 @@
 import tinycolor from "tinycolor2";
-import { NodeShape, NodeEffect } from "../api/publicTypes";
+import { NodeShape, NodeEffect } from "../api/dataTypes";
 import { THOUGHT_BORDER_THICKNESS } from "../core/defaultGraphOptions";
 import { GraphStoresContainer } from "../state/storesContainer";
 import { RenderedNode } from "../core/renderedNode";

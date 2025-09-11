@@ -1,6 +1,6 @@
 import {
     PUSH_THRESH, MOMENTUM_DAMPENING_START_AT, MOMENTUM_DAMPENING_EASE_IN_FRAMES, MAX_MOMENTUM_DAMPENING,
-    SLOW_SIM_EVERY_N_FRAMES, MAX_MOVEMENT_SPEED, GRAVITY_FREE_RADIUS, gravityForce, SIM_WIDTH, SIM_HEIGHT,
+    MAX_MOVEMENT_SPEED, GRAVITY_FREE_RADIUS, gravityForce,
     backlinksNumberForceDivisor,
     FRAMES_WITH_NO_INFLUENCE,
     INFLUENCE_FADE_IN,
@@ -46,9 +46,14 @@ const get_center_distance = (node1: RenderedNode, node2: RenderedNode) => {
 export const simulate_one_frame_of_FDL = ($states: GraphStoresContainer) => {
     const $simulationState = $states.simulation.get();
     const renderedNodes = $states.context.get().renderedNodes;
-
+    const frame = $simulationState.frame;
+    
     // console.log("simulating frame - renderedEdges: " +
     //     JSON.stringify($states.context.get().renderedEdges.map(e => {return {source: e.source.id, target: e.target.id, color: e.color}})));
+
+    $states.context.get().renderedEdges.forEach(e => {
+        pull_or_push_connected_to_ideal_distance(e, $states);
+    });
 
     for (let i = 0; i < renderedNodes.length; i++) {
         const node1 = renderedNodes[i];
@@ -56,13 +61,7 @@ export const simulate_one_frame_of_FDL = ($states: GraphStoresContainer) => {
         for (let j = 0; j < i; j++) {
             const node2 = renderedNodes[j];
             const borderDistance = get_border_distance(node1, node2);
-            const connectingEdge = node1.edges.find(e => 
-                (e.source.id === node2.id && e.target.id === node1.id) ||
-                (e.source.id === node1.id && e.target.id === node2.id));
-            if (connectingEdge !== undefined) {
-                pull_or_push_connected_to_ideal_distance(connectingEdge, $states);
-            }
-            else if (borderDistance < PUSH_THRESH) {
+            if (borderDistance < PUSH_THRESH) {
                 // console.log("pushing: " + node1.id + " " + node2.id);
                 push_unconnected(node1, node2, $states);
             }
@@ -72,17 +71,7 @@ export const simulate_one_frame_of_FDL = ($states: GraphStoresContainer) => {
         }
     }
 
-
-    //todo - the idea is:
-    // - to compute attraction using edges
-    // - and then iterate over nodes and handle:
-    //      - repulsion
-    //      - out of bounds
-    //      their positions finally
-
-    const frame = $simulationState.frame;
     renderedNodes.forEach(node => {
-
         node.framesAlive += 1;
         // I'm gonna be honest, I don't really understandwhat's going on down from here...
         if (Math.abs(node.momentum.x) < Math.abs(node.forces.x)) {
@@ -107,8 +96,8 @@ export const simulate_one_frame_of_FDL = ($states: GraphStoresContainer) => {
         // node.momentum.x = Math.min(node.momentum.x, MAX_MOMENTUM);
         // node.momentum.y = Math.min(node.momentum.y, MAX_MOMENTUM);
 
-        node.x += Math.max(Math.min(node.momentum.x / (Math.floor(frame / SLOW_SIM_EVERY_N_FRAMES) + 1), MAX_MOVEMENT_SPEED), -MAX_MOVEMENT_SPEED); // not taking angle into account...
-        node.y += Math.max(Math.min(node.momentum.y / (Math.floor(frame / SLOW_SIM_EVERY_N_FRAMES) + 1), MAX_MOVEMENT_SPEED), -MAX_MOVEMENT_SPEED); // not taking angle into account...
+        node.x += Math.max(Math.min(node.momentum.x, MAX_MOVEMENT_SPEED), -MAX_MOVEMENT_SPEED); // not taking angle into account...
+        node.y += Math.max(Math.min(node.momentum.y, MAX_MOVEMENT_SPEED), -MAX_MOVEMENT_SPEED); // not taking angle into account...
 
         node.forces.x /= frameAdjustedDampeningRate;
         node.forces.y /= frameAdjustedDampeningRate;

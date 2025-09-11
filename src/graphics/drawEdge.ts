@@ -1,7 +1,7 @@
 import tinycolor from "tinycolor2";
 import { GraphStoresContainer } from "../state/storesContainer";
 import { RenderedEdge } from "../core/renderedEdge";
-import { EdgeType } from "../api/publicTypes";
+import { EdgeType } from "../api/dataTypes";
 
 export const drawEdge = (edge: RenderedEdge, $states: GraphStoresContainer) => {
     edge.graphics.clear();

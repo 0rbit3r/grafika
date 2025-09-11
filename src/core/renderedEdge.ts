@@ -1,6 +1,6 @@
 import { Graphics } from "pixi.js";
 import { RenderedNode } from "./renderedNode";
-import { EdgeType, GraphEdge } from "../api/publicTypes";
+import { EdgeType, GraphEdge } from "../api/dataTypes";
 import { GraphStoresContainer } from "../state/storesContainer";
 import { drawEdge } from "../graphics/drawEdge";
 
@@ -17,9 +17,10 @@ export function initializeRenderedEdge(
     edge: GraphEdge, sourceNode: RenderedNode, targetNode: RenderedNode,
     $states: GraphStoresContainer): RenderedEdge {
 
+    const $graphics = $states.graphics.get();
 
     const edgeGraphics = new Graphics();
-    $states.graphics.get().edgeContainer.addChild(edgeGraphics);
+    $graphics.edgeContainer.addChild(edgeGraphics);
 
     const renderedEdge: RenderedEdge = {
         source: sourceNode,
@@ -33,8 +34,34 @@ export function initializeRenderedEdge(
 
     //interactivity
     edgeGraphics.eventMode = 'static';
+    edgeGraphics.on('pointerdown', () => {
+        if (!$graphics.app.ticker.started) return;
+        $graphics.viewport.dragged = true;
+        // useGraphStore.getState().setLockedOnHighlighted(false);       <---   cancels locked on highlight
+    });
+
+    edgeGraphics.on('pointerup', () => {
+        $graphics.viewport.dragged = false;
+    });
+
+    edgeGraphics.on('pointerupoutside', () => {
+        $graphics.viewport.dragged = false;
+    });
+
+    edgeGraphics.on('pointermove', (event) => {
+        if ($graphics.viewport.dragged && $graphics.app.ticker.started) {
+            $graphics.viewport.moveByZoomed({ x: event.movementX, y: event.movementY });
+
+        }
+        // else  if (event.type === 'touch'){
+        //     const touchEvent = event.originalEvent.nativeEvent as PixiTouch;
+        //     touchEvent.type
+        // }
+    });
+
     edgeGraphics.on('wheel', (e) => {
-        $states.graphics.get().viewport.zoomByWheelDelta(-e.deltaY);
+        if (!$graphics.app.ticker.started) return;
+        $graphics.viewport.zoomByWheelDelta(-e.deltaY);
     });
 
     return renderedEdge;

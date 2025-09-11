@@ -1,6 +1,8 @@
 import { Application, Container, Rectangle } from "pixi.js";
 import { INITIAL_ZOOM, GRAVITY_FREE_RADIUS, MIN_ZOOM, ZOOM_STEP_MULTIPLICATOR_BUTTONS, MAX_ZOOM, ZOOM_STEP_MULTIPLICATOR_WHEEL } from "../core/defaultGraphOptions";
 import { XAndY } from "../core/innerTypes";
+import { GraphStoresContainer } from "../state/storesContainer";
+import { GraphCallbacks } from "../api/controlTypes";
 
 
 export class Viewport {
@@ -93,7 +95,7 @@ export class Viewport {
 
 }
 
-export const addDraggableViewport = (viewportSize: XAndY) => {
+export const addDraggableViewport = (viewportSize: XAndY, app: Application, hooks: GraphCallbacks) => {
     const dragContainer = new Container();
 
     const viewport = new Viewport(viewportSize.x, viewportSize.y, dragContainer);
@@ -107,6 +109,7 @@ export const addDraggableViewport = (viewportSize: XAndY) => {
     // dragContainer.zIndex = DRAG_Z;
     dragContainer.cursor = 'grab';
     dragContainer.on('pointerdown', () => {
+        if (!app.ticker.started) return;
         viewport.dragged = true;
         // useGraphStore.getState().setLockedOnHighlighted(false);       <---   cancels locked on highlight
     });
@@ -120,9 +123,9 @@ export const addDraggableViewport = (viewportSize: XAndY) => {
     });
 
     dragContainer.on('pointermove', (event) => {
-        if (viewport.dragged) {
+        if (viewport.dragged && app.ticker.started) {
             viewport.moveByZoomed({ x: event.movementX, y: event.movementY });
-
+            hooks.onViewportMoved && hooks.onViewportMoved(viewport.position.x, viewport.position.y);
         }
         // else  if (event.type === 'touch'){
         //     const touchEvent = event.originalEvent.nativeEvent as PixiTouch;
@@ -131,9 +134,11 @@ export const addDraggableViewport = (viewportSize: XAndY) => {
     });
 
     dragContainer.on('wheel', event => {
+        if (!app.ticker.started) return;
         event.preventDefault();
         event.stopPropagation();
         viewport.zoomByWheelDelta(-event.deltaY);
+        hooks.onViewportZoomed && hooks.onViewportZoomed(viewport.zoom);
     });
 
     return viewport;

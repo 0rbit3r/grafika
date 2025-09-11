@@ -3,18 +3,19 @@ import { addDraggableViewport, Viewport } from "../graphics/viewport";
 import { XAndY } from "../core/innerTypes";
 import { GraphicsSettings } from "../api/settings";
 import { Graphics, Container, Application, DisplayObject } from "pixi.js";
+import { GraphCallbacks } from "../api/controlTypes";
 
 export interface GraphicsStore {
   viewport: Viewport;
   app: Application;
-  nodeContainer: Graphics; //todo - this probably should be container as well... 
+  nodeContainer: Container<DisplayObject>;
   edgeContainer: Container<DisplayObject>;
   textContainer: Container<DisplayObject>;
 }
 
-export const createGraphicsStore = (app: Application, settings?: GraphicsSettings) =>
+export const createGraphicsStore = (app: Application, hooks: GraphCallbacks, settings?: GraphicsSettings) =>
   map<GraphicsStore>({
-    viewport: addDraggableViewport({ x: app.screen.width, y: app.screen.height }),
+    viewport: addDraggableViewport({ x: app.screen.width, y: app.screen.height }, app, hooks),
     app: app,
     nodeContainer: new Graphics(),
     textContainer: new Container(),

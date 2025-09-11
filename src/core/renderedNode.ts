@@ -1,10 +1,10 @@
 import { RenderedEdge } from "../core/renderedEdge";
-import {NodeShape, NodeEffect, GraphNode} from "../api/publicTypes";
-import {Container, Graphics, TextStyle, Text} from "pixi.js";
+import { NodeShape, NodeEffect, GraphNode } from "../api/dataTypes";
+import { Container, Graphics, TextStyle, Text } from "pixi.js";
 import { DEFAULT_RADIUS, THOUGHT_BORDER_THICKNESS } from "../core/defaultGraphOptions";
 import { GraphStoresContainer } from "../state/storesContainer";
 import { TEXT_Z } from "../graphics/zIndexes";
-import {drawNode} from "../graphics/drawNode";
+import { drawNode } from "../graphics/drawNode";
 import { XAndY } from "./innerTypes";
 
 export interface RenderedNode {
@@ -19,19 +19,19 @@ export interface RenderedNode {
     effects: NodeEffect[];
 
     graphics: Graphics;
-    text: Text; 
+    text: Text;
     radius: number;
-    
+
     held: boolean;
     hovered: boolean;
     dragged: boolean;
-    
+
     // counts the number of frames since the node appeared
     framesAlive: number;
 
     forces: XAndY;
     momentum: XAndY;
-    
+
     // redraw the sprite when dirty
     dirty: boolean;
 }
@@ -46,7 +46,7 @@ export const initializeRenderedNode = (node: GraphNode, $states: GraphStoresCont
         shape: node.shape ?? NodeShape.Circle,
         title: node.title ?? node.id.toString(),
         x: node.x ?? Math.random() * 2 - 1,
-        y: node.y ?? Math.random() * 2 -1,
+        y: node.y ?? Math.random() * 2 - 1,
         color: node.color ?? "#dddddd",
         effects: node.effects ?? [],
         edges: [],
@@ -59,8 +59,8 @@ export const initializeRenderedNode = (node: GraphNode, $states: GraphStoresCont
         dirty: false,
         dragged: false,
         framesAlive: 0,
-        forces: {x: 0, y: 0},
-        momentum: {x: 0, y: 0}
+        forces: { x: 0, y: 0 },
+        momentum: { x: 0, y: 0 }
     };
     drawNode(renderedNode, $states);
 
@@ -71,24 +71,29 @@ export const initializeRenderedNode = (node: GraphNode, $states: GraphStoresCont
     let holdStartTime = 0;
 
     nodeGraphics.on('globalpointermove', e => {
-        if (renderedNode.held) {
+        const $graphics = $states.graphics.get();
+        if (renderedNode.held && $graphics.app.ticker.started) {
             const zoom = $states.graphics.get().viewport.zoom;
             renderedNode.x += e.movementX / zoom;
             renderedNode.y += e.movementY / zoom;
+            $states.hooks.onNodeDragged && $states.hooks.onNodeDragged(node.id, renderedNode.x, renderedNode.y);
             // console.log(renderedNode.x, renderedNode.graphics.x);
         }
     });
 
     nodeGraphics.on('pointerdown', () => {
+        if (!$states.graphics.get().app.ticker.started) return;
         $states.simulation.setKey("frame", 0);
         renderedNode.held = true;
         holdStartTime = performance.now();
     });
 
     nodeGraphics.on('pointerover', () => {
+        if (!$states.graphics.get().app.ticker.started) return;
         renderedNode.hovered = true;
     });
     nodeGraphics.on('pointerout', () => {
+        // if (!$states.graphics.get().app.ticker.started) return; //I think leaving this condition here is reasonable
         renderedNode.hovered = false;
     });
     nodeGraphics.on('pointerupoutside', () => {
@@ -96,6 +101,7 @@ export const initializeRenderedNode = (node: GraphNode, $states: GraphStoresCont
         renderedNode.hovered = false;
     });
     nodeGraphics.on('wheel', (e) => {
+        if (!$states.graphics.get().app.ticker.started) return;
         $states.graphics.get().viewport.zoomByWheelDelta(-e.deltaY);
     });
 
@@ -103,7 +109,9 @@ export const initializeRenderedNode = (node: GraphNode, $states: GraphStoresCont
     $states.graphics.get().app.stage.on('pointerup', () => {
         const DRAG_TIME_THRESHOLD = 200;
 
-        if (renderedNode.held && performance.now() - holdStartTime < DRAG_TIME_THRESHOLD) {
+        if (renderedNode.held && performance.now() - holdStartTime < DRAG_TIME_THRESHOLD
+            && $states.graphics.get().app.ticker.started) {
+                $states.hooks.onNodeSelected && $states.hooks.onNodeSelected(node.id);
             // setTimeout(() => thoughtClicked(thought.id), 30); //timeout to prevent overlay from registering the click too
 
             // const oldHighlightedNode = $states.context.get().highlightedNode;

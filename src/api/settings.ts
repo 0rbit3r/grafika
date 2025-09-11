@@ -1,4 +1,4 @@
-import { GraphEdge, GraphNode } from "./publicTypes";
+import { GraphEdge, GraphNode } from "./dataTypes";
 
 
 export interface SimulationSettings {

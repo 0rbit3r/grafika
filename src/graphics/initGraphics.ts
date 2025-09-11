@@ -1,9 +1,5 @@
-import { Application, Assets, Container, Graphics, Sprite, TextStyle, Text, DisplayObject } from "pixi.js";
-import { addDraggableViewport } from "./viewport"
-import { DEFAULT_RADIUS, BACKDROP_ZOOM_THRESHOLD_FULLY_VISIBLE, BACKDROP_ZOOM_THRESHOLD_HIDDEN, NEW_NODE_INVISIBLE_FOR, ZOOM_TEXT_VISIBLE_THRESHOLD, NEW_NODE_FADE_IN_FRAMES, GRAVITY_FREE_RADIUS, SIM_HEIGHT, THOUGHT_BORDER_THICKNESS } from "../core/defaultGraphOptions";
+import { Application, Container, TextStyle, Text } from "pixi.js";
 import { EDGES_Z, NODES_Z, TEXT_Z } from "./zIndexes";
-import { GraphNode, NodeEffect, NodeShape as NodeShape } from "../api/publicTypes";
-import tinycolor from "tinycolor2";
 import { GraphStoresContainer } from "../state/storesContainer";
 
 export const initGraphics = (app: Application, $states: GraphStoresContainer) => {

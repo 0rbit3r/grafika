@@ -4,7 +4,7 @@
 
 // no biggie
 import { GraphData } from "../../api/settings";
-import { GraphEdge, GraphNode } from "../../api/publicTypes";
+import { GraphEdge, GraphNode } from "../../api/dataTypes";
 import { initializeRenderedEdge } from "../renderedEdge";
 import { initializeRenderedNode } from "../renderedNode";
 import { GraphStoresContainer } from "../../state/storesContainer";
@@ -23,6 +23,17 @@ export function addData($states: GraphStoresContainer, data: GraphData) {
             initializeRenderedNode(newNode, $states)
         );
     });
+
+    $dataContext.notRenderedEdges.forEach(notRenderedEdge => {
+        const sourceRenderedNode = $dataContext.renderedNodes.find(n => n.id == notRenderedEdge.sourceId);
+        const targetRenderedNode = $dataContext.renderedNodes.find(n => n.id == notRenderedEdge.targetId);
+        if (sourceRenderedNode && targetRenderedNode) {
+            const newRenderedEdge = initializeRenderedEdge(notRenderedEdge, sourceRenderedNode, targetRenderedNode, $states);
+            $dataContext.renderedEdges.push(newRenderedEdge);
+            sourceRenderedNode.edges.push(newRenderedEdge);
+            targetRenderedNode.edges.push(newRenderedEdge);
+        }
+    })
 
     data.edges.forEach(newEdge => {
         const sourceRenderedNode = $dataContext.renderedNodes.find(n => n.id == newEdge.sourceId);

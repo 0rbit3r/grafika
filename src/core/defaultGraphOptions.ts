@@ -4,10 +4,6 @@ export const SIM_HEIGHT = 30000;
 
 // Frames are reset every use interaction
 
-// How long to run the simulation after the interaction
-export const SIMULATION_FRAMES = 10000;
-// Halves the simulation speed every vvv this many steps
-export const SLOW_SIM_EVERY_N_FRAMES = 3000;
 // How many frames to allow the nodes to overlap
 export const FRAMES_WITH_OVERLAP = 0;
 

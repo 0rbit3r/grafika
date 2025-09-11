@@ -1,5 +1,5 @@
 import { map } from "nanostores";
-import { GraphEdge } from "../api/publicTypes";
+import { GraphEdge } from "../api/dataTypes";
 import { RenderedNode } from "../core/renderedNode";
 import { GraphData } from "../api/settings";
 import { RenderedEdge } from "../core/renderedEdge";
