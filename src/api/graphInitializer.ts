@@ -1,12 +1,12 @@
 import { Application } from "pixi.js";
 import { initGraphics } from "../graphics/initGraphics";
-import { GraphNode, NodeShape } from "./dataTypes";
 import { GraphData, GraphSettings } from "./settings";
 import { createGraphStores } from "../state/storesContainer";
 import { addData } from "../core/contextManager/addData";
 import { removeData } from "../core/contextManager/removeData";
 import { simulate_one_frame_of_FDL } from "../simulation/forcesSimulation";
-import {GraphInstance, GraphCallbacks} from "./controlTypes";
+import { GraphInstance, GraphCallbacks } from "./controlTypes";
+import {editData} from "../core/contextManager/editData"
 
 export function addGraph(element: HTMLElement, settings: GraphSettings, hooks: GraphCallbacks): GraphInstance {
 
@@ -14,7 +14,10 @@ export function addGraph(element: HTMLElement, settings: GraphSettings, hooks: G
         {
             background: settings.graphics?.backgroundColor ?? '#000000',
             resizeTo: element,
-            antialias: settings.graphics?.antialiasing ?? false
+            antialias: settings.graphics?.antialiasing ?? false,
+
+            autoDensity: true, // todo: i have a hunch this might mess up drag containers relative size to viewport or other things,
+            resolution: window.devicePixelRatio // this and the above are needed for the canvas not to look like shit on mobile
         }
     );
 
@@ -104,9 +107,13 @@ export function addGraph(element: HTMLElement, settings: GraphSettings, hooks: G
     return {
         addData: (data: GraphData) => addData($states, data),
         removeData: (data: GraphData) => removeData($states, data),
+        editData: (data: GraphData) => editData($states, data),
 
         start: () => app.ticker.start(),
         stop: () => app.ticker.stop(),
+        dispose: () => {
+            app.destroy(true, {children: true, texture: true, baseTexture: true});
+        },
 
         simStart: () => $states.simulation.setKey("simulationEnabled", true),
         simStop: () => $states.simulation.setKey("simulationEnabled", false),
@@ -115,8 +122,8 @@ export function addGraph(element: HTMLElement, settings: GraphSettings, hooks: G
             renderGraph();
             app.renderer.render(app.stage);
         },
-        tick: (frames: number) => { 
-            for(let i = 0; i <= frames; i++) handleTick();
+        tick: (frames: number) => {
+            for (let i = 0; i <= frames; i++) handleTick();
             app.renderer.render(app.stage);
         }
     };

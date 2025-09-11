@@ -19,6 +19,7 @@ export interface RenderedNode {
     effects: NodeEffect[];
 
     graphics: Graphics;
+    blinkingGraphics: Graphics;
     text: Text;
     radius: number;
 
@@ -39,6 +40,7 @@ export interface RenderedNode {
 // Will initialize graphics and put it in the nodeContainer
 export const initializeRenderedNode = (node: GraphNode, $states: GraphStoresContainer) => {
     const nodeGraphics = new Graphics();
+
     $states.graphics.get().nodeContainer.addChild(nodeGraphics);
 
     const renderedNode: RenderedNode = {
@@ -52,6 +54,7 @@ export const initializeRenderedNode = (node: GraphNode, $states: GraphStoresCont
         edges: [],
 
         graphics: nodeGraphics,
+        blinkingGraphics: new Graphics(),
         radius: node.radius ?? DEFAULT_RADIUS,
         text: null!,
         held: false,

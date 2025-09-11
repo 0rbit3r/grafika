@@ -18,13 +18,13 @@ export const DEFAULT_EDGE_LENGTH = 350;
 // N > 1 make the connected nodes' push force weaker than the pull force and vice versa
 export const EDGE_COMPRESSIBILITY_FACTOR = 1;
 
-export const MAX_PULL_FORCE = 100;
+export const MAX_PULL_FORCE = 20;
 
 // can only increase the thought (ie. first few sizes will default to 1 if set under 1)
 export const IDEAL_DIST_SIZE_MULTIPLIER = 0.1;//0.01;
 
 export const PUSH_THRESH = 5000;
-export const MAX_PUSH_FORCE = 100;
+export const MAX_PUSH_FORCE = 20;
 
 export const GRAVITY_FREE_RADIUS = 40000;
 
@@ -38,7 +38,7 @@ export const MAX_MOMENTUM_DAMPENING = 1.55; //1.55
 
 // These parameters are the ease-in starting value for the momentum dampening rate
 export const MOMENTUM_DAMPENING_START_AT = 1.5;
-export const MOMENTUM_DAMPENING_EASE_IN_FRAMES = 40;
+export const MOMENTUM_DAMPENING_EASE_IN_FRAMES = 10;
 
 // A movement cap of nodes to prevent them from moving too fast
 export const MAX_MOVEMENT_SPEED = 200;
@@ -83,22 +83,23 @@ export const NEIGHBORHOOD_DEPTH = 2;
 // FDL force functions
 export const pushForce = (borderDist: number) => {
 
-    if (borderDist === 0) {
-        return -borderDist;
-    }
-    if (borderDist < 0) {
-        return -borderDist;
-    }
-    const computed = 30 / Math.sqrt(borderDist);
+    // if (borderDist === 0) {
+    //     return -borderDist;
+    // }
+    // if (borderDist < 0) {
+    //     return -borderDist;
+    // }
+
+    const computed = 30 / Math.sqrt(borderDist <= 0 ? 0.0001 : borderDist);
     return Math.min(MAX_PUSH_FORCE, computed);
 };
 
 export const pullForce = (borderDist: number, idealDistance: number) => {
 
-    if (borderDist < 0) {
-        // console.log('negative borderDist ', borderDist);
-        return -MAX_PULL_FORCE;
-    }
+    // if (borderDist < 0) {
+    //     // console.log('negative borderDist ', borderDist);
+    //     return borderDist / 2;
+    // }
 
     const computed = 0.01 * (borderDist - idealDistance);
     const limited = computed > MAX_PULL_FORCE

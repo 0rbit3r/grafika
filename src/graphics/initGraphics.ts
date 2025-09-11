@@ -132,10 +132,17 @@ export const initGraphics = (app: Application, $states: GraphStoresContainer) =>
         // render thoughts on screen
         contextState.renderedNodes
             .forEach(node => {
+                // handle positions
                 const pos = graphicsState.viewport.toViewportCoordinates({ x: node.x, y: node.y });
                 node.graphics.setTransform(pos.x, pos.y, graphicsState.viewport.zoom, graphicsState.viewport.zoom);
 
-                //             const graphControlsState = useGraphControlsStore.getState();
+                // handle dynamic effects
+                node.blinkingGraphics.alpha = simState.frame % 150 < 50
+                    ? 1 - (simState.frame % 50) / 50
+                    : 0;
+
+                //graphState.frame % 150 < 50
+                //lighten(30 - (graphState.frame % 50) / 50 * 30)
 
                 //             const text = thought.text as Text;
                 //             // console.log(graphState.viewport.zoom, ZOOM_TEXT_VISIBLE_THRESHOLD);
@@ -155,34 +162,7 @@ export const initGraphics = (app: Application, $states: GraphStoresContainer) =>
                 //                 textContainer.addChild(text);
                 //             }
 
-                //             // Render virtual edges when in profile mode
-                //             // if (graphControlsState.explorationMode === ExplorationMode.PROFILE)
-                //             //     thought.virtualLinks.forEach(referencedThoughtId => {
-                //             //         const referencedThought = onScreenThoughts.filter(t => t.id == referencedThoughtId)[0];
-                //             //         // handle dynamic edge appearance based on highlighted thought
-                //             //         if (referencedThought) {
-                //             //             // const arrowColor = highlightedThought === null
-                //             //             //     ? referencedThought.color
-                //             //             //     : highlightedThought === thought || highlightedThought === referencedThought
-                //             //             //         ? tinycolor(referencedThought.color).lighten(5).toString()
-                //             //             //         : tinycolor(referencedThought.color).darken(10).toString();
-                //             //             // const arrowColor = referencedThought.color;
-                //             //             const arrowThickness = UNHIGHLIGHTED_EDGE_WIDTH / 2;
-                //             //             const arrowAlpha = UNHIGHLIGHTED_EDGE_ALPHA / 4;
-
-                //             //             const sourceOpacity = Math.min(1, (thought.timeOnScreen - NEW_NODE_INVISIBLE_FOR) / NEW_NODE_FADE_IN_FRAMES);
-                //             //             const targetOpacity = referencedThought.timeOnScreen <= NEW_NODE_INVISIBLE_FOR
-                //             //                 ? 0
-                //             //                 : Math.min(1, (referencedThought.timeOnScreen - NEW_NODE_INVISIBLE_FOR) / NEW_NODE_FADE_IN_FRAMES);
-
-                //             //             const edgeOpacity = Math.min(sourceOpacity, targetOpacity, arrowAlpha);
-                //             //             draw_edge(
-                //             //                 nodeContainer,
-                //             //                 stateViewport.toViewportCoordinates({ x: referencedThought.position.x, y: referencedThought.position.y }),
-                //             //                 stateViewport.toViewportCoordinates({ x: thought.position.x, y: thought.position.y }),
-                //             //                 "#ffffff", stateViewport.zoom, thought.radius, arrowThickness, edgeOpacity);
-                //             //         }
-                //             //     });
+            
             });
 
         contextState.renderedEdges.forEach(edge => {

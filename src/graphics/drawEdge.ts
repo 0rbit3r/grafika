@@ -18,8 +18,8 @@ export const drawEdge = (edge: RenderedEdge, $states: GraphStoresContainer) => {
             break;
         case EdgeType.Line:
         case EdgeType.Tapered:
-            const segments = 20;
-            const thickness = 200;
+            const segments = 100;
+            const thickness = 100;
 
             edge.graphics.lineStyle(0); // no outline
 
@@ -38,8 +38,8 @@ export const drawEdge = (edge: RenderedEdge, $states: GraphStoresContainer) => {
                 const endX = ux * len * t1;
                 const endY = uy * len * t1;
 
-                const w0 = thickness - (1 - t0) * thickness;
-                const w1 = thickness - (1 - t1) * thickness;
+                const w0 = (1 - t0) * thickness;
+                const w1 = (1 - t1) * thickness;
 
                 const quad = [
                     startX + px * w0 / 2, startY + py * w0 / 2,
@@ -48,7 +48,7 @@ export const drawEdge = (edge: RenderedEdge, $states: GraphStoresContainer) => {
                     endX + px * w1 / 2, endY + py * w1 / 2,
                 ];
 
-                const segmentAlpha = 0.5 * (1 - t0);
+                const segmentAlpha = 0.5 * t0;
 
                 edge.graphics.beginFill(edge.color, segmentAlpha);
                 edge.graphics.drawPolygon(quad);

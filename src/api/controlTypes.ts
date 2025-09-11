@@ -4,6 +4,7 @@ export interface GraphInstance {
     // data management
     addData: (data: GraphData) => void;
     removeData: (data: GraphData) => void;
+    editData: (data: GraphData) => void;
 
     // Renders a single frame
     render: () => void;
@@ -13,6 +14,7 @@ export interface GraphInstance {
     // starts/stops the internal ticker (needed for panning, zooming, dragging etc.)
     start: () => void;
     stop: () => void;
+    dispose: () => void;
 
     // starts/stops the force simulation    
     simStart: () => void;

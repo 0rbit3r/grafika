@@ -47,7 +47,7 @@ export const simulate_one_frame_of_FDL = ($states: GraphStoresContainer) => {
     const $simulationState = $states.simulation.get();
     const renderedNodes = $states.context.get().renderedNodes;
     const frame = $simulationState.frame;
-    
+
     // console.log("simulating frame - renderedEdges: " +
     //     JSON.stringify($states.context.get().renderedEdges.map(e => {return {source: e.source.id, target: e.target.id, color: e.color}})));
 
@@ -61,7 +61,9 @@ export const simulate_one_frame_of_FDL = ($states: GraphStoresContainer) => {
         for (let j = 0; j < i; j++) {
             const node2 = renderedNodes[j];
             const borderDistance = get_border_distance(node1, node2);
-            if (borderDistance < PUSH_THRESH) {
+            if (borderDistance < PUSH_THRESH
+                && node1.edges.filter(e => (e.target === node2 && e.source === node1)
+                    || (e.source === node2 && e.target === node1)).length === 0) { //todo - another performance bottleneck with filter
                 // console.log("pushing: " + node1.id + " " + node2.id);
                 push_unconnected(node1, node2, $states);
             }
