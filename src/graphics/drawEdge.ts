@@ -4,13 +4,12 @@ import { RenderedEdge } from "../core/renderedEdge";
 import { EdgeType } from "../api/dataTypes";
 
 export const drawEdge = (edge: RenderedEdge, $states: GraphStoresContainer) => {
+    if (edge.type === EdgeType.None) return;
     edge.graphics.clear();
     // edge.graphics.beginFill(tinycolor().lighten(5).toString(), thoughtFillStyle.alpha);
     edge.graphics.lineStyle({ width: 30, color: edge.color, alpha: 0.2 });
 
-    switch (edge.type) {
-        case EdgeType.None:
-            return;
+    switch (edge.type){
         case EdgeType.Arrow:
             // scaling arrows might look janky - it might make sence to divide the arrow into the line and the arrow head?
             // for now, let's just make it a line...

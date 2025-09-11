@@ -15,8 +15,9 @@ export function addData($states: GraphStoresContainer, data: GraphData) {
 
     let angle = 0;
     data.nodes.forEach(newNode => {
-        if (newNode.x === undefined) newNode.x = Math.cos(angle) * INITIAL_POSITIONS_RADIUS;
-        if (newNode.y === undefined) newNode.y = Math.sin(angle) * INITIAL_POSITIONS_RADIUS;
+        console.log("new node pos: " + newNode.x + " " + newNode.y)
+        if (newNode.x === undefined && data.nodes.length > 1) newNode.x = Math.cos(angle) * INITIAL_POSITIONS_RADIUS;
+        if (newNode.y === undefined && data.nodes.length > 1) newNode.y = Math.sin(angle) * INITIAL_POSITIONS_RADIUS;
 
         angle += Math.PI * 2 / data.nodes.length;
         $dataContext.renderedNodes.push(

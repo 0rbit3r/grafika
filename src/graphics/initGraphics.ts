@@ -1,6 +1,7 @@
 import { Application, Container, TextStyle, Text } from "pixi.js";
 import { EDGES_Z, NODES_Z, TEXT_Z } from "./zIndexes";
 import { GraphStoresContainer } from "../state/storesContainer";
+import { EdgeType } from "../api/dataTypes";
 
 export const initGraphics = (app: Application, $states: GraphStoresContainer) => {
     app.stage.eventMode = 'static';
@@ -185,7 +186,7 @@ export const initGraphics = (app: Application, $states: GraphStoresContainer) =>
             });
 
         contextState.renderedEdges.forEach(edge => {
-
+            if (edge.type === EdgeType.None) return;
             const src = graphicsState.viewport.toViewportCoordinates({ x: edge.source.x, y: edge.source.y });
             const tgt = graphicsState.viewport.toViewportCoordinates({ x: edge.target.x, y: edge.target.y });
 

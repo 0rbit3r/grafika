@@ -34,7 +34,7 @@ export const INFLUENCE_FADE_IN = 250;
 export const FRAMES_WITH_NO_INFLUENCE = 20;
 
 // Slows the simulation but makes it more stable
-export const MAX_MOMENTUM_DAMPENING = 1.7; //1.55
+export const MAX_MOMENTUM_DAMPENING = 1.55; //1.55
 
 // These parameters are the ease-in starting value for the momentum dampening rate
 export const MOMENTUM_DAMPENING_START_AT = 1.5;
