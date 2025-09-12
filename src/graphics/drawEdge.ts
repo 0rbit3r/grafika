@@ -3,27 +3,41 @@ import { GraphStoresContainer } from "../state/storesContainer";
 import { RenderedEdge } from "../core/renderedEdge";
 import { EdgeType } from "../api/dataTypes";
 
+const UNSCALED_EDGE_LENGTH = 1000; //todo: this is needed elsewhere, so move it into new file parameters or similar
+const ARROWHEAD_LENGTH = UNSCALED_EDGE_LENGTH / 2;
+const ARROWHEAD_THICKNESS = 100;
+
 export const drawEdge = (edge: RenderedEdge, $states: GraphStoresContainer) => {
     if (edge.type === EdgeType.None) return;
     edge.graphics.clear();
     // edge.graphics.beginFill(tinycolor().lighten(5).toString(), thoughtFillStyle.alpha);
     edge.graphics.lineStyle({ width: 30, color: edge.color, alpha: 0.2 });
 
-    switch (edge.type){
-        case EdgeType.Arrow:
-            // scaling arrows might look janky - it might make sence to divide the arrow into the line and the arrow head?
-            // for now, let's just make it a line...
-            edge.graphics.moveTo(0, 0);
-            edge.graphics.lineTo(1000, 0);
-            break;
+    switch (edge.type) {
         case EdgeType.Line:
+            edge.graphics.moveTo(0, 0);
+            edge.graphics.lineTo(UNSCALED_EDGE_LENGTH, 0);
+            break;
+        case EdgeType.Arrow:
+
+            edge.graphics.moveTo(0, 0);
+            edge.graphics.lineTo(UNSCALED_EDGE_LENGTH - ARROWHEAD_LENGTH, 0);
+
+            edge.graphics.beginFill(edge.color, 0.2);
+            edge.graphics.lineStyle();
+            edge.graphics.lineTo(UNSCALED_EDGE_LENGTH - ARROWHEAD_LENGTH, -ARROWHEAD_THICKNESS);
+            edge.graphics.lineTo(UNSCALED_EDGE_LENGTH, 0);
+            edge.graphics.lineTo(UNSCALED_EDGE_LENGTH - ARROWHEAD_LENGTH, ARROWHEAD_THICKNESS);
+            edge.graphics.lineTo(UNSCALED_EDGE_LENGTH - ARROWHEAD_LENGTH, 0);
+            edge.graphics.endFill();
+            break;
         case EdgeType.Tapered:
             const segments = 100;
             const thickness = 100;
 
             edge.graphics.lineStyle(0); // no outline
 
-            const len = 1000;
+            const len = UNSCALED_EDGE_LENGTH;
             const ux = 1;  // unit vector along x-axis
             const uy = 0;
             const px = 0;  // perpendicular vector
@@ -54,6 +68,15 @@ export const drawEdge = (edge: RenderedEdge, $states: GraphStoresContainer) => {
                 edge.graphics.drawPolygon(quad);
                 edge.graphics.endFill();
             }
+            break;
+        case EdgeType.CurvedLine:
+            edge.graphics.moveTo(0, 0);
+            edge.graphics.quadraticCurveTo(
+                UNSCALED_EDGE_LENGTH / 2,
+                -UNSCALED_EDGE_LENGTH / 2,
+                UNSCALED_EDGE_LENGTH,
+                0
+            );
             break;
     }
 }

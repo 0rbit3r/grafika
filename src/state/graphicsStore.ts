@@ -23,6 +23,6 @@ export const createGraphicsStore = (app: Application, hooks: GraphCallbacks, set
     nodeContainer: new Container(),
     textContainer: new Container(),
     edgeContainer: new Container(),
-    viewport: addDraggableViewport({ x: app.screen.width, y: app.screen.height }, app, hooks, [nodeContainer, edgeContainer])
+    viewport: addDraggableViewport(app, hooks, [nodeContainer, edgeContainer])
   });
 }

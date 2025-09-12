@@ -27,6 +27,9 @@ export function addGraph(element: HTMLElement, settings: GraphSettings, hooks: G
 
     const renderGraph = initGraphics(app, $states);
 
+    element.addEventListener("resize", _ =>
+        setTimeout(() => $states.graphics.get().viewport.resizeHitArea(app.screen.width, app.screen.height), 100));
+
     addData($states, settings.data ?? { edges: [], nodes: [] });
 
     app.ticker.stop();

@@ -19,13 +19,19 @@ export class Viewport {
     dragContainer: Container;
 
     constructor(width: number, height: number, dragContainer: Container) {
-        this.height = height;
         this.width = width;
+        this.height = height;
         this.zoom = INITIAL_ZOOM;
         this.position = { x: 0, y: 0 };
         this.dragged = false;
         this.lockedOnNode = false;
         this.dragContainer = dragContainer;
+    }
+
+    public resizeHitArea = (width: number, height: number) => {
+        this.width = width;
+        this.height = height;
+        this.dragContainer.hitArea = new Rectangle(0, 0, width, height);
     }
 
     // Moves the viewport by zoom-corrected amount
@@ -86,6 +92,11 @@ export class Viewport {
         };
     }
 
+    toGlobalCoordinates = (ViewportRelativePos: XAndY): XAndY => ({
+        x: (ViewportRelativePos.x - this.width / 2) / this.zoom + this.position.x,
+        y: (ViewportRelativePos.y - this.height / 2) / this.zoom + this.position.y
+    })
+
     zoomedViewportSize = (): XAndY => {
         return {
             x: this.width / this.zoom,
@@ -95,13 +106,17 @@ export class Viewport {
 
 }
 
-// todo: this method was completely re-written by AI - check it thoroughly
-
-export const addDraggableViewport = (viewportSize: XAndY, app: Application, hooks: GraphCallbacks, containers: Container<DisplayObject>[]) => {
+export const addDraggableViewport = (app: Application, hooks: GraphCallbacks, containers: Container<DisplayObject>[]) => {
     const dragContainer = new Container();
-    const viewport = new Viewport(viewportSize.x, viewportSize.y, dragContainer);
+    dragContainer.hitArea = new Rectangle(0, 0, app.screen.width, app.screen.height);
 
-    dragContainer.hitArea = new Rectangle(0, 0, viewportSize.x, viewportSize.y);
+    const viewport = new Viewport(app.screen.width, app.screen.height, dragContainer);
+
+
+    window.addEventListener("resize", _ =>
+        setTimeout(() => viewport.resizeHitArea(app.screen.width, app.screen.height), 60));
+        // timeout to let the app screen react first (hacky but oh well)
+        // anyway, this will not work for programatically-driven changes of the canvas size - todo 
 
     dragContainer.sortableChildren = true;
     dragContainer.eventMode = 'static';
@@ -114,11 +129,6 @@ export const addDraggableViewport = (viewportSize: XAndY, app: Application, hook
 
     const getDistance = (a: XAndY, b: XAndY) =>
         Math.sqrt((a.x - b.x) ** 2 + (a.y - b.y) ** 2);
-
-    const globalToWorld = (g: XAndY): XAndY => ({
-        x: (g.x - viewport.width / 2) / viewport.zoom + viewport.position.x,
-        y: (g.y - viewport.height / 2) / viewport.zoom + viewport.position.y
-    });
 
     const updateZoom = (newZoom: number, centerWorld: XAndY) => {
         newZoom = Math.min(MAX_ZOOM, Math.max(MIN_ZOOM, newZoom));
@@ -143,23 +153,15 @@ export const addDraggableViewport = (viewportSize: XAndY, app: Application, hook
         if (!app.ticker.started) return;
         activeTouches.set(e.pointerId, { x: e.global.x, y: e.global.y });
         if (activeTouches.size === 1) viewport.dragged = true;
-
-        // containers.forEach(c => c.interactiveChildren = false);
-        // if (activeTouches.size >= 1) {
-        //     // multi touch starting, temporarily disable node interactivity
-        //     nodesContainer.interactiveChildren = false;
-        // }
     });
 
-    const pointerUpEvents = ['pointerup', 'pointerupoutside', 'pointercancel', 'pointerout', 'pointerleave'];
+    const pointerUpEvents = ['pointerup', 'pointerupoutside'];
     pointerUpEvents.forEach(ev => {
-        dragContainer.on(ev, (e) => clearPointer(e.pointerId))
-        // if (activeTouches.size === 0)
-        //     containers.forEach(c => c.interactiveChildren = true);
-    }
-    );
+        dragContainer.on(ev, (e) => clearPointer(e.pointerId));
+    });
 
-    dragContainer.on('pointermove', (e) => {
+    
+    app.stage.on('pointermove', (e) => {
         if (!app.ticker.started) return;
 
         if (activeTouches.size === 1 && viewport.dragged) {
@@ -175,7 +177,7 @@ export const addDraggableViewport = (viewportSize: XAndY, app: Application, hook
             if (initialPinchDistance === null) {
                 initialPinchDistance = dist;
                 initialZoom = viewport.zoom;
-                pinchCenter = globalToWorld({
+                pinchCenter = viewport.toGlobalCoordinates({
                     x: (p1.x + p2.x) / 2,
                     y: (p1.y + p2.y) / 2
                 });
@@ -191,7 +193,7 @@ export const addDraggableViewport = (viewportSize: XAndY, app: Application, hook
         if (!app.ticker.started) return;
         event.preventDefault();
         event.stopPropagation();
-        const worldCenter = globalToWorld({ x: event.globalX, y: event.globalY });
+        const worldCenter = viewport.toGlobalCoordinates({ x: event.globalX, y: event.globalY });
         const factor = event.deltaY < 0 ? ZOOM_STEP_MULTIPLICATOR_WHEEL : 1 / ZOOM_STEP_MULTIPLICATOR_WHEEL;
         updateZoom(viewport.zoom * factor, worldCenter);
     });

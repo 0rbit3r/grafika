@@ -32,37 +32,5 @@ export function initializeRenderedEdge(
     };
     drawEdge(renderedEdge, $states);
 
-    //interactivity
-    edgeGraphics.eventMode = 'static';
-    edgeGraphics.on('pointerdown', () => {
-        if (!$graphics.app.ticker.started) return;
-        $graphics.viewport.dragged = true;
-        // useGraphStore.getState().setLockedOnHighlighted(false);       <---   cancels locked on highlight
-    });
-
-    edgeGraphics.on('pointerup', () => {
-        $graphics.viewport.dragged = false;
-    });
-
-    edgeGraphics.on('pointerupoutside', () => {
-        $graphics.viewport.dragged = false;
-    });
-
-    edgeGraphics.on('pointermove', (event) => {
-        if ($graphics.viewport.dragged && $graphics.app.ticker.started) {
-            $graphics.viewport.moveByZoomed({ x: event.movementX, y: event.movementY });
-
-        }
-        // else  if (event.type === 'touch'){
-        //     const touchEvent = event.originalEvent.nativeEvent as PixiTouch;
-        //     touchEvent.type
-        // }
-    });
-
-    edgeGraphics.on('wheel', (e) => {
-        if (!$graphics.app.ticker.started) return;
-        $graphics.viewport.zoomByWheelDelta(-e.deltaY);
-    });
-
     return renderedEdge;
 }
