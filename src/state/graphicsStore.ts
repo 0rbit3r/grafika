@@ -14,10 +14,15 @@ export interface GraphicsStore {
 }
 
 export const createGraphicsStore = (app: Application, hooks: GraphCallbacks, settings?: GraphicsSettings) =>
-  map<GraphicsStore>({
-    viewport: addDraggableViewport({ x: app.screen.width, y: app.screen.height }, app, hooks),
+  {
+    const nodeContainer = new Container();
+    const edgeContainer = new Container();
+
+    return map<GraphicsStore>({
     app: app,
-    nodeContainer: new Graphics(),
+    nodeContainer: new Container(),
     textContainer: new Container(),
-    edgeContainer: new Container()
-  })
+    edgeContainer: new Container(),
+    viewport: addDraggableViewport({ x: app.screen.width, y: app.screen.height }, app, hooks, [nodeContainer, edgeContainer])
+  });
+}

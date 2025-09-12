@@ -1,5 +1,5 @@
 import { Application, Container, TextStyle, Text } from "pixi.js";
-import { EDGES_Z, NODES_Z, TEXT_Z } from "./zIndexes";
+import { DRAG_Z, EDGES_Z, NODES_Z, TEXT_Z } from "./zIndexes";
 import { GraphStoresContainer } from "../state/storesContainer";
 import { EdgeType } from "../api/dataTypes";
 
@@ -17,7 +17,9 @@ export const initGraphics = (app: Application, $states: GraphStoresContainer) =>
 
     zSortedContainer.addChild(viewport.dragContainer);
 
+    
     // nodeGraphics.sortableChildren = true;
+    viewport.dragContainer.zIndex = DRAG_Z;
     nodeContainer.zIndex = NODES_Z;
     textContainer.zIndex = TEXT_Z;
     edgeContainer.zIndex = EDGES_Z;

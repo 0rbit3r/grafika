@@ -1,4 +1,4 @@
-import { Application, Container, Rectangle } from "pixi.js";
+import { Application, Container, DisplayObject, Rectangle } from "pixi.js";
 import { INITIAL_ZOOM, GRAVITY_FREE_RADIUS, MIN_ZOOM, ZOOM_STEP_MULTIPLICATOR_BUTTONS, MAX_ZOOM, ZOOM_STEP_MULTIPLICATOR_WHEEL } from "../core/defaultGraphOptions";
 import { XAndY } from "../core/innerTypes";
 import { GraphStoresContainer } from "../state/storesContainer";
@@ -95,51 +95,107 @@ export class Viewport {
 
 }
 
-export const addDraggableViewport = (viewportSize: XAndY, app: Application, hooks: GraphCallbacks) => {
-    const dragContainer = new Container();
+// todo: this method was completely re-written by AI - check it thoroughly
 
+export const addDraggableViewport = (viewportSize: XAndY, app: Application, hooks: GraphCallbacks, containers: Container<DisplayObject>[]) => {
+    const dragContainer = new Container();
     const viewport = new Viewport(viewportSize.x, viewportSize.y, dragContainer);
 
-    // dragContainer.width = app.screen.width;
-    // dragContainer.height = app.screen.height; Doesn't affect anything... 
     dragContainer.hitArea = new Rectangle(0, 0, viewportSize.x, viewportSize.y);
+
     dragContainer.sortableChildren = true;
-
     dragContainer.eventMode = 'static';
-    // dragContainer.zIndex = DRAG_Z;
     dragContainer.cursor = 'grab';
-    dragContainer.on('pointerdown', () => {
-        if (!app.ticker.started) return;
-        viewport.dragged = true;
-        // useGraphStore.getState().setLockedOnHighlighted(false);       <---   cancels locked on highlight
+
+    const activeTouches = new Map<number, XAndY>();
+    let initialPinchDistance: number | null = null;
+    let initialZoom = viewport.zoom;
+    let pinchCenter: XAndY | null = null;
+
+    const getDistance = (a: XAndY, b: XAndY) =>
+        Math.sqrt((a.x - b.x) ** 2 + (a.y - b.y) ** 2);
+
+    const globalToWorld = (g: XAndY): XAndY => ({
+        x: (g.x - viewport.width / 2) / viewport.zoom + viewport.position.x,
+        y: (g.y - viewport.height / 2) / viewport.zoom + viewport.position.y
     });
 
-    dragContainer.on('pointerup', () => {
-        viewport.dragged = false;
-    });
+    const updateZoom = (newZoom: number, centerWorld: XAndY) => {
+        newZoom = Math.min(MAX_ZOOM, Math.max(MIN_ZOOM, newZoom));
+        // keep centerWorld stable on screen
+        viewport.position.x = centerWorld.x - (centerWorld.x - viewport.position.x) * (viewport.zoom / newZoom);
+        viewport.position.y = centerWorld.y - (centerWorld.y - viewport.position.y) * (viewport.zoom / newZoom);
+        viewport.zoom = newZoom;
+        hooks.onViewportZoomed?.(viewport.zoom);
+        hooks.onViewportMoved?.(viewport.position.x, viewport.position.y);
+    };
 
-    dragContainer.on('pointerupoutside', () => {
-        viewport.dragged = false;
-    });
-
-    dragContainer.on('pointermove', (event) => {
-        if (viewport.dragged && app.ticker.started) {
-            viewport.moveByZoomed({ x: event.movementX, y: event.movementY });
-            hooks.onViewportMoved && hooks.onViewportMoved(viewport.position.x, viewport.position.y);
+    const clearPointer = (id: number) => {
+        activeTouches.delete(id);
+        if (activeTouches.size < 2) {
+            initialPinchDistance = null;
+            pinchCenter = null;
         }
-        // else  if (event.type === 'touch'){
-        //     const touchEvent = event.originalEvent.nativeEvent as PixiTouch;
-        //     touchEvent.type
+        if (activeTouches.size === 0) viewport.dragged = false;
+    };
+
+    dragContainer.on('pointerdown', (e) => {
+        if (!app.ticker.started) return;
+        activeTouches.set(e.pointerId, { x: e.global.x, y: e.global.y });
+        if (activeTouches.size === 1) viewport.dragged = true;
+
+        // containers.forEach(c => c.interactiveChildren = false);
+        // if (activeTouches.size >= 1) {
+        //     // multi touch starting, temporarily disable node interactivity
+        //     nodesContainer.interactiveChildren = false;
         // }
     });
 
-    dragContainer.on('wheel', event => {
+    const pointerUpEvents = ['pointerup', 'pointerupoutside', 'pointercancel', 'pointerout', 'pointerleave'];
+    pointerUpEvents.forEach(ev => {
+        dragContainer.on(ev, (e) => clearPointer(e.pointerId))
+        // if (activeTouches.size === 0)
+        //     containers.forEach(c => c.interactiveChildren = true);
+    }
+    );
+
+    dragContainer.on('pointermove', (e) => {
+        if (!app.ticker.started) return;
+
+        if (activeTouches.size === 1 && viewport.dragged) {
+            viewport.moveByZoomed({ x: e.movementX, y: e.movementY });
+            hooks.onViewportMoved?.(viewport.position.x, viewport.position.y);
+        }
+
+        if (activeTouches.size === 2) {
+            activeTouches.set(e.pointerId, { x: e.global.x, y: e.global.y });
+            const [p1, p2] = [...activeTouches.values()];
+            const dist = getDistance(p1, p2);
+
+            if (initialPinchDistance === null) {
+                initialPinchDistance = dist;
+                initialZoom = viewport.zoom;
+                pinchCenter = globalToWorld({
+                    x: (p1.x + p2.x) / 2,
+                    y: (p1.y + p2.y) / 2
+                });
+            } else if (pinchCenter) {
+                const scale = dist / initialPinchDistance;
+                updateZoom(initialZoom * scale, pinchCenter);
+            }
+        }
+    });
+
+    // Mouse wheel zoom toward mouse position
+    dragContainer.on('wheel', (event) => {
         if (!app.ticker.started) return;
         event.preventDefault();
         event.stopPropagation();
-        viewport.zoomByWheelDelta(-event.deltaY);
-        hooks.onViewportZoomed && hooks.onViewportZoomed(viewport.zoom);
+        const worldCenter = globalToWorld({ x: event.globalX, y: event.globalY });
+        const factor = event.deltaY < 0 ? ZOOM_STEP_MULTIPLICATOR_WHEEL : 1 / ZOOM_STEP_MULTIPLICATOR_WHEEL;
+        updateZoom(viewport.zoom * factor, worldCenter);
     });
 
     return viewport;
-}
+};
+
