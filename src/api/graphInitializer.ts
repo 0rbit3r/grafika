@@ -1,12 +1,14 @@
 import { Application } from "pixi.js";
 import { initGraphics } from "../graphics/initGraphics";
-import { GraphData, GraphSettings } from "./settings";
+import { GraphSettings } from "./settings";
 import { createGraphStores } from "../state/storesContainer";
 import { addData } from "../core/contextManager/addData";
 import { removeData } from "../core/contextManager/removeData";
 import { simulate_one_frame_of_FDL } from "../simulation/forcesSimulation";
 import { GraphInstance, GraphCallbacks } from "./controlTypes";
-import {editData} from "../core/contextManager/editData"
+import { editData } from "../core/contextManager/editData"
+import { GraphData } from "./dataTypes";
+import { testProxy } from "./nodeProxy"
 
 export function addGraph(element: HTMLElement, settings: GraphSettings, hooks: GraphCallbacks): GraphInstance {
 
@@ -32,7 +34,9 @@ export function addGraph(element: HTMLElement, settings: GraphSettings, hooks: G
 
     addData($states, settings.data ?? { edges: [], nodes: [] });
 
-    app.ticker.stop();
+    app.ticker.autoStart = false;
+
+    // testProxy($states);
 
     const handleTick = () => {
         $states.simulation.setKey("frame", $states.simulation.get().frame + 1);
@@ -115,7 +119,7 @@ export function addGraph(element: HTMLElement, settings: GraphSettings, hooks: G
         start: () => app.ticker.start(),
         stop: () => app.ticker.stop(),
         dispose: () => {
-            app.destroy(true, {children: true, texture: true, baseTexture: true});
+            app.destroy(true, { children: true, texture: true, baseTexture: true });
         },
 
         simStart: () => $states.simulation.setKey("simulationEnabled", true),

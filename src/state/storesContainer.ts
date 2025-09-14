@@ -21,7 +21,7 @@ export function createGraphStores(pixiApp: Application, settings: GraphSettings,
         simulation: createSimulationStore(settings.simulation),
         graphics: createGraphicsStore(pixiApp, hooks, settings.graphics),
         debug: createDebugStore(settings.debug),
-        context: createContextStore(settings.data),
+        context: createContextStore(),
         hooks: hooks
     }
 }

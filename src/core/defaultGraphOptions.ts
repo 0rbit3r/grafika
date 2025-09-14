@@ -44,7 +44,7 @@ export const MOMENTUM_DAMPENING_EASE_IN_FRAMES = 10;
 export const MAX_MOVEMENT_SPEED = 200;
 
 // Mass allows asymmetric forces based on radius
-export const NODE_MASS_ON = true;
+export const NODE_MASS_ON = false;
 export const MAX_MASS_DIFFERENCE_PULL_FORCE_MULTIPLIER = 2;
 export const MIN_MASS_DIFFERENCE_PULL_FORCE_MULTIPLIER = 0.5;
 export const MAX_MASS_DIFFERENCE_PUSH_FORCE_MULTIPLIER = 2;

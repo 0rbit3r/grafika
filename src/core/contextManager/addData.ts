@@ -1,8 +1,8 @@
-import { GraphData } from "../../api/settings";
 import { initializeRenderedEdge } from "../renderedEdge";
 import { initializeRenderedNode } from "../renderedNode";
 import { GraphStoresContainer } from "../../state/storesContainer";
 import { INITIAL_POSITIONS_RADIUS } from "../defaultGraphOptions";
+import { GraphData } from "../../api/dataTypes";
 
 export function addData($states: GraphStoresContainer, data: GraphData) {
     let angle = 0;

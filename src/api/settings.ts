@@ -1,4 +1,4 @@
-import { GraphEdge, GraphNode } from "./dataTypes";
+import { GraphData } from "./dataTypes";
 
 
 export interface SimulationSettings {
@@ -13,11 +13,6 @@ export interface DebugSettings {
 export interface GraphicsSettings {
     antialiasing?: boolean;
     backgroundColor?: string;
-}
-
-export interface GraphData {
-    nodes: GraphNode[];
-    edges: GraphEdge[];
 }
 
 

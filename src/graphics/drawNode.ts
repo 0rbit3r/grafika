@@ -1,5 +1,5 @@
 import tinycolor from "tinycolor2";
-import { NodeShape, NodeEffect } from "../api/dataTypes";
+import { NodeShape } from "../api/dataTypes";
 import { THOUGHT_BORDER_THICKNESS } from "../core/defaultGraphOptions";
 import { GraphStoresContainer } from "../state/storesContainer";
 import { RenderedNode } from "../core/renderedNode";
@@ -52,14 +52,14 @@ export const drawNode = (node: RenderedNode, $states: GraphStoresContainer) => {
 
     drawShape(nodeGraphics, node.shape, node.radius, thoughtLineStyle, node.color);
 
-    if (node.effects.includes(NodeEffect.Blinking)) {
+    if (node.blinkEffect) {
         node.graphics.addChild(node.blinkingGraphics);
         drawShape(node.blinkingGraphics, node.shape, node.radius * 9 / 10, thoughtLineStyle, "#ffffff"); //todo - add blinking color as a parameter to GraphNode
     } else {
-        node.graphics.removeChild(node.blinkingGraphics);
+        node.graphics.removeChildren();
     }
 
-    if (node.effects.includes(NodeEffect.Hollow)) {
+    if (node.hollowEffect) {
         nodeGraphics.beginFill($states.graphics.get().app.renderer.background.backgroundColor.toHex(), 1);
         nodeGraphics.lineStyle(node.radius * 0.1, tinycolor(node.color).lighten(15).toString(), 1);
         nodeGraphics.drawCircle(0, 0, (node.radius * 0.5));
@@ -125,7 +125,7 @@ export const drawNode = (node: RenderedNode, $states: GraphStoresContainer) => {
     // const scale = graphState.viewport.zoom * thought.radius / 2;
     // circle.scale = { x: scale, y: scale };
 
-    if (node.effects.includes(NodeEffect.Aura)) {
+    if (node.glowEffect) {
         nodeGraphics.lineStyle(500, node.color, 0.05);
         nodeGraphics.drawCircle(0, 0, (node.radius + 400));
 

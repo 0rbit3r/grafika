@@ -1,4 +1,4 @@
-import {GraphData } from "./settings";
+import { GraphData } from "./dataTypes";
 
 export interface GraphInstance {
     // data management

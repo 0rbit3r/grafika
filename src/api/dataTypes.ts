@@ -1,3 +1,8 @@
+export interface GraphData {
+    nodes: GraphNode[];
+    edges: GraphEdge[];
+}
+
 export interface GraphNode {
     id: number;
 
@@ -7,7 +12,10 @@ export interface GraphNode {
     title?: string;
     color?: string;
     shape?: NodeShape;
-    effects?: NodeEffect[];
+
+    hollowEffect?: boolean;
+    glowEffect?: boolean;
+    blinkEffect?: boolean;
 }
 
 export enum NodeShape {
@@ -21,12 +29,6 @@ export enum NodeShape {
     // todo: exclamation mark, question mark, dash, checked and unchecked "checkbox-like",  
 }
 
-export enum NodeEffect {
-    Hollow = 0,
-    Aura = 1,
-    Blinking = 2
-}
-
 export interface GraphEdge {
     sourceId: number;
     targetId: number;
@@ -37,7 +39,7 @@ export interface GraphEdge {
     weight?: number;
 }
 
-export enum EdgeType{
+export enum EdgeType {
     None = 0,
     Line = 1,
     Arrow = 2,

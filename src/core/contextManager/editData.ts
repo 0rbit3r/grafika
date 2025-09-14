@@ -1,11 +1,11 @@
-import { GraphData } from "../../api/settings";
 import { initializeRenderedEdge } from "../renderedEdge";
 import { initializeRenderedNode } from "../renderedNode";
 import { GraphStoresContainer } from "../../state/storesContainer";
 import { INITIAL_POSITIONS_RADIUS } from "../defaultGraphOptions";
 import { drawNode } from "../../graphics/drawNode";
 import { drawEdge } from "../../graphics/drawEdge";
-import { GraphEdge } from "../../api/dataTypes";
+import { GraphData, GraphEdge } from "../../api/dataTypes";
+import { removeData } from "./removeData";
 
 // Edits found nodes and edges according to non-undefined fields of the new data
 // When argument field is left undefined, the value is not updated
@@ -27,7 +27,8 @@ export function editData($states: GraphStoresContainer, editedData: GraphData) {
         if (!matchingNode) continue;
 
         if (matchingNode.color !== undefined) renderedNode.color = matchingNode.color;
-        if (matchingNode.effects !== undefined) renderedNode.effects = matchingNode.effects;
+        if (matchingNode.hollowEffect !== undefined) renderedNode.hollowEffect = matchingNode.hollowEffect;
+        if (matchingNode.blinkEffect !== undefined) renderedNode.blinkEffect = matchingNode.blinkEffect;
         if (matchingNode.radius !== undefined) renderedNode.radius = matchingNode.radius;
         if (matchingNode.shape !== undefined) renderedNode.shape = matchingNode.shape;
         if (matchingNode.title !== undefined) renderedNode.title = matchingNode.title;

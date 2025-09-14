@@ -1,5 +1,5 @@
 import { RenderedEdge } from "../core/renderedEdge";
-import { NodeShape, NodeEffect, GraphNode } from "../api/dataTypes";
+import { NodeShape, GraphNode } from "../api/dataTypes";
 import { Container, Graphics, TextStyle, Text } from "pixi.js";
 import { DEFAULT_RADIUS, THOUGHT_BORDER_THICKNESS } from "../core/defaultGraphOptions";
 import { GraphStoresContainer } from "../state/storesContainer";
@@ -16,7 +16,10 @@ export interface RenderedNode {
     title: string;
     color: string;
     shape: NodeShape;
-    effects: NodeEffect[];
+
+    hollowEffect: boolean;
+    glowEffect: boolean;
+    blinkEffect: boolean;
 
     graphics: Graphics;
     blinkingGraphics: Graphics;
@@ -25,16 +28,12 @@ export interface RenderedNode {
 
     held: boolean;
     hovered: boolean;
-    dragged: boolean;
 
     // counts the number of frames since the node appeared
     framesAlive: number;
 
     forces: XAndY;
     momentum: XAndY;
-
-    // redraw the sprite when dirty
-    dirty: boolean;
 }
 
 // Will initialize graphics and put it in the nodeContainer
@@ -50,8 +49,11 @@ export const initializeRenderedNode = (node: GraphNode, $states: GraphStoresCont
         x: node.x ?? Math.random() * 2 - 1,
         y: node.y ?? Math.random() * 2 - 1,
         color: node.color ?? "#dddddd",
-        effects: node.effects ?? [],
         edges: [],
+
+        hollowEffect: node.hollowEffect ?? false,
+        blinkEffect: node.blinkEffect ?? false,
+        glowEffect: node.glowEffect ?? false,
 
         graphics: nodeGraphics,
         blinkingGraphics: new Graphics(),
@@ -59,8 +61,6 @@ export const initializeRenderedNode = (node: GraphNode, $states: GraphStoresCont
         text: null!,
         held: false,
         hovered: false,
-        dirty: false,
-        dragged: false,
         framesAlive: 0,
         forces: { x: 0, y: 0 },
         momentum: { x: 0, y: 0 }
@@ -125,7 +125,6 @@ export const initializeRenderedNode = (node: GraphNode, $states: GraphStoresCont
             // renderedNode.dirty = true;
         }
         renderedNode.held = false;
-        renderedNode.dragged = false;
     });
 
 

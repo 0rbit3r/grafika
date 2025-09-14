@@ -1,4 +1,4 @@
-import { GraphData } from "../../api/settings";
+import { GraphData } from "../../api/dataTypes";
 import { GraphStoresContainer } from "../../state/storesContainer";
 
 // Removes data based on ids - other fields are ignored
