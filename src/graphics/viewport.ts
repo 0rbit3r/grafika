@@ -15,10 +15,11 @@ export class Viewport {
     // indicates whether the viewport follows a highlighted node
     lockedOnNode: boolean;
     // onScreenSizeChange: () => void;
+    hooks: GraphCallbacks;
 
     dragContainer: Container;
 
-    constructor(width: number, height: number, dragContainer: Container) {
+    constructor(width: number, height: number, dragContainer: Container, hooks: GraphCallbacks) {
         this.width = width;
         this.height = height;
         this.zoom = INITIAL_ZOOM;
@@ -26,6 +27,7 @@ export class Viewport {
         this.dragged = false;
         this.lockedOnNode = false;
         this.dragContainer = dragContainer;
+        this.hooks = hooks;
     }
 
     public resizeHitArea = (width: number, height: number) => {
@@ -104,14 +106,22 @@ export class Viewport {
         }
     }
 
+    updateZoom = (newZoom: number, globalCoors: XAndY) => {
+        newZoom = Math.min(MAX_ZOOM, Math.max(MIN_ZOOM, newZoom));
+        // keep centerWorld stable on screen
+        this.position.x = globalCoors.x - (globalCoors.x - this.position.x) * (this.zoom / newZoom);
+        this.position.y = globalCoors.y - (globalCoors.y - this.position.y) * (this.zoom / newZoom);
+        this.zoom = newZoom;
+        this.hooks.onViewportZoomed?.(this.zoom);
+        this.hooks.onViewportMoved?.(this.position.x, this.position.y);
+    }
 }
 
 export const addDraggableViewport = (app: Application, hooks: GraphCallbacks, containers: Container<DisplayObject>[]) => {
     const dragContainer = new Container();
     dragContainer.hitArea = new Rectangle(0, 0, app.screen.width, app.screen.height);
 
-    const viewport = new Viewport(app.screen.width, app.screen.height, dragContainer);
-
+    const viewport = new Viewport(app.screen.width, app.screen.height, dragContainer, hooks);
 
     window.addEventListener("resize", _ =>
         setTimeout(() => viewport.resizeHitArea(app.screen.width, app.screen.height), 60));
@@ -129,16 +139,6 @@ export const addDraggableViewport = (app: Application, hooks: GraphCallbacks, co
 
     const getDistance = (a: XAndY, b: XAndY) =>
         Math.sqrt((a.x - b.x) ** 2 + (a.y - b.y) ** 2);
-
-    const updateZoom = (newZoom: number, centerWorld: XAndY) => {
-        newZoom = Math.min(MAX_ZOOM, Math.max(MIN_ZOOM, newZoom));
-        // keep centerWorld stable on screen
-        viewport.position.x = centerWorld.x - (centerWorld.x - viewport.position.x) * (viewport.zoom / newZoom);
-        viewport.position.y = centerWorld.y - (centerWorld.y - viewport.position.y) * (viewport.zoom / newZoom);
-        viewport.zoom = newZoom;
-        hooks.onViewportZoomed?.(viewport.zoom);
-        hooks.onViewportMoved?.(viewport.position.x, viewport.position.y);
-    };
 
     const clearPointer = (id: number) => {
         activeTouches.delete(id);
@@ -183,7 +183,7 @@ export const addDraggableViewport = (app: Application, hooks: GraphCallbacks, co
                 });
             } else if (pinchCenter) {
                 const scale = dist / initialPinchDistance;
-                updateZoom(initialZoom * scale, pinchCenter);
+                viewport.updateZoom(initialZoom * scale, pinchCenter);
             }
         }
     });
@@ -195,7 +195,7 @@ export const addDraggableViewport = (app: Application, hooks: GraphCallbacks, co
         event.stopPropagation();
         const worldCenter = viewport.toGlobalCoordinates({ x: event.globalX, y: event.globalY });
         const factor = event.deltaY < 0 ? ZOOM_STEP_MULTIPLICATOR_WHEEL : 1 / ZOOM_STEP_MULTIPLICATOR_WHEEL;
-        updateZoom(viewport.zoom * factor, worldCenter);
+        viewport.updateZoom(viewport.zoom * factor, worldCenter);
     });
 
     return viewport;

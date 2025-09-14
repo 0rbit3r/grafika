@@ -1,7 +1,7 @@
 import { RenderedEdge } from "../core/renderedEdge";
 import { NodeShape, GraphNode } from "../api/dataTypes";
 import { Container, Graphics, TextStyle, Text } from "pixi.js";
-import { DEFAULT_RADIUS, THOUGHT_BORDER_THICKNESS } from "../core/defaultGraphOptions";
+import { DEFAULT_RADIUS, THOUGHT_BORDER_THICKNESS, ZOOM_STEP_MULTIPLICATOR_WHEEL } from "../core/defaultGraphOptions";
 import { GraphStoresContainer } from "../state/storesContainer";
 import { TEXT_Z } from "../graphics/zIndexes";
 import { drawNode } from "../graphics/drawNode";
@@ -104,8 +104,13 @@ export const initializeRenderedNode = (node: GraphNode, $states: GraphStoresCont
         renderedNode.hovered = false;
     });
     nodeGraphics.on('wheel', (e) => {
-        if (!$states.graphics.get().app.ticker.started) return;
-        $states.graphics.get().viewport.zoomByWheelDelta(-e.deltaY);
+        const $graphics = $states.graphics.get();
+        if (!$graphics.app.ticker.started) return;
+        e.preventDefault();
+        e.stopPropagation();
+        const worldCenter = $graphics.viewport.toGlobalCoordinates({ x: e.globalX, y: e.globalY });
+        const factor = e.deltaY < 0 ? ZOOM_STEP_MULTIPLICATOR_WHEEL : 1 / ZOOM_STEP_MULTIPLICATOR_WHEEL;
+        $graphics.viewport.updateZoom($graphics.viewport.zoom * factor, worldCenter);
     });
 
     // opens the node if the click was short
@@ -114,7 +119,7 @@ export const initializeRenderedNode = (node: GraphNode, $states: GraphStoresCont
 
         if (renderedNode.held && performance.now() - holdStartTime < DRAG_TIME_THRESHOLD
             && $states.graphics.get().app.ticker.started) {
-                $states.hooks.onNodeSelected && $states.hooks.onNodeSelected(node.id);
+            $states.hooks.onNodeSelected && $states.hooks.onNodeSelected(node.id);
             // setTimeout(() => thoughtClicked(thought.id), 30); //timeout to prevent overlay from registering the click too
 
             // const oldHighlightedNode = $states.context.get().highlightedNode;
