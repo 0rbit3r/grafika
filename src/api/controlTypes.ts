@@ -1,10 +1,12 @@
-import { GraphData } from "./dataTypes";
+import { EdgeType, GraphDataInit, GraphEdgeInit } from "./dataTypes";
+import { GraphProxyEdge } from "./proxyEdge";
+import { GraphProxyNode } from "./proxyNode";
 
 export interface GraphInstance {
     // data management
-    addData: (data: GraphData) => void;
-    removeData: (data: GraphData) => void;
-    editData: (data: GraphData) => void;
+    addData: (data: GraphDataInit) => void;
+    removeData: (data: GraphDataInit) => void;
+    getData: () => GraphDataProxy;
 
     // Renders a single frame
     render: () => void;
@@ -22,9 +24,15 @@ export interface GraphInstance {
 }
 
 export interface GraphCallbacks {
-    onNodeSelected?: (id: number) => void;
+    onNodeSelected?: (node: GraphProxyNode) => void;
     onNodeDragged?: (id: number, x: number, y: number) => void;
     onViewportMoved?: (x: number, y: number) => void;
     onViewportZoomed?: (zoom: number) => void;
     onNextFrame?: (frame: number) => void;
+}
+
+export interface GraphDataProxy {
+    nodes: GraphProxyNode[];
+    edges: GraphProxyEdge[];
+    unusedEdges: GraphEdgeInit[];
 }

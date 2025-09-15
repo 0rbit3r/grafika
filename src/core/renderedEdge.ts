@@ -1,6 +1,6 @@
 import { Graphics } from "pixi.js";
 import { RenderedNode } from "./renderedNode";
-import { EdgeType, GraphEdge } from "../api/dataTypes";
+import { EdgeType, GraphEdgeInit } from "../api/dataTypes";
 import { GraphStoresContainer } from "../state/storesContainer";
 import { drawEdge } from "../graphics/drawEdge";
 
@@ -14,7 +14,7 @@ export interface RenderedEdge {
 }
 
 export function initializeRenderedEdge(
-    edge: GraphEdge, sourceNode: RenderedNode, targetNode: RenderedNode,
+    edge: GraphEdgeInit, sourceNode: RenderedNode, targetNode: RenderedNode,
     $states: GraphStoresContainer): RenderedEdge {
 
     const $graphics = $states.graphics.get();
@@ -26,7 +26,7 @@ export function initializeRenderedEdge(
         source: sourceNode,
         target: targetNode,
         graphics: edgeGraphics,
-        type: edge.type ?? EdgeType.Line,
+        type: edge.type ?? $graphics.defaultEdgeType,
         weight: edge.weight ?? 1,
         color: edge.color ?? "#dddddd"
     };

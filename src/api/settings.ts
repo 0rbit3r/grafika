@@ -1,4 +1,4 @@
-import { GraphData } from "./dataTypes";
+import { EdgeType, GraphDataInit } from "./dataTypes";
 
 
 export interface SimulationSettings {
@@ -13,11 +13,13 @@ export interface DebugSettings {
 export interface GraphicsSettings {
     antialiasing?: boolean;
     backgroundColor?: string;
+
+    defaultEdgeType: EdgeType;
 }
 
 
 export interface GraphSettings {
-    data?: GraphData,
+    data?: GraphDataInit,
     graphics?: GraphicsSettings,
     simulation?: SimulationSettings,
     debug?: DebugSettings

@@ -1,8 +1,9 @@
-import { GraphData } from "../../api/dataTypes";
+import { GraphDataProxy } from "../../api/controlTypes";
+import { GraphDataInit } from "../../api/dataTypes";
 import { GraphStoresContainer } from "../../state/storesContainer";
 
 // Removes data based on ids - other fields are ignored
-export function removeData($states: GraphStoresContainer, dataToRemove: GraphData) {
+export function removeData($states: GraphStoresContainer, dataToRemove: GraphDataInit) {
 
     //todo - this might be made faster by using sets
 

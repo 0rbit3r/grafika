@@ -5,10 +5,9 @@ import { createGraphStores } from "../state/storesContainer";
 import { addData } from "../core/contextManager/addData";
 import { removeData } from "../core/contextManager/removeData";
 import { simulate_one_frame_of_FDL } from "../simulation/forcesSimulation";
-import { GraphInstance, GraphCallbacks } from "./controlTypes";
-import { editData } from "../core/contextManager/editData"
-import { GraphData } from "./dataTypes";
-import { testProxy } from "./nodeProxy"
+import { GraphInstance, GraphCallbacks, GraphDataProxy } from "./controlTypes";
+import { GraphDataInit } from "./dataTypes";
+import { testProxy } from "./proxyNode"
 
 export function addGraph(element: HTMLElement, settings: GraphSettings, hooks: GraphCallbacks): GraphInstance {
 
@@ -112,9 +111,13 @@ export function addGraph(element: HTMLElement, settings: GraphSettings, hooks: G
     });
 
     return {
-        addData: (data: GraphData) => addData($states, data),
-        removeData: (data: GraphData) => removeData($states, data),
-        editData: (data: GraphData) => editData($states, data),
+        addData: (data: GraphDataInit) => addData($states, data),
+        removeData: (data: GraphDataInit) => removeData($states, data),
+        getData: () => ({
+            nodes: $states.context.get().proxyNodesList,
+            edges: $states.context.get().proxyEdgesList,
+            unusedEdges: $states.context.get().notRenderedEdges
+        }),
 
         start: () => app.ticker.start(),
         stop: () => app.ticker.stop(),

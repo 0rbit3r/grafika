@@ -1,5 +1,5 @@
 import { RenderedEdge } from "../core/renderedEdge";
-import { NodeShape, GraphNode } from "../api/dataTypes";
+import { NodeShape, GraphNodeInit } from "../api/dataTypes";
 import { Container, Graphics, TextStyle, Text } from "pixi.js";
 import { DEFAULT_RADIUS, THOUGHT_BORDER_THICKNESS, ZOOM_STEP_MULTIPLICATOR_WHEEL } from "../core/defaultGraphOptions";
 import { GraphStoresContainer } from "../state/storesContainer";
@@ -37,7 +37,7 @@ export interface RenderedNode {
 }
 
 // Will initialize graphics and put it in the nodeContainer
-export const initializeRenderedNode = (node: GraphNode, $states: GraphStoresContainer) => {
+export const initializeRenderedNode = (node: GraphNodeInit, $states: GraphStoresContainer) => {
     const nodeGraphics = new Graphics();
 
     $states.graphics.get().nodeContainer.addChild(nodeGraphics);
@@ -119,7 +119,11 @@ export const initializeRenderedNode = (node: GraphNode, $states: GraphStoresCont
 
         if (renderedNode.held && performance.now() - holdStartTime < DRAG_TIME_THRESHOLD
             && $states.graphics.get().app.ticker.started) {
-            $states.hooks.onNodeSelected && $states.hooks.onNodeSelected(node.id);
+            const nodeProxy = $states.context.get().proxyNodesMap.get(renderedNode);
+            if (nodeProxy)
+                $states.hooks.onNodeSelected && $states.hooks.onNodeSelected(nodeProxy!);
+            else
+                console.error("Not initialized node proxy for node " + node.id);
             // setTimeout(() => thoughtClicked(thought.id), 30); //timeout to prevent overlay from registering the click too
 
             // const oldHighlightedNode = $states.context.get().highlightedNode;
