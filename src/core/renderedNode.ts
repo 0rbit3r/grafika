@@ -1,7 +1,7 @@
 import { RenderedEdge } from "../core/renderedEdge";
 import { NodeShape, GraphNodeInit } from "../api/dataTypes";
 import { Graphics, TextStyle, Text } from "pixi.js";
-import { DEFAULT_RADIUS, ZOOM_STEP_MULTIPLICATOR_WHEEL } from "../core/defaultGraphOptions";
+import { DEFAULT_RADIUS, TEXT_WORD_WRAP, ZOOM_STEP_MULTIPLICATOR_WHEEL } from "../core/defaultGraphOptions";
 import { GraphStoresContainer } from "../state/storesContainer";
 import { TEXT_Z } from "../graphics/zIndexes";
 import { drawNode } from "../graphics/drawNode";
@@ -128,13 +128,6 @@ export const initializeRenderedNode = (node: GraphNodeInit, $states: GraphStores
             else
                 console.error("Not initialized node proxy for node " + node.id);
             // setTimeout(() => thoughtClicked(thought.id), 30); //timeout to prevent overlay from registering the click too
-
-            // const oldHighlightedNode = $states.context.get().highlightedNode;
-            // if (oldHighlightedNode !== null) oldHighlightedNode.dirty = true;
-
-            // const contextState = $states.context.get().getState();
-            // contextState.setHighlightedNode(renderedNode);
-            // renderedNode.dirty = true;
         }
         renderedNode.held = false;
     });
@@ -144,10 +137,10 @@ export const initializeRenderedNode = (node: GraphNodeInit, $states: GraphStores
         breakWords: false,
         wordWrap: true,
         fontFamily: 'Arial',
-        fontSize: 15,
+        fontSize: 14,
         fontWeight: 'bold',
         fill: 'white',
-        wordWrapWidth: renderedNode.radius * 4,
+        wordWrapWidth: TEXT_WORD_WRAP,
         stroke: "#000000",
         // dropShadow: true,
         // dropShadowDistance: 2,

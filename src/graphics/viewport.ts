@@ -1,7 +1,6 @@
 import { Application, Container, DisplayObject, Rectangle } from "pixi.js";
-import { INITIAL_ZOOM, GRAVITY_FREE_RADIUS, MIN_ZOOM, ZOOM_STEP_MULTIPLICATOR_BUTTONS, MAX_ZOOM, ZOOM_STEP_MULTIPLICATOR_WHEEL } from "../core/defaultGraphOptions";
+import { INITIAL_ZOOM, MIN_ZOOM, ZOOM_STEP_MULTIPLICATOR_BUTTONS, MAX_ZOOM, ZOOM_STEP_MULTIPLICATOR_WHEEL } from "../core/defaultGraphOptions";
 import { XAndY } from "../api/dataTypes";
-import { GraphStoresContainer } from "../state/storesContainer";
 import { GraphInteractionEvents } from "../api/events";
 import { Emitter } from "mitt";
 

@@ -1,8 +1,7 @@
 import { map } from "nanostores";
 import { addDraggableViewport, Viewport } from "../graphics/viewport";
-import { XAndY } from "../api/dataTypes";
 import { GraphicsSettings } from "../api/settings";
-import { Graphics, Container, Application, DisplayObject } from "pixi.js";
+import { Container, Application, DisplayObject } from "pixi.js";
 import { EdgeType } from "../api/dataTypes";
 import { Emitter } from "mitt";
 import { GraphInteractionEvents } from "../api/events";
@@ -17,12 +16,11 @@ export interface GraphicsStore {
   defaultEdgeType: EdgeType;
 }
 
-export const createGraphicsStore = (app: Application, interactionEvents: Emitter<GraphInteractionEvents>, settings?: GraphicsSettings) =>
-  {
-    const nodeContainer = new Container();
-    const edgeContainer = new Container();
+export const createGraphicsStore = (app: Application, interactionEvents: Emitter<GraphInteractionEvents>, settings?: GraphicsSettings) => {
+  const nodeContainer = new Container();
+  const edgeContainer = new Container();
 
-    return map<GraphicsStore>({
+  return map<GraphicsStore>({
     app: app,
     nodeContainer: new Container(),
     textContainer: new Container(),

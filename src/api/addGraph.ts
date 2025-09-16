@@ -5,9 +5,8 @@ import { createGraphStores } from "../state/storesContainer";
 import { addData } from "../core/contextManager/addData";
 import { removeDataByIds } from "../core/contextManager/removeData";
 import { simulate_one_frame_of_FDL } from "../simulation/forcesSimulation";
-import { GraphInstance, GraphDataProxy } from "./controlTypes";
+import { GraphInstance } from "./controlTypes";
 import { GraphDataInit } from "./dataTypes";
-import { testProxy } from "./proxyNode"
 import mitt from "mitt";
 import {type GraphInteractionEvents} from "./events";
 

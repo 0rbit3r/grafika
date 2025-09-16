@@ -14,7 +14,9 @@ export interface GraphicsSettings {
     antialiasing?: boolean;
     backgroundColor?: string;
 
-    defaultEdgeType: EdgeType;
+    defaultEdgeType?: EdgeType;
+
+    backdropUrl?: string;
 }
 
 

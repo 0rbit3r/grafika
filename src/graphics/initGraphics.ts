@@ -2,6 +2,8 @@ import { Application, Container, TextStyle, Text } from "pixi.js";
 import { DRAG_Z, EDGES_Z, NODES_Z, TEXT_Z } from "./zIndexes";
 import { GraphStoresContainer } from "../state/storesContainer";
 import { EdgeType } from "../api/dataTypes";
+import { ZOOM_TEXT_INVISIBLE_THRESHOLD, ZOOM_TEXT_VISIBLE_THRESHOLD } from "../core/defaultGraphOptions";
+import {initBackdrop } from "./initBackdrop";
 
 export const initGraphics = (app: Application, $states: GraphStoresContainer) => {
     app.stage.eventMode = 'static';
@@ -11,6 +13,8 @@ export const initGraphics = (app: Application, $states: GraphStoresContainer) =>
 
     const nodeContainer = $states.graphics.get().nodeContainer;
     const textContainer = $states.graphics.get().textContainer;
+    textContainer.eventMode = "none";
+
     const edgeContainer = $states.graphics.get().edgeContainer;
 
     const viewport = $states.graphics.get().viewport;
@@ -27,11 +31,10 @@ export const initGraphics = (app: Application, $states: GraphStoresContainer) =>
     zSortedContainer.addChild(textContainer);
     zSortedContainer.addChild(edgeContainer);
 
+    // const backdrop = initBackdrop(backdropUrl);
+    // zSortedContainer.addChild(backdrop);
+
     zSortedContainer.sortChildren();
-
-    //     const initializeGraphicsForEdge = (edge: RenderedEdge) => {
-
-    //     }
 
     const fpsCounter: Text = new Text('0', new TextStyle({ fontSize: 20, fill: "#ffffff" }));
     fpsCounter.x = 20;
@@ -42,26 +45,11 @@ export const initGraphics = (app: Application, $states: GraphStoresContainer) =>
         textContainer.addChild(fpsCounter);
     }
 
-    //     const backdropTexture = new Sprite();
-    //     Assets.load(import.meta.env.VITE_PUBLIC_FOLDER + '/backdrop.png').then(t => { backdropTexture.texture = t });
-    //     backdropTexture.width = 100;
-    //     backdropTexture.height = 100;
-    //     backdropTexture.position.set(- backdropTexture.width / 2, - backdropTexture.height / 2);
-
-    //     backdropTexture.alpha = 1;
-    //     backdropTexture.interactive = false;
-    //     backdropTexture.hitArea = null;
-    //     backdropTexture.zIndex = -1;
-    // zSortedContainer.addChild(backdropTexture);
-
     const renderGraph = () => {
         const $simulation = $states.simulation.get();
         const $debug = $states.debug.get();
         const $graphics = $states.graphics.get();
         const $context = $states.context.get();
-
-        // clear textContainer
-        // textContainer.removeChildren();
 
         // FPS counter
         if ($debug.showFps) {
@@ -72,26 +60,7 @@ export const initGraphics = (app: Application, $states: GraphStoresContainer) =>
             if ($simulation.frame % updateFpsEveryNFrames === 0 && $simulation.frame >= 10) {
                 fpsCounter.text = Math.floor(fpsRollingHistory.reduce((a, b) => a+b) / fpsRollingHistory.length);
             }
-            // textContainer.addChild(fpsCounter);
         }
-
-
-        //         const onScreenThoughts = getThoughtsOnScreen()
-        //             .concat(graphState.fadeOutThoughts);
-
-        //         const stateViewport = graphState.viewport;
-        //         if (stateViewport === null) {
-        //             return;
-        //         }
-
-        //         nodeContainer.clear();
-
-        //         // nodeContainer.children.forEach(child => {
-        //         //     if (child instanceof Graphics) {
-        //         //         child.clear();
-        //         //     }
-        //         // });
-
 
 
         //         // BACKDROP
@@ -134,6 +103,14 @@ export const initGraphics = (app: Application, $states: GraphStoresContainer) =>
                 node.blinkingGraphics.alpha = $simulation.frame % 150 < 50
                     ? 1 - ($simulation.frame % 50) / 50
                     : 0;
+
+                node.text.setTransform(pos.x - node.text.width / 2, pos.y + node.radius * 1.1 * $graphics.viewport.zoom);
+                node.text.alpha = $graphics.viewport.zoom <= ZOOM_TEXT_INVISIBLE_THRESHOLD
+                    ? 0
+                    : $graphics.viewport.zoom >= ZOOM_TEXT_VISIBLE_THRESHOLD
+                        ? 1
+                        : 1 -(ZOOM_TEXT_VISIBLE_THRESHOLD - $graphics.viewport.zoom) /
+                            (ZOOM_TEXT_VISIBLE_THRESHOLD - ZOOM_TEXT_INVISIBLE_THRESHOLD);
 
                 //graphState.frame % 150 < 50
                 //lighten(30 - (graphState.frame % 50) / 50 * 30)

@@ -1,4 +1,3 @@
-import { GraphDataProxy } from "../../api/controlTypes";
 import { GraphDataInit } from "../../api/dataTypes";
 import { GraphStoresContainer } from "../../state/storesContainer";
 import { filterInPlace } from "../../util/filterInPlace";

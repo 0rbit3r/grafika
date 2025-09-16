@@ -1,5 +1,5 @@
 import { Emitter } from "mitt";
-import { EdgeType, GraphDataInit, GraphEdgeInit } from "./dataTypes";
+import { GraphDataInit, GraphEdgeInit } from "./dataTypes";
 import { GraphProxyEdge } from "./proxyEdge";
 import { GraphProxyNode } from "./proxyNode";
 import { GraphInteractionEvents } from "./events";
