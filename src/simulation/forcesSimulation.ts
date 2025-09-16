@@ -1,7 +1,7 @@
 import {
     PUSH_THRESH, MOMENTUM_DAMPENING_START_AT, MOMENTUM_DAMPENING_EASE_IN_FRAMES, MAX_MOMENTUM_DAMPENING,
     MAX_MOVEMENT_SPEED, GRAVITY_FREE_RADIUS, gravityForce,
-    backlinksNumberForceDivisor,
+    inEdgesLengthForceDivisor,
     FRAMES_WITH_NO_INFLUENCE,
     INFLUENCE_FADE_IN,
     MAX_MASS_DIFFERENCE_PULL_FORCE_MULTIPLIER,
@@ -24,9 +24,6 @@ export const get_border_distance = (node1: RenderedNode, node2: RenderedNode) =>
     const y2 = node2.y;
     const centerDistance = Math.sqrt(Math.pow(Math.abs(x1 - x2), 2) + Math.pow(Math.abs(y1 - y2), 2));
     const borderDistance = centerDistance - node1.radius - node2.radius;
-    // if (borderDistance > centerDistance) {
-    //     return borderDistance - 
-    // }
 
     return borderDistance;
 }
@@ -47,29 +44,23 @@ export const simulate_one_frame_of_FDL = ($states: GraphStoresContainer) => {
     const $simulationState = $states.simulation.get();
     const renderedNodes = $states.context.get().renderedNodes;
     const frame = $simulationState.frame;
-
-    // console.log("simulating frame - renderedEdges: " +
-    //     JSON.stringify($states.context.get().renderedEdges.map(e => {return {source: e.source.id, target: e.target.id, color: e.color}})));
+    const $context = $states.context.get();
 
     $states.context.get().renderedEdges.forEach(e => {
         pull_or_push_connected_to_ideal_distance(e, $states);
     });
 
-    for (let i = 0; i < renderedNodes.length; i++) {
-        const node1 = renderedNodes[i];
-        handleOutOfBounds(node1);
-        for (let j = 0; j < i; j++) {
-            const node2 = renderedNodes[j];
-            const borderDistance = get_border_distance(node1, node2);
+    for (let node1Index = 0; node1Index < renderedNodes.length; node1Index++) {
+        handleOutOfBounds(renderedNodes[node1Index]);
+        for (let node2Index = 0; node2Index < node1Index; node2Index++) {
+            const borderDistance = get_border_distance(renderedNodes[node1Index], renderedNodes[node2Index]);
             if (borderDistance < PUSH_THRESH
-                && node1.edges.filter(e => (e.target === node2 && e.source === node1)
-                    || (e.source === node2 && e.target === node1)).length === 0) { //todo - another performance bottleneck with filter
-                // console.log("pushing: " + node1.id + " " + node2.id);
-                push_unconnected(node1, node2, $states);
+                && !$context.edgesAdjacency.get(renderedNodes[node1Index].id)?.has(renderedNodes[node2Index].id)) {
+                push_unconnected(renderedNodes[node1Index], renderedNodes[node2Index], $states);
             }
         }
         if ($simulationState.gravityEnabled) {
-            gravity_pull(node1);
+            gravity_pull(renderedNodes[node1Index]);
         }
     }
 
@@ -90,13 +81,9 @@ export const simulate_one_frame_of_FDL = ($states: GraphStoresContainer) => {
             MOMENTUM_DAMPENING_START_AT +
             Math.min(frame, MOMENTUM_DAMPENING_EASE_IN_FRAMES) / MOMENTUM_DAMPENING_EASE_IN_FRAMES * (MAX_MOMENTUM_DAMPENING - MOMENTUM_DAMPENING_START_AT);
 
-        // console.log("frameAdjustedDampeningRate: ", frameAdjustedDampeningRate);
 
         node.momentum.x /= frameAdjustedDampeningRate;
         node.momentum.y /= frameAdjustedDampeningRate;
-
-        // node.momentum.x = Math.min(node.momentum.x, MAX_MOMENTUM);
-        // node.momentum.y = Math.min(node.momentum.y, MAX_MOMENTUM);
 
         node.x += Math.max(Math.min(node.momentum.x, MAX_MOVEMENT_SPEED), -MAX_MOVEMENT_SPEED); // not taking angle into account...
         node.y += Math.max(Math.min(node.momentum.y, MAX_MOVEMENT_SPEED), -MAX_MOVEMENT_SPEED); // not taking angle into account...
@@ -113,13 +100,9 @@ export const pull_or_push_connected_to_ideal_distance = (edge: RenderedEdge, $st
     const dy = edge.target.y - edge.source.y;
     const centerDistance = get_center_distance(edge.source, edge.target);
     const borderDistance = get_border_distance(edge.source, edge.target);
-    // const borderDistance = get_border_distance(sourceNode, targetNode);
-    // if (borderDistance < 0) {
-    //     return;
-    // }
 
     const force = pullForce(borderDistance, simState.edgeLength)
-        / backlinksNumberForceDivisor(edge.target.edges.filter(e => e.target.id === edge.target.id).length) //todo check the logic + potential bottleneck?
+        / inEdgesLengthForceDivisor(edge.target.inEdges.size); //todo check the logic + potential bottleneck?
 
     const nodeMassMultiplier = NODE_MASS_ON
         ? Math.min(Math.max(edge.target.radius / edge.source.radius, MIN_MASS_DIFFERENCE_PULL_FORCE_MULTIPLIER), MAX_MASS_DIFFERENCE_PULL_FORCE_MULTIPLIER)

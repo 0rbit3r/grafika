@@ -1,4 +1,4 @@
-export * from './api/graphInitializer';
+export * from './api/addGraph';
 
 // // typescript types
 export * from "./api/dataTypes";

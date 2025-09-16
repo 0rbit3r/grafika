@@ -18,13 +18,13 @@ export const DEFAULT_EDGE_LENGTH = 350;
 // N > 1 make the connected nodes' push force weaker than the pull force and vice versa
 export const EDGE_COMPRESSIBILITY_FACTOR = 1;
 
-export const MAX_PULL_FORCE = 20;
+export const MAX_PULL_FORCE = 50;
 
 // can only increase the thought (ie. first few sizes will default to 1 if set under 1)
 export const IDEAL_DIST_SIZE_MULTIPLIER = 0.1;//0.01;
 
 export const PUSH_THRESH = 5000;
-export const MAX_PUSH_FORCE = 20;
+export const MAX_PUSH_FORCE = 50;
 
 export const GRAVITY_FREE_RADIUS = 40000;
 
@@ -127,8 +127,8 @@ export const gravityForce = (centerDistance: number) => {
     }
 }
 
-// Makes bigger thoughts less active and thus reduces jitter after loading them
-export const backlinksNumberForceDivisor = (bl: number) => {
+// Makes bigger (ie. more referenced) thoughts less active and thus reduces jitter after loading them
+export const inEdgesLengthForceDivisor = (bl: number) => {
     if (bl < 3) {
         return 1;
     }

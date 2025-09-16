@@ -7,41 +7,54 @@ import { getNodeProxy } from "../../api/proxyNode";
 import { getEdgeProxy } from "../../api/proxyEdge";
 
 export function addData($states: GraphStoresContainer, data: GraphDataInit) {
+    if (data.nodes === undefined) data.nodes = [];
+    if (data.edges === undefined) data.edges = [];
+
+    let $context = $states.context.get();
+
     let angle = 0;
     data.nodes.forEach(newNode => {
-        if (newNode.x === undefined && data.nodes.length > 1) newNode.x = Math.cos(angle) * INITIAL_POSITIONS_RADIUS;
-        if (newNode.y === undefined && data.nodes.length > 1) newNode.y = Math.sin(angle) * INITIAL_POSITIONS_RADIUS;
+        if (newNode.x === undefined && data.nodes!.length > 1) newNode.x = Math.cos(angle) * INITIAL_POSITIONS_RADIUS;
+        if (newNode.y === undefined && data.nodes!.length > 1) newNode.y = Math.sin(angle) * INITIAL_POSITIONS_RADIUS;
 
-        angle += Math.PI * 2 / data.nodes.length;
+        angle += Math.PI * 2 / data.nodes!.length;
         const newRenderedNode = initializeRenderedNode(newNode, $states);
-        $states.context.get().renderedNodes.push(newRenderedNode);
-        $states.context.get().proxyNodesList.push(getNodeProxy(newRenderedNode, $states));
+        $context.renderedNodes.push(newRenderedNode);
+        $context.proxyNodesList.push(getNodeProxy(newRenderedNode, $states));
     });
 
-    $states.context.get().notRenderedEdges.forEach(notRenderedEdge => {
-        const sourceRenderedNode = $states.context.get().renderedNodes.find(n => n.id == notRenderedEdge.sourceId);
-        const targetRenderedNode = $states.context.get().renderedNodes.find(n => n.id == notRenderedEdge.targetId);
+    $context.notRenderedEdges.forEach(notRenderedEdge => {
+        const sourceRenderedNode = $context.renderedNodes.find(n => n.id == notRenderedEdge.sourceId);
+        const targetRenderedNode = $context.renderedNodes.find(n => n.id == notRenderedEdge.targetId);
         if (sourceRenderedNode && targetRenderedNode) {
             const newRenderedEdge = initializeRenderedEdge(notRenderedEdge, sourceRenderedNode, targetRenderedNode, $states);
-            $states.context.get().renderedEdges.push(newRenderedEdge);
-            sourceRenderedNode.edges.push(newRenderedEdge);
-            targetRenderedNode.edges.push(newRenderedEdge);
-            $states.context.get().proxyEdgesList.push(getEdgeProxy(newRenderedEdge, $states));
+            $context.renderedEdges.push(newRenderedEdge);
+            sourceRenderedNode.outEdges.add(newRenderedEdge);
+            targetRenderedNode.inEdges.add(newRenderedEdge);
+            $context.proxyEdgesList.push(getEdgeProxy(newRenderedEdge, $states));
         }
     })
 
     data.edges.forEach(newEdge => {
-        const sourceRenderedNode = $states.context.get().renderedNodes.find(n => n.id == newEdge.sourceId);
-        const targetRenderedNode = $states.context.get().renderedNodes.find(n => n.id == newEdge.targetId);
+        const sourceRenderedNode = $context.renderedNodes.find(n => n.id == newEdge.sourceId);
+        const targetRenderedNode = $context.renderedNodes.find(n => n.id == newEdge.targetId);
         if (sourceRenderedNode && targetRenderedNode) {
             const newRenderedEdge = initializeRenderedEdge(newEdge, sourceRenderedNode, targetRenderedNode, $states);
-            $states.context.get().renderedEdges.push(newRenderedEdge);
-            sourceRenderedNode.edges.push(newRenderedEdge);
-            targetRenderedNode.edges.push(newRenderedEdge);
+            $context.renderedEdges.push(newRenderedEdge);
+            sourceRenderedNode.outEdges.add(newRenderedEdge);
+            targetRenderedNode.inEdges.add(newRenderedEdge);
         }
         else {
-            $states.context.get().notRenderedEdges.push(newEdge);
+            $context.notRenderedEdges.push(newEdge);
         }
+
+        if ($context.edgesAdjacency.get(sourceRenderedNode?.id ?? -1) === undefined)
+            $context.edgesAdjacency.set(sourceRenderedNode?.id ?? -1, new Set());
+        $context.edgesAdjacency.get(sourceRenderedNode?.id ?? -1)?.add(targetRenderedNode?.id ?? -1);
+        if ($context.edgesAdjacency.get(targetRenderedNode?.id ?? -1) === undefined)
+            $context.edgesAdjacency.set(targetRenderedNode?.id ?? -1, new Set());
+        $context.edgesAdjacency.get(targetRenderedNode?.id ?? -1)?.add(sourceRenderedNode?.id ?? -1);
+
     });
 
 

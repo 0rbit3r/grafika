@@ -9,7 +9,8 @@ import { XAndY } from "./innerTypes";
 
 export interface RenderedNode {
     id: number;
-    edges: RenderedEdge[];
+    inEdges: Set<RenderedEdge>;
+    outEdges:Set<RenderedEdge>;
 
     x: number;
     y: number;
@@ -49,7 +50,8 @@ export const initializeRenderedNode = (node: GraphNodeInit, $states: GraphStores
         x: node.x ?? Math.random() * 2 - 1,
         y: node.y ?? Math.random() * 2 - 1,
         color: node.color ?? "#dddddd",
-        edges: [],
+        inEdges: new Set(),
+        outEdges: new Set(),
 
         hollowEffect: node.hollowEffect ?? false,
         blinkEffect: node.blinkEffect ?? false,

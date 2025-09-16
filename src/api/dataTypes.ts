@@ -1,6 +1,6 @@
 export interface GraphDataInit {
-    nodes: GraphNodeInit[];
-    edges: GraphEdgeInit[];
+    nodes?: GraphNodeInit[];
+    edges?: GraphEdgeInit[];
 }
 
 export interface GraphNodeInit {

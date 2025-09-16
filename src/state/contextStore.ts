@@ -9,6 +9,8 @@ export interface ContextStore{
     renderedNodes: RenderedNode[];
     renderedEdges: RenderedEdge[];
 
+    edgesAdjacency: Map<number, Set<number>>;
+
     notRenderedEdges: GraphEdgeInit[]; // edges that are defined, but missing either source or target node
 
     proxyNodesList: GraphProxyNode[];
@@ -22,11 +24,13 @@ export const createContextStore = () =>
     map<ContextStore>({
         renderedNodes: [],
         renderedEdges: [],
+        edgesAdjacency: new Map(),
+        
         notRenderedEdges: [],
 
         proxyNodesList: [],
         proxyEdgesList: [],
 
         proxyEdgesMap: new WeakMap(),
-        proxyNodesMap: new WeakMap
+        proxyNodesMap: new WeakMap()
     });

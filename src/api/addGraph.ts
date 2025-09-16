@@ -3,7 +3,7 @@ import { initGraphics } from "../graphics/initGraphics";
 import { GraphSettings } from "./settings";
 import { createGraphStores } from "../state/storesContainer";
 import { addData } from "../core/contextManager/addData";
-import { removeData } from "../core/contextManager/removeData";
+import { removeDataByIds } from "../core/contextManager/removeData";
 import { simulate_one_frame_of_FDL } from "../simulation/forcesSimulation";
 import { GraphInstance, GraphCallbacks, GraphDataProxy } from "./controlTypes";
 import { GraphDataInit } from "./dataTypes";
@@ -40,31 +40,6 @@ export function addGraph(element: HTMLElement, settings: GraphSettings, hooks: G
     const handleTick = () => {
         $states.simulation.setKey("frame", $states.simulation.get().frame + 1);
 
-        // const graphState = useGraphStore.getState();
-        // const controlsState = useGraphControlsStore.getState();
-
-
-
-        // // handle zoom input from user
-        // const zoomingControl = graphState.zoomingControl;
-        // if (zoomingControl !== 0) {
-        //     graphState.viewport.zoomByButtonDelta(zoomingControl);
-        // }
-
-        // // handle TimeShift  control input from user
-        // const timeShiftControl = graphState.timeShiftControl;
-        // const timeShift = graphState.timeShift;
-        // const maxThoughtsOnScreen = controlsState.thoughtsOnScreenLimit;
-
-        // if ((timeShiftControl > 0 && timeShift < graphState.temporalRenderedThoughts.length)
-        //     || (timeShiftControl < 0 && timeShift > -maxThoughtsOnScreen)) { //todo check the one
-        //     graphState.setTimeShift(timeShift + timeShiftControl);
-        //     graphState.setFrame(1);
-        // }
-
-        // // Update temporal thoughts
-        // handleTemporalThoughtsTimeShifting();
-
         // //move the viewport to the highlighted thought
         // const lockedOnHighlighted = graphState.lockedOnHighlighted;
         // if (lockedOnHighlighted && !controlsState.disableFollowHighlightedThought) {
@@ -88,7 +63,6 @@ export function addGraph(element: HTMLElement, settings: GraphSettings, hooks: G
         // }
 
         // // force simulation
-        // const frame = graphState.frame;
         if ($states.simulation.get().simulationEnabled) {
             simulate_one_frame_of_FDL($states);
         }
@@ -112,7 +86,7 @@ export function addGraph(element: HTMLElement, settings: GraphSettings, hooks: G
 
     return {
         addData: (data: GraphDataInit) => addData($states, data),
-        removeData: (data: GraphDataInit) => removeData($states, data),
+        removeData: (data: GraphDataInit) => removeDataByIds($states, data),
         getData: () => ({
             nodes: $states.context.get().proxyNodesList,
             edges: $states.context.get().proxyEdgesList,

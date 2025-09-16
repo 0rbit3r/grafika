@@ -3,6 +3,7 @@ import { GraphNodeInit, NodeShape } from "./dataTypes";
 import { GraphStoresContainer } from "../state/storesContainer";
 import { drawNode } from "../graphics/drawNode";
 import { getEdgeProxy, GraphProxyEdge } from "./proxyEdge";
+import { mapSet } from "../util/mapSet";
 
 export interface GraphProxyNode {
     id: number;
@@ -19,12 +20,13 @@ export interface GraphProxyNode {
     glowEffect: boolean;
     blinkEffect: boolean;
 
-    edges: GraphProxyEdge[];
+    inEdges: Set<GraphProxyEdge>; //edges are readonly - modifying this array will not change anything
+    outEdges: Set<GraphProxyEdge>;
 }
 
 const allowedSetWithRedraw = new Set(["color", "radius", "shape", "title", "hollowEffect", "glowEffect", "blinkEffect"])
 const allowedSet = new Set([...allowedSetWithRedraw, "x", "y",]);
-const allowedGet = new Set([...allowedSet, "id", "edges"]);
+const allowedGet = new Set([...allowedSet, "id", "inEdges", "outEdges"]);
 
 export function getNodeProxy(n: RenderedNode, states: GraphStoresContainer): GraphProxyNode {
     let p = states.context.get().proxyNodesMap.get(n);
@@ -39,8 +41,10 @@ function createNodeProxy(target: RenderedNode, $states: GraphStoresContainer): G
     return new Proxy(target as any, {
         get(_, prop) {
             if (allowedGet.has(prop as string)) {
-                if (prop === "edges")
-                    return target.edges.map(e => getEdgeProxy(e, $states));
+                if (prop === "inEdges")
+                    return mapSet(target.inEdges, e => getEdgeProxy(e, $states));
+                if (prop === "outEdges")
+                    return mapSet(target.outEdges, e => getEdgeProxy(e, $states));
                 return (target as any)[prop];
             }
             console.error(`property ${prop as string} cannot be accessed on the GraphProxyNode.`);

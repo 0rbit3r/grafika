@@ -17,7 +17,6 @@ export const initGraphics = (app: Application, $states: GraphStoresContainer) =>
 
     zSortedContainer.addChild(viewport.dragContainer);
 
-    
     // nodeGraphics.sortableChildren = true;
     viewport.dragContainer.zIndex = DRAG_Z;
     nodeContainer.zIndex = NODES_Z;
@@ -37,10 +36,11 @@ export const initGraphics = (app: Application, $states: GraphStoresContainer) =>
     const fpsCounter: Text = new Text('0', new TextStyle({ fontSize: 20, fill: "#ffffff" }));
     fpsCounter.x = 20;
     fpsCounter.y = app.screen.height - 40;
-
-    const renderTimeDeltas: number[] = [1];
-    let lastRenderTime = performance.now();
-
+    const updateFpsEveryNFrames = 10;
+    const fpsRollingHistory: number[] = [];
+    if ($states.debug.get().showFps) {
+        textContainer.addChild(fpsCounter);
+    }
 
     //     const backdropTexture = new Sprite();
     //     Assets.load(import.meta.env.VITE_PUBLIC_FOLDER + '/backdrop.png').then(t => { backdropTexture.texture = t });
@@ -55,32 +55,24 @@ export const initGraphics = (app: Application, $states: GraphStoresContainer) =>
     // zSortedContainer.addChild(backdropTexture);
 
     const renderGraph = () => {
-        const simState = $states.simulation.get();
-        const settingsState = $states.debug.get();
-        const graphicsState = $states.graphics.get();
-        const contextState = $states.context.get();
+        const $simulation = $states.simulation.get();
+        const $debug = $states.debug.get();
+        const $graphics = $states.graphics.get();
+        const $context = $states.context.get();
 
         // clear textContainer
-        textContainer.removeChildren();
+        // textContainer.removeChildren();
 
         // FPS counter
-        const computeEveryNFrames = 10;
-        if (settingsState.showFps) {
-            const currentTime = performance.now();
-            if (simState.frame % computeEveryNFrames === 0 && simState.frame >= 10) {
-                //compute FPS
-                const averageDelta = renderTimeDeltas.reduce((acc, cur) => acc + cur, 0) / renderTimeDeltas.length;
-                const fps = Math.round(1000 / averageDelta);
-                fpsCounter.text = fps.toString();
+        if ($debug.showFps) {
+            const fps = $graphics.app.ticker.FPS;
+            fpsRollingHistory.push(fps);
+            if (fpsRollingHistory.length > updateFpsEveryNFrames)
+                fpsRollingHistory.shift();
+            if ($simulation.frame % updateFpsEveryNFrames === 0 && $simulation.frame >= 10) {
+                fpsCounter.text = Math.floor(fpsRollingHistory.reduce((a, b) => a+b) / fpsRollingHistory.length);
             }
-
-            renderTimeDeltas.push(currentTime - lastRenderTime);
-            lastRenderTime = currentTime;
-
-            if (renderTimeDeltas.length > computeEveryNFrames) {
-                renderTimeDeltas.shift();
-            }
-            textContainer.addChild(fpsCounter);
+            // textContainer.addChild(fpsCounter);
         }
 
 
@@ -132,15 +124,15 @@ export const initGraphics = (app: Application, $states: GraphStoresContainer) =>
         //         })
 
         // render thoughts on screen
-        contextState.renderedNodes
+        $context.renderedNodes
             .forEach(node => {
                 // handle positions
-                const pos = graphicsState.viewport.toViewportCoordinates({ x: node.x, y: node.y });
-                node.graphics.setTransform(pos.x, pos.y, graphicsState.viewport.zoom, graphicsState.viewport.zoom);
+                const pos = $graphics.viewport.toViewportCoordinates({ x: node.x, y: node.y });
+                node.graphics.setTransform(pos.x, pos.y, $graphics.viewport.zoom, $graphics.viewport.zoom);
 
                 // handle dynamic effects
-                node.blinkingGraphics.alpha = simState.frame % 150 < 50
-                    ? 1 - (simState.frame % 50) / 50
+                node.blinkingGraphics.alpha = $simulation.frame % 150 < 50
+                    ? 1 - ($simulation.frame % 50) / 50
                     : 0;
 
                 //graphState.frame % 150 < 50
@@ -164,13 +156,13 @@ export const initGraphics = (app: Application, $states: GraphStoresContainer) =>
                 //                 textContainer.addChild(text);
                 //             }
 
-            
+
             });
 
-        contextState.renderedEdges.forEach(edge => {
+        $context.renderedEdges.forEach(edge => {
             if (edge.type === EdgeType.None) return;
-            const src = graphicsState.viewport.toViewportCoordinates({ x: edge.source.x, y: edge.source.y });
-            const tgt = graphicsState.viewport.toViewportCoordinates({ x: edge.target.x, y: edge.target.y });
+            const src = $graphics.viewport.toViewportCoordinates({ x: edge.source.x, y: edge.source.y });
+            const tgt = $graphics.viewport.toViewportCoordinates({ x: edge.target.x, y: edge.target.y });
 
             const dx = tgt.x - src.x;
             const dy = tgt.y - src.y;
@@ -179,7 +171,7 @@ export const initGraphics = (app: Application, $states: GraphStoresContainer) =>
             const angle = Math.atan2(dy, dx);          // radians
 
             // NOTE: scaleY = 1 keeps the stroke thickness constant in screen pixels
-            edge.graphics.setTransform(src.x, src.y, scaleX, graphicsState.viewport.zoom, angle);
+            edge.graphics.setTransform(src.x, src.y, scaleX, $graphics.viewport.zoom, angle);
             // const pos = graphicsState.viewport.toViewportCoordinates({ x: edge.source.x, y: edge.source.y });
             // edge.graphics.setTransform(pos.x, pos.y, graphicsState.viewport.zoom, graphicsState.viewport.zoom)
         })

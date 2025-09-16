@@ -8,16 +8,21 @@ import { Graphics } from "pixi.js";
 import { getNodeProxy, GraphProxyNode } from "./proxyNode";
 
 export interface GraphProxyEdge {
-    source: GraphProxyNode;
-    target: GraphProxyNode;
+    // same as RenderedEdge - fall through
     color: string;
     type: EdgeType;
     weight: number;
+
+    // different than renderedEdge - require traps
+    source: GraphProxyNode;
+    target: GraphProxyNode;
+    sourceId: number;
+    targetId: number;
 }
 
 const allowedSetWithRedraw = new Set(["color", "type"]);
 const allowedSet = new Set([...allowedSetWithRedraw, "weight"]);
-const allowedGet = new Set([...allowedSet, "source", "target"]);
+const allowedGet = new Set([...allowedSet, "source", "target", "sourceId", "targetId"]);
 
 export function getEdgeProxy(n: RenderedEdge, states: GraphStoresContainer): GraphProxyEdge {
     let p = states.context.get().proxyEdgesMap.get(n);
@@ -37,6 +42,10 @@ function createEdgeProxy(target: RenderedEdge, $states: GraphStoresContainer): G
                     return getNodeProxy(target.source, $states);
                 if (prop === "target")
                     return getNodeProxy(target.target, $states);
+                if (prop === "sourceId")
+                    return target.source.id;
+                if (prop === "targetId")
+                    return target.target.id;
                 return (target as any)[prop];
             }
             console.error(`property ${prop as string} cannot be accessed on the GraphProxyEdge.`);
