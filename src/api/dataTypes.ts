@@ -47,3 +47,8 @@ export enum EdgeType {
     CurvedLine = 4
     // Animated = 4 animated edges will be pain to optimize...
 }
+
+export interface XAndY {
+    x: number;
+    y: number;
+}

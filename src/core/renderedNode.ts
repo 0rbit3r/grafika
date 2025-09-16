@@ -1,11 +1,12 @@
 import { RenderedEdge } from "../core/renderedEdge";
 import { NodeShape, GraphNodeInit } from "../api/dataTypes";
-import { Container, Graphics, TextStyle, Text } from "pixi.js";
-import { DEFAULT_RADIUS, THOUGHT_BORDER_THICKNESS, ZOOM_STEP_MULTIPLICATOR_WHEEL } from "../core/defaultGraphOptions";
+import { Graphics, TextStyle, Text } from "pixi.js";
+import { DEFAULT_RADIUS, ZOOM_STEP_MULTIPLICATOR_WHEEL } from "../core/defaultGraphOptions";
 import { GraphStoresContainer } from "../state/storesContainer";
 import { TEXT_Z } from "../graphics/zIndexes";
 import { drawNode } from "../graphics/drawNode";
-import { XAndY } from "./innerTypes";
+import { XAndY } from "../api/dataTypes";
+import { getNodeProxy } from "../api/proxyNode";
 
 export interface RenderedNode {
     id: number;
@@ -81,7 +82,7 @@ export const initializeRenderedNode = (node: GraphNodeInit, $states: GraphStores
             const zoom = $states.graphics.get().viewport.zoom;
             renderedNode.x += e.movementX / zoom;
             renderedNode.y += e.movementY / zoom;
-            $states.hooks.onNodeDragged && $states.hooks.onNodeDragged(node.id, renderedNode.x, renderedNode.y);
+            $states.interactionEvents.emit("nodeDragged", getNodeProxy(renderedNode, $states));
             // console.log(renderedNode.x, renderedNode.graphics.x);
         }
     });
@@ -123,7 +124,7 @@ export const initializeRenderedNode = (node: GraphNodeInit, $states: GraphStores
             && $states.graphics.get().app.ticker.started) {
             const nodeProxy = $states.context.get().proxyNodesMap.get(renderedNode);
             if (nodeProxy)
-                $states.hooks.onNodeSelected && $states.hooks.onNodeSelected(nodeProxy!);
+                $states.interactionEvents.emit("nodeClicked", nodeProxy);
             else
                 console.error("Not initialized node proxy for node " + node.id);
             // setTimeout(() => thoughtClicked(thought.id), 30); //timeout to prevent overlay from registering the click too

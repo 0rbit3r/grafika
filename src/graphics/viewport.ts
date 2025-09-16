@@ -1,8 +1,9 @@
 import { Application, Container, DisplayObject, Rectangle } from "pixi.js";
 import { INITIAL_ZOOM, GRAVITY_FREE_RADIUS, MIN_ZOOM, ZOOM_STEP_MULTIPLICATOR_BUTTONS, MAX_ZOOM, ZOOM_STEP_MULTIPLICATOR_WHEEL } from "../core/defaultGraphOptions";
-import { XAndY } from "../core/innerTypes";
+import { XAndY } from "../api/dataTypes";
 import { GraphStoresContainer } from "../state/storesContainer";
-import { GraphCallbacks } from "../api/controlTypes";
+import { GraphInteractionEvents } from "../api/events";
+import { Emitter } from "mitt";
 
 
 export class Viewport {
@@ -15,11 +16,11 @@ export class Viewport {
     // indicates whether the viewport follows a highlighted node
     lockedOnNode: boolean;
     // onScreenSizeChange: () => void;
-    hooks: GraphCallbacks;
+    interactionEvents: Emitter<GraphInteractionEvents>;
 
     dragContainer: Container;
 
-    constructor(width: number, height: number, dragContainer: Container, hooks: GraphCallbacks) {
+    constructor(width: number, height: number, dragContainer: Container, interactionEvents: Emitter<GraphInteractionEvents>) {
         this.width = width;
         this.height = height;
         this.zoom = INITIAL_ZOOM;
@@ -27,7 +28,7 @@ export class Viewport {
         this.dragged = false;
         this.lockedOnNode = false;
         this.dragContainer = dragContainer;
-        this.hooks = hooks;
+        this.interactionEvents = interactionEvents;
     }
 
     public resizeHitArea = (width: number, height: number) => {
@@ -112,21 +113,21 @@ export class Viewport {
         this.position.x = globalCoors.x - (globalCoors.x - this.position.x) * (this.zoom / newZoom);
         this.position.y = globalCoors.y - (globalCoors.y - this.position.y) * (this.zoom / newZoom);
         this.zoom = newZoom;
-        this.hooks.onViewportZoomed?.(this.zoom);
-        this.hooks.onViewportMoved?.(this.position.x, this.position.y);
+        this.interactionEvents.emit("viewportZoomed", this.zoom);
+        this.interactionEvents.emit("viewportMoved", { x: this.position.x, y: this.position.y });
     }
 }
 
-export const addDraggableViewport = (app: Application, hooks: GraphCallbacks, containers: Container<DisplayObject>[]) => {
+export const addDraggableViewport = (app: Application, interactionevents: Emitter<GraphInteractionEvents>, containers: Container<DisplayObject>[]) => {
     const dragContainer = new Container();
     dragContainer.hitArea = new Rectangle(0, 0, app.screen.width, app.screen.height);
 
-    const viewport = new Viewport(app.screen.width, app.screen.height, dragContainer, hooks);
+    const viewport = new Viewport(app.screen.width, app.screen.height, dragContainer, interactionevents);
 
     window.addEventListener("resize", _ =>
         setTimeout(() => viewport.resizeHitArea(app.screen.width, app.screen.height), 60));
-        // timeout to let the app screen react first (hacky but oh well)
-        // anyway, this will not work for programatically-driven changes of the canvas size - todo 
+    // timeout to let the app screen react first (hacky but oh well)
+    // anyway, this will not work for programatically-driven changes of the canvas size - todo 
 
     dragContainer.sortableChildren = true;
     dragContainer.eventMode = 'static';
@@ -160,13 +161,13 @@ export const addDraggableViewport = (app: Application, hooks: GraphCallbacks, co
         dragContainer.on(ev, (e) => clearPointer(e.pointerId));
     });
 
-    
+
     app.stage.on('pointermove', (e) => {
         if (!app.ticker.started) return;
 
         if (activeTouches.size === 1 && viewport.dragged) {
             viewport.moveByZoomed({ x: e.movementX, y: e.movementY });
-            hooks.onViewportMoved?.(viewport.position.x, viewport.position.y);
+            interactionevents.emit("viewportMoved", { x: viewport.position.x, y: viewport.position.y });
         }
 
         if (activeTouches.size === 2) {

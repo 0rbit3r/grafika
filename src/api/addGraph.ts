@@ -5,11 +5,13 @@ import { createGraphStores } from "../state/storesContainer";
 import { addData } from "../core/contextManager/addData";
 import { removeDataByIds } from "../core/contextManager/removeData";
 import { simulate_one_frame_of_FDL } from "../simulation/forcesSimulation";
-import { GraphInstance, GraphCallbacks, GraphDataProxy } from "./controlTypes";
+import { GraphInstance, GraphDataProxy } from "./controlTypes";
 import { GraphDataInit } from "./dataTypes";
 import { testProxy } from "./proxyNode"
+import mitt from "mitt";
+import {type GraphInteractionEvents} from "./events";
 
-export function addGraph(element: HTMLElement, settings: GraphSettings, hooks: GraphCallbacks): GraphInstance {
+export function addGraph(element: HTMLElement, settings: GraphSettings): GraphInstance {
 
     const app = new Application<HTMLCanvasElement>(
         {
@@ -24,7 +26,9 @@ export function addGraph(element: HTMLElement, settings: GraphSettings, hooks: G
 
     element.appendChild(app.view as HTMLCanvasElement);
 
-    const $states = createGraphStores(app, settings, hooks);
+    const interactionEvents = mitt<GraphInteractionEvents>()
+
+    const $states = createGraphStores(app, settings, interactionEvents);
 
     const renderGraph = initGraphics(app, $states);
 
@@ -76,7 +80,7 @@ export function addGraph(element: HTMLElement, settings: GraphSettings, hooks: G
 
         // // render the graph
         renderGraph();
-        if (hooks.onNextFrame) hooks.onNextFrame($states.simulation.get().frame);
+        interactionEvents.emit("framePassed", $states.simulation.get().frame);
     }
 
     // main application loop
@@ -85,6 +89,8 @@ export function addGraph(element: HTMLElement, settings: GraphSettings, hooks: G
     });
 
     return {
+        interactionEvents: interactionEvents,
+
         addData: (data: GraphDataInit) => addData($states, data),
         removeData: (data: GraphDataInit) => removeDataByIds($states, data),
         getData: () => ({

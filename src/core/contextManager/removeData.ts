@@ -15,7 +15,7 @@ export function removeDataByIds($states: GraphStoresContainer, dataToRemove: Gra
     // [x] notrendered list of edges in place
     // [x] individual nodes' edge lists
     // [x] proxylists
-    // [ ] adjacencymap
+    // [x] adjacencymap
 
     // then check my sanity nd try to find a better architecture than this...
 
