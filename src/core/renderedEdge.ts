@@ -3,6 +3,7 @@ import { RenderedNode } from "./renderedNode";
 import { EdgeType, GraphEdgeInit } from "../api/dataTypes";
 import { GraphStoresContainer } from "../state/storesContainer";
 import { drawEdge } from "../graphics/drawEdge";
+import { loadEdge } from "./contextManager/dynamicLoader";
 
 export interface RenderedEdge {
     source: RenderedNode;
@@ -11,6 +12,8 @@ export interface RenderedEdge {
     type: EdgeType;
     weight: number;
     graphics: Graphics;
+
+    isLoaded: boolean;
 }
 
 export function initializeRenderedEdge(
@@ -20,7 +23,6 @@ export function initializeRenderedEdge(
     const $graphics = $states.graphics.get();
 
     const edgeGraphics = new Graphics();
-    $graphics.edgeContainer.addChild(edgeGraphics);
 
     const renderedEdge: RenderedEdge = {
         source: sourceNode,
@@ -28,9 +30,11 @@ export function initializeRenderedEdge(
         graphics: edgeGraphics,
         type: edge.type ?? $graphics.defaultEdgeType,
         weight: edge.weight ?? 1,
-        color: edge.color ?? "#dddddd"
+        color: edge.color ?? "#dddddd",
+        isLoaded: true
     };
     drawEdge(renderedEdge, $states);
+    loadEdge(renderedEdge, $graphics);
 
     return renderedEdge;
 }

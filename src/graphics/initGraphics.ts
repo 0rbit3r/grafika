@@ -3,7 +3,8 @@ import { DRAG_Z, EDGES_Z, NODES_Z, TEXT_Z } from "./zIndexes";
 import { GraphStoresContainer } from "../state/storesContainer";
 import { EdgeType } from "../api/dataTypes";
 import { BACKDROP_ZOOM_THRESHOLD_FULLY_VISIBLE, BACKDROP_ZOOM_THRESHOLD_HIDDEN, ZOOM_TEXT_INVISIBLE_THRESHOLD, ZOOM_TEXT_VISIBLE_THRESHOLD } from "../core/defaultGraphOptions";
-import {initBackdrop } from "./initBackdrop";
+import { initBackdrop } from "./initBackdrop";
+import { loadEdge, loadNode, unloadEdge, unloadNode } from "../core/contextManager/dynamicLoader";
 
 export const initGraphics = (app: Application, $states: GraphStoresContainer) => {
     app.stage.eventMode = 'static';
@@ -47,11 +48,17 @@ export const initGraphics = (app: Application, $states: GraphStoresContainer) =>
         textContainer.addChild(fpsCounter);
     }
 
+    let $simulation = $states.simulation.get();
+    let $debug = $states.debug.get();
+    let $graphics = $states.graphics.get();
+    let $context = $states.context.get();
+    let zoom = 0;
     const renderGraph = () => {
-        const $simulation = $states.simulation.get();
-        const $debug = $states.debug.get();
-        const $graphics = $states.graphics.get();
-        const $context = $states.context.get();
+        $simulation = $states.simulation.get();
+        $debug = $states.debug.get();
+        $graphics = $states.graphics.get();
+        $context = $states.context.get();
+        zoom = $graphics.viewport.zoom;
 
         // FPS counter
         if ($debug.showFps) {
@@ -60,14 +67,14 @@ export const initGraphics = (app: Application, $states: GraphStoresContainer) =>
             if (fpsRollingHistory.length > updateFpsEveryNFrames)
                 fpsRollingHistory.shift();
             if ($simulation.frame % updateFpsEveryNFrames === 0 && $simulation.frame >= 10) {
-                fpsCounter.text = Math.floor(fpsRollingHistory.reduce((a, b) => a+b) / fpsRollingHistory.length);
+                fpsCounter.text = Math.floor(fpsRollingHistory.reduce((a, b) => a + b) / fpsRollingHistory.length);
             }
         }
 
         // if (backdrop !== undefined) {
 
         //     // BACKDROP
-        //     const sizeOnScreen = 27.75 * $graphics.viewport.zoom;
+        //     const sizeOnScreen = 27.75 * zoom;
         //     const onScreenCoors = $graphics.viewport.toViewportCoordinates(
         //         { x: -41600, y: -41600 }
         //     );
@@ -76,7 +83,7 @@ export const initGraphics = (app: Application, $states: GraphStoresContainer) =>
         //         onScreenCoors.x, onScreenCoors.y,
         //         sizeOnScreen, sizeOnScreen);
         //     const backdropOpacity =
-        //         1 - Math.min(1, Math.max(0, $graphics.viewport.zoom - BACKDROP_ZOOM_THRESHOLD_FULLY_VISIBLE)
+        //         1 - Math.min(1, Math.max(0, zoom - BACKDROP_ZOOM_THRESHOLD_FULLY_VISIBLE)
         //             / (BACKDROP_ZOOM_THRESHOLD_HIDDEN - BACKDROP_ZOOM_THRESHOLD_FULLY_VISIBLE));
 
         //     backdrop.alpha = 0.5;//backdropOpacity;
@@ -86,81 +93,77 @@ export const initGraphics = (app: Application, $states: GraphStoresContainer) =>
         //     edgeContainer.alpha = nodeContainer.alpha;
         // }
 
-        //         // BACKDROP
-        //         const sizeOnScreen = 27.75 * graphState.viewport.zoom;
-        //         const onScreenCoors = graphState.viewport.toViewportCoordinates(
-        //             { x: -41600, y: -41600 }
-        //         );
-
-        //         backdropTexture.setTransform(
-        //             onScreenCoors.x, onScreenCoors.y,
-        //             sizeOnScreen, sizeOnScreen);
-
-        //         const backdropOpacity = 1 - Math.min(1, Math.max(0, graphState.viewport.zoom - BACKDROP_ZOOM_THRESHOLD_FULLY_VISIBLE)
-        //             / (BACKDROP_ZOOM_THRESHOLD_HIDDEN - BACKDROP_ZOOM_THRESHOLD_FULLY_VISIBLE));
-
-        //         backdropTexture.alpha = 0//backdropOpacity;
-
-        //         nodeContainer.alpha = 1// - backdropOpacity;
-
-        //         if (false)//graphState.viewport.zoom < BACKDROP_ZOOM_THRESHOLD_FULLY_VISIBLE)
-        //             graphState.temporalRenderedThoughts.concat(graphState.neighborhoodThoughts)
-        //                 .forEach(t => {
-        //                     if (!onScreenThoughts.includes(t))
-        //                         t.graphics?.setTransform(0, 0, 0.01, 0.01);
-        //                 });
-
-        //         const thoughtsToRedraw = graphState.popThoughtsForRedraw();
-        //         thoughtsToRedraw.forEach(t => {
-        //             initializeGraphicsForThought(t);
-        //         })
-
         // render thoughts on screen
+        const vpW = viewport.width;
+        const vpH = viewport.height;
         $context.renderedNodes
             .forEach(node => {
                 // handle positions
                 const pos = $graphics.viewport.toViewportCoordinates({ x: node.x, y: node.y });
-                node.graphics.setTransform(pos.x, pos.y, $graphics.viewport.zoom, $graphics.viewport.zoom);
+                const margin = node.radius * 4 * zoom;
 
+                if ($simulation.frame % 3 === 0) { //only do this once every few frames to save preformance
+                    const isInside =
+                        pos.x > -margin && pos.x < vpW + margin &&
+                        pos.y > -margin && pos.y < vpH + margin;
+
+                    if (!node.isLoaded) {
+                        if (isInside) {
+                            loadNode(node, $graphics);
+                        }
+                    } else if (!isInside) {
+                        unloadNode(node, $graphics);
+                        return;
+                    }
+                }
+                node.graphics.setTransform(pos.x, pos.y, zoom, zoom);
                 // handle dynamic effects
                 node.blinkingGraphics.alpha = $simulation.frame % 150 < 50
                     ? 1 - ($simulation.frame % 50) / 50
                     : 0;
 
-                node.text.setTransform(pos.x - node.text.width / 2, pos.y + node.radius * 1.1 * $graphics.viewport.zoom);
-                node.text.alpha = $graphics.viewport.zoom <= ZOOM_TEXT_INVISIBLE_THRESHOLD
+                node.text.setTransform(pos.x - node.text.width / 2, pos.y + node.radius * 1.1 * zoom);
+                node.text.alpha = zoom <= ZOOM_TEXT_INVISIBLE_THRESHOLD
                     ? 0
-                    : $graphics.viewport.zoom >= ZOOM_TEXT_VISIBLE_THRESHOLD
+                    : zoom >= ZOOM_TEXT_VISIBLE_THRESHOLD
                         ? 1
-                        : 1 -(ZOOM_TEXT_VISIBLE_THRESHOLD - $graphics.viewport.zoom) /
-                            (ZOOM_TEXT_VISIBLE_THRESHOLD - ZOOM_TEXT_INVISIBLE_THRESHOLD);
-
-                //graphState.frame % 150 < 50
-                //lighten(30 - (graphState.frame % 50) / 50 * 30)
-
-                //             const text = thought.text as Text;
-                //             // console.log(graphState.viewport.zoom, ZOOM_TEXT_VISIBLE_THRESHOLD);
-                //             if ((graphState.viewport.zoom > graphControlsState.titleVisibilityThresholdMultiplier * ZOOM_TEXT_VISIBLE_THRESHOLD && thought.timeOnScreen > NEW_NODE_INVISIBLE_FOR)
-                //                 || (thought.hovered && graphControlsState.titleOnHoverEnabled)) {
-
-                //                 const textCoors = graphState.viewport.toViewportCoordinates({
-                //                     x: thought.position.x,
-                //                     y: thought.position.y + thought.radius
-                //                 });
-                //                 textCoors.y += (graphControlsState.titleOnHoverEnabled && graphState.viewport.zoom <= ZOOM_TEXT_VISIBLE_THRESHOLD ? 20 : 5);
-                //                 textCoors.x -= text.width / 2;
-                //                 text.x = textCoors.x;
-                //                 text.y = textCoors.y;
-                //                 text.alpha = Math.min(1, (thought.timeOnScreen - NEW_NODE_INVISIBLE_FOR) / NEW_NODE_FADE_IN_FRAMES);
-
-                //                 textContainer.addChild(text);
-                //             }
-
-
+                        : 1 - (ZOOM_TEXT_VISIBLE_THRESHOLD - zoom) /
+                        (ZOOM_TEXT_VISIBLE_THRESHOLD - ZOOM_TEXT_INVISIBLE_THRESHOLD);
             });
 
+        const viewRect = { x: 0, y: 0, w: vpW, h: vpH };
+        const margin = 4 * zoom; // tweak for early loading
+
         $context.renderedEdges.forEach(edge => {
-            if (edge.type === EdgeType.None) return;
+            if ($simulation.frame % 3 === 0) {
+                // todo: the bounding box checker here is spowed out by ai - double check
+
+                // convert endpoints once
+                const src = viewport.toViewportCoordinates({ x: edge.source.x, y: edge.source.y });
+                const tgt = viewport.toViewportCoordinates({ x: edge.target.x, y: edge.target.y });
+
+                // axis-aligned bounding box of the segment
+                const minX = Math.min(src.x, tgt.x) - margin;
+                const maxX = Math.max(src.x, tgt.x) + margin;
+                const minY = Math.min(src.y, tgt.y) - margin;
+                const maxY = Math.max(src.y, tgt.y) + margin;
+
+                // test against viewport rect
+                const inside =
+                    maxX >= viewRect.x &&
+                    minX <= viewRect.x + viewRect.w &&
+                    maxY >= viewRect.y &&
+                    minY <= viewRect.y + viewRect.h;
+
+                if (!edge.isLoaded && inside) {
+                    loadEdge(edge, $graphics);
+                } else if (edge.isLoaded && !inside) {
+                    unloadEdge(edge, $graphics);
+                    return; // skip transform/update
+                }
+            }
+
+            if (!edge.isLoaded || edge.type === EdgeType.None) return;
             const src = $graphics.viewport.toViewportCoordinates({ x: edge.source.x, y: edge.source.y });
             const tgt = $graphics.viewport.toViewportCoordinates({ x: edge.target.x, y: edge.target.y });
 
@@ -171,7 +174,7 @@ export const initGraphics = (app: Application, $states: GraphStoresContainer) =>
             const angle = Math.atan2(dy, dx);          // radians
 
             // NOTE: scaleY = 1 keeps the stroke thickness constant in screen pixels
-            edge.graphics.setTransform(src.x, src.y, scaleX, $graphics.viewport.zoom, angle);
+            edge.graphics.setTransform(src.x, src.y, scaleX, zoom, angle);
             // const pos = graphicsState.viewport.toViewportCoordinates({ x: edge.source.x, y: edge.source.y });
             // edge.graphics.setTransform(pos.x, pos.y, graphicsState.viewport.zoom, graphicsState.viewport.zoom)
         })

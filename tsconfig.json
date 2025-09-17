@@ -14,7 +14,8 @@
     "skipLibCheck": true,
   },
   "include": [
-    "src/index.ts"
+    "src"
+    // "src/index.ts"
   ],
   // "compilerOptions": {
   //   "target": "ES2022",

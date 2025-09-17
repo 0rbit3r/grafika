@@ -36,6 +36,8 @@ export interface RenderedNode {
 
     forces: XAndY;
     momentum: XAndY;
+
+    isLoaded: boolean;
 }
 
 // Will initialize graphics and put it in the nodeContainer
@@ -66,7 +68,8 @@ export const initializeRenderedNode = (node: GraphNodeInit, $states: GraphStores
         hovered: false,
         framesAlive: 0,
         forces: { x: 0, y: 0 },
-        momentum: { x: 0, y: 0 }
+        momentum: { x: 0, y: 0 },
+        isLoaded: false
     };
     drawNode(renderedNode, $states);
 
@@ -152,6 +155,7 @@ export const initializeRenderedNode = (node: GraphNodeInit, $states: GraphStores
     text.y = renderedNode.y - text.height / 2 + text.height / 2 + DEFAULT_RADIUS + 5;
     renderedNode.text = text;
 
+    
     $states.graphics.get().textContainer.addChild(text);
     return renderedNode;
 };
