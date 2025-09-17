@@ -31,10 +31,10 @@ export const initGraphics = (app: Application, $states: GraphStoresContainer) =>
     zSortedContainer.addChild(textContainer);
     zSortedContainer.addChild(edgeContainer);
 
-    const backdropUrl = "/backdrop.png";
+    // const backdropUrl = "/backdrop.png";
 
-    const backdrop = initBackdrop(backdropUrl);
-    zSortedContainer.addChild(backdrop);
+    // const backdrop = initBackdrop(backdropUrl);
+    // zSortedContainer.addChild(backdrop);
 
     zSortedContainer.sortChildren();
 
