@@ -59,34 +59,7 @@ export class Viewport {
         //         this.position.y = -GRAVITY_FREE_RADIUS;
         // }
     }
-
-    //Used for zooming by buttons
-    public zoomByButtonDelta(dir: number) {
-        // const oldBottomRight: XAndY = { x: this.position.x + this.zoomedViewportSize().x, y: this.position.y + this.zoomedViewportSize().y };
-
-        if (dir < 0 && this.zoom > MIN_ZOOM)
-            this.zoom /= ZOOM_STEP_MULTIPLICATOR_BUTTONS;
-        if (dir > 0 && this.zoom < MAX_ZOOM)
-            this.zoom *= ZOOM_STEP_MULTIPLICATOR_BUTTONS;
-
-        // const newBottomRight: XAndY = { x: this.position.x + this.zoomedViewportSize().x, y: this.position.y + this.zoomedViewportSize().y };
-
-        // this.moveBy({ x: -(oldBottomRight.x - newBottomRight.x) / 2, y: -(oldBottomRight.y - newBottomRight.y) * 2 / 3});
-    }
-
-    //used for zoom by mouse wheel
-    public zoomByWheelDelta(dir: number) {
-        // const oldBottomRight: XAndY = { x: this.position.x + this.zoomedViewportSize().x, y: this.position.y + this.zoomedViewportSize().y };
-        if (dir < 0 && this.zoom > MIN_ZOOM)
-            this.zoom /= ZOOM_STEP_MULTIPLICATOR_WHEEL;
-        if (dir > 0 && this.zoom < MAX_ZOOM)
-            this.zoom *= ZOOM_STEP_MULTIPLICATOR_WHEEL;
-
-        // const newBottomRight: XAndY = { x: this.position.x + this.zoomedViewportSize().x, y: this.position.y + this.zoomedViewportSize().y };
-
-        // this.moveBy({ x: -(oldBottomRight.x - newBottomRight.x) / 2, y: -(oldBottomRight.y - newBottomRight.y) * 2 / 3 });
-    }
-
+    
     toViewportCoordinates = (position: XAndY): XAndY => {
         return {
             x: (position.x - this.position.x) * this.zoom + this.width / 2,

@@ -2,7 +2,7 @@ import { Application, Container, TextStyle, Text } from "pixi.js";
 import { DRAG_Z, EDGES_Z, NODES_Z, TEXT_Z } from "./zIndexes";
 import { GraphStoresContainer } from "../state/storesContainer";
 import { EdgeType } from "../api/dataTypes";
-import { ZOOM_TEXT_INVISIBLE_THRESHOLD, ZOOM_TEXT_VISIBLE_THRESHOLD } from "../core/defaultGraphOptions";
+import { BACKDROP_ZOOM_THRESHOLD_FULLY_VISIBLE, BACKDROP_ZOOM_THRESHOLD_HIDDEN, ZOOM_TEXT_INVISIBLE_THRESHOLD, ZOOM_TEXT_VISIBLE_THRESHOLD } from "../core/defaultGraphOptions";
 import {initBackdrop } from "./initBackdrop";
 
 export const initGraphics = (app: Application, $states: GraphStoresContainer) => {
@@ -31,8 +31,10 @@ export const initGraphics = (app: Application, $states: GraphStoresContainer) =>
     zSortedContainer.addChild(textContainer);
     zSortedContainer.addChild(edgeContainer);
 
-    // const backdrop = initBackdrop(backdropUrl);
-    // zSortedContainer.addChild(backdrop);
+    const backdropUrl = "/backdrop.png";
+
+    const backdrop = initBackdrop(backdropUrl);
+    zSortedContainer.addChild(backdrop);
 
     zSortedContainer.sortChildren();
 
@@ -62,6 +64,27 @@ export const initGraphics = (app: Application, $states: GraphStoresContainer) =>
             }
         }
 
+        // if (backdrop !== undefined) {
+
+        //     // BACKDROP
+        //     const sizeOnScreen = 27.75 * $graphics.viewport.zoom;
+        //     const onScreenCoors = $graphics.viewport.toViewportCoordinates(
+        //         { x: -41600, y: -41600 }
+        //     );
+
+        //     backdrop.setTransform(
+        //         onScreenCoors.x, onScreenCoors.y,
+        //         sizeOnScreen, sizeOnScreen);
+        //     const backdropOpacity =
+        //         1 - Math.min(1, Math.max(0, $graphics.viewport.zoom - BACKDROP_ZOOM_THRESHOLD_FULLY_VISIBLE)
+        //             / (BACKDROP_ZOOM_THRESHOLD_HIDDEN - BACKDROP_ZOOM_THRESHOLD_FULLY_VISIBLE));
+
+        //     backdrop.alpha = 0.5;//backdropOpacity;
+
+        //     nodeContainer.alpha = 0.5; //1 - backdropOpacity;
+        //     textContainer.alpha = nodeContainer.alpha;
+        //     edgeContainer.alpha = nodeContainer.alpha;
+        // }
 
         //         // BACKDROP
         //         const sizeOnScreen = 27.75 * graphState.viewport.zoom;

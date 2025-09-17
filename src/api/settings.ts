@@ -16,6 +16,7 @@ export interface GraphicsSettings {
 
     defaultEdgeType?: EdgeType;
 
+    backdropEnabled?: boolean;
     backdropUrl?: string;
 }
 

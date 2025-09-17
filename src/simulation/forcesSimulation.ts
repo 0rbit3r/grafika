@@ -18,23 +18,23 @@ import { RenderedNode } from "../core/renderedNode";
 import { GraphStoresContainer } from "../state/storesContainer";
 
 export const get_border_distance = (node1: RenderedNode, node2: RenderedNode) => {
-    const x1 = node1.x;
-    const y1 = node1.y;
-    const x2 = node2.x;
-    const y2 = node2.y;
-    const centerDistance = Math.sqrt(Math.pow(Math.abs(x1 - x2), 2) + Math.pow(Math.abs(y1 - y2), 2));
-    const borderDistance = centerDistance - node1.radius - node2.radius;
+    const dx = node1.x - node2.x;
+    const dy = node1.y - node2.y;
+    const centerDistance = Math.hypot(dx, dy); 
+    return centerDistance - node1.radius - node2.radius;
+};
 
-    return borderDistance;
+export const get_x_distance = (node1: RenderedNode, node2: RenderedNode) => {
+    return Math.abs(node1.x - node2.x);
+}
+export const get_y_distance = (node1: RenderedNode, node2: RenderedNode) => {
+    return Math.abs(node1.y - node2.y);
 }
 
 const get_center_distance = (node1: RenderedNode, node2: RenderedNode) => {
-    const x1 = node1.x;
-    const y1 = node1.y;
-    const x2 = node2.x;
-    const y2 = node2.y;
-
-    const dist = Math.sqrt(Math.pow(Math.abs(x1 - x2), 2) + Math.pow(Math.abs(y1 - y2), 2));
+    const dx = node1.x - node2.x;
+    const dy = node1.y - node2.y;
+    const dist = Math.hypot(dx, dy);
 
     // prevents division by zero (?)
     return dist === 0 ? 0.01 : dist;
