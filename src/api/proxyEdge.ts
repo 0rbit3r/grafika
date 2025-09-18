@@ -1,11 +1,12 @@
 import { RenderedNode } from "../core/renderedNode";
 import { EdgeType, GraphEdgeInit, GraphNodeInit, NodeShape } from "./dataTypes";
 import { GraphStoresContainer } from "../state/storesContainer";
-import { drawNode } from "../graphics/drawNode";
+// import { drawNode } from "../graphics/drawNode";
 import { RenderedEdge } from "../core/renderedEdge";
-import { drawEdge } from "../graphics/drawEdge";
+// import { drawEdge } from "../graphics/drawEdge";
 import { Graphics } from "pixi.js";
 import { getNodeProxy, GraphProxyNode } from "./proxyNode";
+import { initEdgeGraphics } from "../graphics/initEdgeGraphics";
 
 export interface GraphProxyEdge {
     // same as RenderedEdge - fall through
@@ -36,9 +37,8 @@ export function getEdgeProxy(n: RenderedEdge, states: GraphStoresContainer): Gra
 function createEdgeProxy(target: RenderedEdge, $states: GraphStoresContainer): GraphProxyEdge {
     return new Proxy(target as any, {
         get(_, prop) {
-            if (allowedGet.has(prop as string))
-            {
-                if ( prop === "source")
+            if (allowedGet.has(prop as string)) {
+                if (prop === "source")
                     return getNodeProxy(target.source, $states);
                 if (prop === "target")
                     return getNodeProxy(target.target, $states);
@@ -54,7 +54,7 @@ function createEdgeProxy(target: RenderedEdge, $states: GraphStoresContainer): G
             if (allowedSet.has(prop as string)) {
                 (target as any)[prop] = value;
                 if (allowedSetWithRedraw.has(prop as string))
-                    drawEdge(target, $states);
+                    initEdgeGraphics(target, $states);
                 return true;
             }
             console.error(`property ${prop as string} cannot be modified on the GraphProxyEdge.`);

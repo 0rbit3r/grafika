@@ -149,7 +149,7 @@ export const inEdgesLengthForceDivisor = (bl: number) => {
 
 // MORE SET IN STONE OBSCURE PARAMETERS
 
-export const THOUGHT_BORDER_THICKNESS = 0.1;
+export const NODE_BORDER_THICKNESS = 0.1;
 
 // Rendered edge is rendered with this length and then scaled and rotated appropriately
 export const RENDERED_EDGE_DEFAULT_LENGTH = 100;

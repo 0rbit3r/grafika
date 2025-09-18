@@ -1,3 +1,4 @@
+import { checkMaxIfStatementsInShader } from "pixi.js";
 import { GraphDataInit } from "../../api/dataTypes";
 import { GraphStoresContainer } from "../../state/storesContainer";
 import { filterInPlace } from "../../util/filterInPlace";
@@ -27,8 +28,8 @@ export function removeDataByIds($states: GraphStoresContainer, dataToRemove: Gra
 
     const edgesToDestroy: Set<RenderedEdge> = new Set();
     nodesToDestroy.forEach(node => {
-        node.graphics.destroy();
-        node.blinkingGraphics.destroy();
+        node.sprite?.destroy({children: true});
+        node.text?.destroy({children: true});
         // remove deleted edges from nodes' references
         node.inEdges.forEach(e => edgesToDestroy.add(e));
         node.outEdges.forEach(e => edgesToDestroy.add(e));
@@ -47,7 +48,7 @@ export function removeDataByIds($states: GraphStoresContainer, dataToRemove: Gra
         $states.context.get().renderedEdges.filter(e => !edgesToDestroy.has(e)));
 
     edgesToDestroy.forEach(e => {
-        e.graphics?.destroy();
+        e.sprite?.destroy({children: true});
         e.target.inEdges.delete(e);
         e.source.outEdges.delete(e);
 

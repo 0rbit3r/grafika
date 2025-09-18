@@ -1,0 +1,177 @@
+import { Application, Graphics, SCALE_MODES, Sprite, Texture } from "pixi.js";
+import { NodeShape } from "../../api/dataTypes";
+import { NODE_BORDER_THICKNESS } from "../../core/defaultGraphOptions";
+import { RenderedNode } from "../../core/renderedNode";
+
+export const SPRITE_TEXTURE_RADIUS = 200;
+
+interface BaseTexturesContainer {
+    circle: Texture | undefined;
+    square: Texture | undefined;
+    diamond: Texture | undefined;
+    upTriangle: Texture | undefined;
+    downTriangle: Texture | undefined;
+    cross: Texture | undefined;
+    heart: Texture | undefined;
+}
+
+const baseTextures: BaseTexturesContainer = {
+    circle: undefined,
+    square: undefined,
+    diamond: undefined,
+    upTriangle: undefined,
+    downTriangle: undefined,
+    cross: undefined,
+    heart: undefined,
+}
+
+export function getNodeSprite(app: Application, node: RenderedNode): Sprite {
+    let sprite: Sprite = null!;
+    switch (node.shape) {
+        default:
+        case NodeShape.Circle:
+            if (!baseTextures.circle) {
+                const graphics = new Graphics();
+                graphics.beginFill("#ffffff");
+                graphics.lineStyle(SPRITE_TEXTURE_RADIUS * NODE_BORDER_THICKNESS, "#888888");
+                graphics.drawCircle(0, 0, SPRITE_TEXTURE_RADIUS);
+                baseTextures.circle = app.renderer.generateTexture(graphics,
+                    {
+                        scaleMode: SCALE_MODES.LINEAR,
+                        resolution: 1
+                    });
+                graphics.destroy({ children: true, baseTexture: true, texture: true });
+            }
+            sprite = Sprite.from(baseTextures.circle);
+            sprite.anchor.set(0.5);
+            break;
+        case NodeShape.Square:
+            if (!baseTextures.square) {
+                const graphics = new Graphics();
+                graphics.beginFill("#ffffff");
+                graphics.lineStyle(SPRITE_TEXTURE_RADIUS * NODE_BORDER_THICKNESS, "#888888");
+                graphics.drawRoundedRect(
+                    - SPRITE_TEXTURE_RADIUS / 3 * 2, - SPRITE_TEXTURE_RADIUS / 3 * 2,
+                    SPRITE_TEXTURE_RADIUS * 4 / 3, SPRITE_TEXTURE_RADIUS * 4 / 3, SPRITE_TEXTURE_RADIUS / 3
+                );
+                baseTextures.square = app.renderer.generateTexture(graphics,
+                    {
+                        scaleMode: SCALE_MODES.LINEAR,
+                        resolution: 1
+                    });
+            }
+            sprite = Sprite.from(baseTextures.square);
+            sprite.anchor.set(0.5);
+            break;
+        case NodeShape.Diamond:
+            if (!baseTextures.diamond) {
+                const graphics = new Graphics();
+                graphics.moveTo(0, 0 - SPRITE_TEXTURE_RADIUS);
+                graphics.arcTo(0 - SPRITE_TEXTURE_RADIUS, 0, 0, 0 + SPRITE_TEXTURE_RADIUS, SPRITE_TEXTURE_RADIUS / 3);
+                graphics.beginFill("#ffffff");
+                graphics.lineStyle(SPRITE_TEXTURE_RADIUS * NODE_BORDER_THICKNESS, "#888888");
+                graphics.arcTo(0, 0 + SPRITE_TEXTURE_RADIUS, 0 + SPRITE_TEXTURE_RADIUS, 0, SPRITE_TEXTURE_RADIUS / 3);
+                graphics.arcTo(0 + SPRITE_TEXTURE_RADIUS, 0, 0, 0 - SPRITE_TEXTURE_RADIUS, SPRITE_TEXTURE_RADIUS / 3);
+                graphics.arcTo(0, 0 - SPRITE_TEXTURE_RADIUS, 0 - SPRITE_TEXTURE_RADIUS, 0, SPRITE_TEXTURE_RADIUS / 3);
+                graphics.arcTo(0 - SPRITE_TEXTURE_RADIUS, 0, 0, 0 + SPRITE_TEXTURE_RADIUS, SPRITE_TEXTURE_RADIUS / 3);
+                baseTextures.diamond = app.renderer.generateTexture(graphics,
+                    {
+                        scaleMode: SCALE_MODES.LINEAR,
+                        resolution: 1
+                    });
+            }
+            sprite = Sprite.from(baseTextures.diamond);
+            sprite.anchor.set(0.5);
+            break;
+        case NodeShape.UpTriangle:
+            if (!baseTextures.upTriangle) {
+                const graphics = new Graphics();
+                graphics.moveTo(0, 0 - SPRITE_TEXTURE_RADIUS);
+                graphics.beginFill("#ffffff");
+                graphics.lineStyle(SPRITE_TEXTURE_RADIUS * NODE_BORDER_THICKNESS, "#888888");
+                graphics.lineTo(0 - SPRITE_TEXTURE_RADIUS * Math.sqrt(3) / 2, 0 + SPRITE_TEXTURE_RADIUS / 2);
+                graphics.lineTo(0 + SPRITE_TEXTURE_RADIUS * Math.sqrt(3) / 2, 0 + SPRITE_TEXTURE_RADIUS / 2);
+                graphics.lineTo(0, 0 - SPRITE_TEXTURE_RADIUS);
+                baseTextures.upTriangle = app.renderer.generateTexture(graphics,
+                    {
+                        scaleMode: SCALE_MODES.LINEAR,
+                        resolution: 1
+                    });
+            }
+            sprite = Sprite.from(baseTextures.upTriangle);
+            sprite.anchor.set(0.5, 1.95 / 3) //I was lazy to do math...
+            break;
+        case NodeShape.DownTriangle:
+            if (!baseTextures.downTriangle) {
+                const graphics = new Graphics();
+                graphics.moveTo(0, SPRITE_TEXTURE_RADIUS);
+                graphics.beginFill("#ffffff");
+                graphics.lineStyle(SPRITE_TEXTURE_RADIUS * NODE_BORDER_THICKNESS, "#888888");
+                graphics.lineTo(-SPRITE_TEXTURE_RADIUS * Math.sqrt(3) / 2, -SPRITE_TEXTURE_RADIUS / 2);
+                graphics.lineTo(SPRITE_TEXTURE_RADIUS * Math.sqrt(3) / 2, -SPRITE_TEXTURE_RADIUS / 2);
+                graphics.lineTo(0, SPRITE_TEXTURE_RADIUS);
+                baseTextures.downTriangle = app.renderer.generateTexture(graphics,
+                    {
+                        scaleMode: SCALE_MODES.LINEAR,
+                        resolution: 1
+                    });
+            }
+            sprite = Sprite.from(baseTextures.downTriangle);
+            sprite.anchor.set(0.5, 1 - 1.95 / 3)
+            break;
+        case NodeShape.Cross:
+            if (!baseTextures.cross) {
+                const graphics = new Graphics();
+                graphics.beginFill("#ffffff");
+                graphics.lineStyle(SPRITE_TEXTURE_RADIUS * NODE_BORDER_THICKNESS, "#888888");
+                const gridSize = SPRITE_TEXTURE_RADIUS / 7 * 3;
+
+                graphics.moveTo(0, 0 - gridSize);
+                graphics.lineTo(0 - gridSize, 0 - gridSize * 2);
+                graphics.lineTo(0 - gridSize * 2, 0 - gridSize);
+                graphics.lineTo(0 - gridSize, 0);
+                graphics.lineTo(0 - gridSize * 2, 0 + gridSize);
+                graphics.lineTo(0 - gridSize, 0 + gridSize * 2);
+                graphics.lineTo(0, 0 + gridSize);
+                graphics.lineTo(0 + gridSize, 0 + gridSize * 2);
+                graphics.lineTo(0 + gridSize * 2, 0 + gridSize);
+                graphics.lineTo(0 + gridSize, 0);
+                graphics.lineTo(0 + gridSize * 2, 0 - gridSize);
+                graphics.lineTo(0 + gridSize, 0 - gridSize * 2);
+                graphics.lineTo(0, 0 - gridSize);
+                graphics.endFill();
+
+                baseTextures.cross = app.renderer.generateTexture(graphics,
+                    {
+                        scaleMode: SCALE_MODES.LINEAR,
+                        resolution: 1
+                    });
+            }
+            sprite = Sprite.from(baseTextures.cross);
+            sprite.anchor.set(0.5)
+            break;
+        case NodeShape.Heart:
+            if (!baseTextures.heart) {
+                const graphics = new Graphics();
+                const yOffset = SPRITE_TEXTURE_RADIUS * 0.3;
+                graphics.beginFill("#ffffff");
+                graphics.lineStyle(SPRITE_TEXTURE_RADIUS * NODE_BORDER_THICKNESS, "#888888");
+
+                graphics.moveTo(0, SPRITE_TEXTURE_RADIUS * 0.6 + yOffset);
+                graphics.bezierCurveTo(-SPRITE_TEXTURE_RADIUS * 1.7, SPRITE_TEXTURE_RADIUS * -0.25 + yOffset, -SPRITE_TEXTURE_RADIUS * 0.93, -SPRITE_TEXTURE_RADIUS * 1.75 + yOffset, 0, -SPRITE_TEXTURE_RADIUS * 0.8 + yOffset);
+                graphics.bezierCurveTo(SPRITE_TEXTURE_RADIUS * 0.93, -SPRITE_TEXTURE_RADIUS * 1.75 + yOffset, SPRITE_TEXTURE_RADIUS * 1.7, SPRITE_TEXTURE_RADIUS * -0.25 + yOffset, 0, SPRITE_TEXTURE_RADIUS * 0.6 + yOffset);
+
+                graphics.endFill();
+                baseTextures.heart = app.renderer.generateTexture(graphics,
+                    {
+                        scaleMode: SCALE_MODES.LINEAR,
+                        resolution: 1
+                    });
+            }
+            sprite = Sprite.from(baseTextures.heart);
+            sprite.anchor.set(0.5);
+            break;
+    }
+
+    return sprite;
+}

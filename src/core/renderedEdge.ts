@@ -1,9 +1,8 @@
-import { Graphics } from "pixi.js";
+import { Graphics, Sprite } from "pixi.js";
 import { RenderedNode } from "./renderedNode";
 import { EdgeType, GraphEdgeInit } from "../api/dataTypes";
 import { GraphStoresContainer } from "../state/storesContainer";
-import { drawEdge } from "../graphics/drawEdge";
-import { loadEdge } from "./contextManager/dynamicLoader";
+import { initEdgeGraphics } from "../graphics/initEdgeGraphics";
 
 export interface RenderedEdge {
     source: RenderedNode;
@@ -11,30 +10,27 @@ export interface RenderedEdge {
     color: string;
     type: EdgeType;
     weight: number;
-    graphics: Graphics;
+    sprite: Sprite | null;
 
-    isLoaded: boolean;
+    isOnScreen: boolean;
 }
 
 export function initializeRenderedEdge(
     edge: GraphEdgeInit, sourceNode: RenderedNode, targetNode: RenderedNode,
     $states: GraphStoresContainer): RenderedEdge {
-
     const $graphics = $states.graphics.get();
-
-    const edgeGraphics = new Graphics();
 
     const renderedEdge: RenderedEdge = {
         source: sourceNode,
         target: targetNode,
-        graphics: edgeGraphics,
+        sprite: null,
         type: edge.type ?? $graphics.defaultEdgeType,
         weight: edge.weight ?? 1,
         color: edge.color ?? "#dddddd",
-        isLoaded: true
+        isOnScreen: true
     };
-    drawEdge(renderedEdge, $states);
-    loadEdge(renderedEdge, $graphics);
+
+    initEdgeGraphics(renderedEdge, $states);
 
     return renderedEdge;
 }
