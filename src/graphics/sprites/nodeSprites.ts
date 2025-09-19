@@ -1,4 +1,4 @@
-import { Application, Graphics, SCALE_MODES, Sprite, Texture } from "pixi.js";
+import { Application, Circle, Graphics, SCALE_MODES, Sprite, Texture } from "pixi.js";
 import { NodeShape } from "../../api/dataTypes";
 import { NODE_BORDER_THICKNESS } from "../../core/defaultGraphOptions";
 import { RenderedNode } from "../../core/renderedNode";
@@ -172,6 +172,7 @@ export function getNodeSprite(app: Application, node: RenderedNode): Sprite {
             sprite.anchor.set(0.5);
             break;
     }
-
+    // todo - polygon hitareas for others (especially triangles as they now have big areas of hitArea outside)
+    sprite.hitArea = new Circle(0, 0, SPRITE_TEXTURE_RADIUS + 10); // + 10 to make it slightly easier to grip on touchscreens
     return sprite;
 }

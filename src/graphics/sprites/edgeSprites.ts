@@ -136,7 +136,7 @@ export function getEdgeSprite(app: Application, type: EdgeType): Sprite | null {
     }
 
     type === EdgeType.CurvedLine
-        ? sprite.anchor.set(0,1)
+        ? sprite.anchor.set(0, 1)
         : sprite.anchor.set(0, 0.5);
     return sprite;
 }

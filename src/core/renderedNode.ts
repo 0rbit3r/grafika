@@ -9,6 +9,7 @@ import { XAndY } from "../api/dataTypes";
 import { getNodeProxy } from "../api/proxyNode";
 import { getNodeSprite } from "../graphics/sprites/nodeSprites";
 import { initNodeGraphics } from "../graphics/initNodeGraphics";
+import { handleNodeLoading } from "../graphics/dynamicLoader";
 
 export interface RenderedNode {
     id: number;
@@ -40,6 +41,8 @@ export interface RenderedNode {
     momentum: XAndY;
 
     isOnScreen: boolean;
+
+    renderDisplacement: XAndY;
 }
 
 // Will initialize graphics and put it in the nodeContainer
@@ -68,10 +71,11 @@ export const initializeRenderedNode = (node: GraphNodeInit, $states: GraphStores
         framesAlive: 0,
         forces: { x: 0, y: 0 },
         momentum: { x: 0, y: 0 },
-        isOnScreen: true
+        isOnScreen: false,
+        renderDisplacement: {x: 0, y: 0}
     };
-    // drawNode(renderedNode, $states);
     initNodeGraphics(renderedNode, $states);
+    handleNodeLoading(renderedNode, $states.graphics.get())
 
     return renderedNode;
 };

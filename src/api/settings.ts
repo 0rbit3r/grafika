@@ -15,11 +15,10 @@ export interface GraphicsSettings {
     backgroundColor?: string;
 
     defaultEdgeType?: EdgeType;
+    floatingNodes?: boolean;
 
-    backdropEnabled?: boolean;
-    backdropUrl?: string;
+    overlay?: OverlaySettings;
 }
-
 
 export interface GraphSettings {
     data?: GraphDataInit,
@@ -27,3 +26,18 @@ export interface GraphSettings {
     simulation?: SimulationSettings,
     debug?: DebugSettings
 }
+
+
+export interface OverlaySettings {
+    url: string;
+    // position and resolution are the same for x and y - the overlay is expected square
+    position: number;
+    // resolution: number;
+    scale: number;
+
+    starDisappearingAt: number;
+    disappearCompletelyAt: number;
+}
+
+// todo - backdrop will be parallaxed behind the nodes (past era/epoch)
+// export interface BackdropSettings

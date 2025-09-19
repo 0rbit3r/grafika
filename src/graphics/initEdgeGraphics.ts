@@ -7,9 +7,10 @@ export const initEdgeGraphics = (edge: RenderedEdge, $states: GraphStoresContain
     const sprite = getEdgeSprite($graphics.app, edge.type ?? $graphics.defaultEdgeType);
 
     edge.sprite = sprite;
+    edge.isOnScreen = false;
     
     sprite && (sprite.tint = edge.color ?? "#dddddd");
-    sprite && $graphics.edgeContainer.addChild(sprite);
+    // sprite && $graphics.edgeContainer.addChild(sprite); -> handled in loader
 
     sprite && (sprite.eventMode = "none");
 }

@@ -7,6 +7,7 @@ import { RenderedEdge } from "../core/renderedEdge";
 import { Graphics } from "pixi.js";
 import { getNodeProxy, GraphProxyNode } from "./proxyNode";
 import { initEdgeGraphics } from "../graphics/initEdgeGraphics";
+import { handleEdgeLoading } from "../graphics/dynamicLoader";
 
 export interface GraphProxyEdge {
     // same as RenderedEdge - fall through
@@ -53,8 +54,10 @@ function createEdgeProxy(target: RenderedEdge, $states: GraphStoresContainer): G
         set(_, prop, value) {
             if (allowedSet.has(prop as string)) {
                 (target as any)[prop] = value;
-                if (allowedSetWithRedraw.has(prop as string))
+                if (allowedSetWithRedraw.has(prop as string)){
                     initEdgeGraphics(target, $states);
+                    handleEdgeLoading(target, $states.graphics.get())
+                }
                 return true;
             }
             console.error(`property ${prop as string} cannot be modified on the GraphProxyEdge.`);

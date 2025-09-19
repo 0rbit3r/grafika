@@ -3,6 +3,7 @@ import { RenderedNode } from "./renderedNode";
 import { EdgeType, GraphEdgeInit } from "../api/dataTypes";
 import { GraphStoresContainer } from "../state/storesContainer";
 import { initEdgeGraphics } from "../graphics/initEdgeGraphics";
+import { handleEdgeLoading } from "../graphics/dynamicLoader";
 
 export interface RenderedEdge {
     source: RenderedNode;
@@ -27,10 +28,11 @@ export function initializeRenderedEdge(
         type: edge.type ?? $graphics.defaultEdgeType,
         weight: edge.weight ?? 1,
         color: edge.color ?? "#dddddd",
-        isOnScreen: true
+        isOnScreen: false
     };
 
     initEdgeGraphics(renderedEdge, $states);
+    handleEdgeLoading(renderedEdge, $graphics);
 
     return renderedEdge;
 }

@@ -1,6 +1,6 @@
 import { map } from "nanostores";
 import { addDraggableViewport, Viewport } from "../graphics/viewport";
-import { GraphicsSettings } from "../api/settings";
+import { GraphicsSettings, OverlaySettings } from "../api/settings";
 import { Container, Application, DisplayObject, ParticleContainer } from "pixi.js";
 import { EdgeType } from "../api/dataTypes";
 import { Emitter } from "mitt";
@@ -15,6 +15,11 @@ export interface GraphicsStore {
   debugContainer: Container<DisplayObject>;
 
   defaultEdgeType: EdgeType;
+
+  // nodes turning around a point to make the graph a bit more alive
+  floatingNodes: boolean;
+
+  overlay?: OverlaySettings;
 }
 
 export const createGraphicsStore = (app: Application, interactionEvents: Emitter<GraphInteractionEvents>, settings?: GraphicsSettings) => {
@@ -33,9 +38,11 @@ export const createGraphicsStore = (app: Application, interactionEvents: Emitter
       scale: true,
       tint: true,
       uvs: false,
-      vertices: false
+      vertices: false,
     }), //todo - parametrize
+    floatingNodes: settings?.floatingNodes ?? false,
     viewport: addDraggableViewport(app, interactionEvents, [nodeContainer, edgeContainer]),
-    defaultEdgeType: settings?.defaultEdgeType ?? EdgeType.Line
+    defaultEdgeType: settings?.defaultEdgeType ?? EdgeType.Line,
+    overlay: settings?.overlay
   });
 }

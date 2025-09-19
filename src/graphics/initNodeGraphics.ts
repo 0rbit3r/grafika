@@ -11,11 +11,12 @@ export const initNodeGraphics = (node: RenderedNode, $states: GraphStoresContain
     const app = $states.graphics.get().app;
 
     node.sprite?.destroy({ baseTexture: false, children: true, texture: false });
+    node.isOnScreen = false;
 
     const sprite = getNodeSprite(app, node);
     sprite.tint = node.color;
 
-    $states.graphics.get().nodeContainer.addChild(sprite);
+    // $states.graphics.get().nodeContainer.addChild(sprite); -> handled in loader
 
     node.sprite = sprite;
 
@@ -54,6 +55,7 @@ export const initNodeGraphics = (node: RenderedNode, $states: GraphStoresContain
         if (!app.ticker.started) return;
         $states.simulation.setKey("frame", 0);
         node.held = true;
+        $states.context.setKey("heldNode", node);
         holdStartTime = performance.now();
     });
 
@@ -68,6 +70,7 @@ export const initNodeGraphics = (node: RenderedNode, $states: GraphStoresContain
     sprite.on('pointerupoutside', () => {
         node.held = false;
         node.hovered = false;
+        $states.context.setKey("heldNode", undefined);
     });
     sprite.on('wheel', (e) => {
         const $graphics = $states.graphics.get();
@@ -94,6 +97,7 @@ export const initNodeGraphics = (node: RenderedNode, $states: GraphStoresContain
             // setTimeout(() => thoughtClicked(thought.id), 30); //timeout to prevent overlay from registering the click too
         }
         node.held = false;
+        $states.context.setKey("heldNode", undefined);
     }
     sprite.on('pointerup', handlePointerUp);
     sprite.on("pointerupoutside", handlePointerUp);
@@ -121,5 +125,5 @@ export const initNodeGraphics = (node: RenderedNode, $states: GraphStoresContain
     text.y = node.y - text.height / 2 + text.height / 2 + DEFAULT_RADIUS + 5;
     node.text = text;
 
-    $states.graphics.get().textContainer.addChild(text);
+    // $states.graphics.get().textContainer.addChild(text); -> handled in loader
 }

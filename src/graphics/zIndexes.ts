@@ -4,4 +4,4 @@ export const TEXT_Z = 400;
 export const NODES_Z = 300;
 export const DRAG_Z = 200;
 export const EDGES_Z = 100;
-export const BACKDROP_Z = 0;
+export const OVERLAY_Z = 0;

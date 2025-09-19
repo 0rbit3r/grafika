@@ -18,6 +18,9 @@ export interface ContextStore{
 
     proxyNodesMap: WeakMap<RenderedNode, GraphProxyNode>;
     proxyEdgesMap: WeakMap<RenderedEdge, GraphProxyEdge>;
+
+
+    heldNode?: RenderedNode;
 }
 
 export const createContextStore = () =>
@@ -32,5 +35,5 @@ export const createContextStore = () =>
         proxyEdgesList: [],
 
         proxyEdgesMap: new WeakMap(),
-        proxyNodesMap: new WeakMap()
+        proxyNodesMap: new WeakMap(),
     });

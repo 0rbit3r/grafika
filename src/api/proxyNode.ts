@@ -5,6 +5,7 @@ import { GraphStoresContainer } from "../state/storesContainer";
 import { getEdgeProxy, GraphProxyEdge } from "./proxyEdge";
 import { mapSet } from "../util/mapSet";
 import { initNodeGraphics } from "../graphics/initNodeGraphics";
+import { handleNodeLoading } from "../graphics/dynamicLoader";
 
 export interface GraphProxyNode {
     id: number;
@@ -53,8 +54,10 @@ function createNodeProxy(target: RenderedNode, $states: GraphStoresContainer): G
         set(_, prop, value) {
             if (allowedSet.has(prop as string)) {
                 (target as any)[prop] = value;
-                if (allowedSetWithRedraw.has(prop as string))
+                if (allowedSetWithRedraw.has(prop as string)){
                     initNodeGraphics(target, $states);
+                    handleNodeLoading(target, $states.graphics.get())
+                }
                 return true;
             }
             console.error(`property ${prop as string} cannot be modified on the GraphProxyNode.`);

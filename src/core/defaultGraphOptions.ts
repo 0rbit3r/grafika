@@ -62,10 +62,10 @@ export const UNHIGHLIGHTED_EDGE_ALPHA = 0.7;
 // nodes appearing appearance
 export const NEW_NODE_INVISIBLE_FOR = 0;
 export const NEW_NODE_FADE_IN_FRAMES = 0;
-// Backdrop
-export const BACKDROP_ZOOM_THRESHOLD_FULLY_VISIBLE = 0.05;
-export const BACKDROP_ZOOM_THRESHOLD_HIDDEN = 0.1;
 
+// Backdrop - delete?
+// export const OVERLAY_ZOOM_THRESHOLD_FULLY_VISIBLE = 0.05;
+// export const OVERLAY_ZOOM_THRESHOLD_HIDDEN = 0.1;
 
 // zoom
 export const MAX_ZOOM = 5;
