@@ -8,8 +8,9 @@ export const handleNodeLoading = (node: RenderedNode, $graphics: GraphicsStore, 
 
     const margin = node.radius * 4 * $graphics.viewport.zoom;
     const isInside =
-        pos.x > -margin && pos.x < $graphics.viewport.width + margin &&
-        pos.y > -margin && pos.y < $graphics.viewport.height + margin;
+        (!$graphics.overlay || $graphics.viewport.zoom > $graphics.overlay.startDisappearingAt)
+        && pos.x > -margin && pos.x < $graphics.viewport.width + margin
+        && pos.y > -margin && pos.y < $graphics.viewport.height + margin;
 
     if (!node.isOnScreen) {
         if (isInside) {
@@ -44,6 +45,7 @@ export const handleEdgeLoading = (edge: RenderedEdge, $graphics: GraphicsStore,
 
     // test against viewport rect
     const inside =
+        (!$graphics.overlay || $graphics.viewport.zoom > $graphics.overlay.startDisappearingAt) &&
         maxX >= viewRect.x &&
         minX <= viewRect.x + viewRect.w &&
         maxY >= viewRect.y &&

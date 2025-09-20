@@ -35,7 +35,7 @@ export interface OverlaySettings {
     // resolution: number;
     scale: number;
 
-    starDisappearingAt: number;
+    startDisappearingAt: number;
     disappearCompletelyAt: number;
 }
 

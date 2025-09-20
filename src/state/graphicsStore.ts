@@ -24,14 +24,7 @@ export interface GraphicsStore {
 
 export const createGraphicsStore = (app: Application, interactionEvents: Emitter<GraphInteractionEvents>, settings?: GraphicsSettings) => {
   const nodeContainer = new Container();
-  const edgeContainer = new Container();
-
-  return map<GraphicsStore>({
-    app: app,
-    nodeContainer: new Container(),
-    textContainer: new Container(),
-    debugContainer: new Container(),
-    edgeContainer: new ParticleContainer(50000, {
+  const edgeContainer = new ParticleContainer(50000, {
       alpha: true,
       position: true,
       rotation: true,
@@ -39,7 +32,14 @@ export const createGraphicsStore = (app: Application, interactionEvents: Emitter
       tint: true,
       uvs: false,
       vertices: false,
-    }), //todo - parametrize
+    });//todo - parametrize?
+
+  return map<GraphicsStore>({
+    app: app,
+    nodeContainer: new Container(),
+    textContainer: new Container(),
+    debugContainer: new Container(),
+    edgeContainer: edgeContainer, 
     floatingNodes: settings?.floatingNodes ?? false,
     viewport: addDraggableViewport(app, interactionEvents, [nodeContainer, edgeContainer]),
     defaultEdgeType: settings?.defaultEdgeType ?? EdgeType.Line,

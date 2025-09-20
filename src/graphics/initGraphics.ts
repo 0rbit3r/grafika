@@ -117,7 +117,7 @@ export const initGraphics = (app: Application, $states: GraphStoresContainer) =>
                 const viewportPos = $graphics.viewport.toViewportCoordinates({ x: node.x + node.renderDisplacement.x, y: node.y + node.renderDisplacement.y });
                 handleNodeLoading(node, $graphics, viewportPos);
 
-                if (!node.isOnScreen || ($graphics.overlay && zoom < $graphics.overlay.starDisappearingAt))
+                if (!node.isOnScreen)
                     return;
 
                 const scale = zoom * node.radius / SPRITE_TEXTURE_RADIUS;
@@ -138,7 +138,7 @@ export const initGraphics = (app: Application, $states: GraphStoresContainer) =>
                 { x: edge.target.x + edge.target.renderDisplacement.x, y: edge.target.y + edge.target.renderDisplacement.y });
             handleEdgeLoading(edge, $graphics, srcViewportCoors, tgtViewportCoors);
             if (!edge.isOnScreen || edge.type === EdgeType.None) return;
-            if (!edge.isOnScreen || ($graphics.overlay && zoom < $graphics.overlay.starDisappearingAt))
+            if (!edge.isOnScreen)
                 return;
 
             const dx = tgtViewportCoors.x - srcViewportCoors.x;
