@@ -16,6 +16,7 @@ export function removeDataByIds($states: GraphStoresContainer, dataToRemove: Gra
     // [x] individual nodes' edge lists
     // [x] proxylists
     // [x] adjacencymap
+    // [x] destroy sprites and unsubscribe event listeners
 
     // then check my sanity nd try to find a better architecture than this...
 
@@ -28,6 +29,7 @@ export function removeDataByIds($states: GraphStoresContainer, dataToRemove: Gra
 
     const edgesToDestroy: Set<RenderedEdge> = new Set();
     nodesToDestroy.forEach(node => {
+        node.sprite?.removeAllListeners();
         node.sprite?.destroy({children: true});
         node.text?.destroy({children: true});
         // remove deleted edges from nodes' references

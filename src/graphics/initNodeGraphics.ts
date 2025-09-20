@@ -10,6 +10,7 @@ import { TEXT_Z } from "./zIndexes";
 export const initNodeGraphics = (node: RenderedNode, $states: GraphStoresContainer) => {
     const app = $states.graphics.get().app;
 
+    node.sprite?.removeAllListeners();
     node.sprite?.destroy({ baseTexture: false, children: true, texture: false });
     node.isOnScreen = false;
 
@@ -55,7 +56,6 @@ export const initNodeGraphics = (node: RenderedNode, $states: GraphStoresContain
         if (!app.ticker.started) return;
         $states.simulation.setKey("frame", 0);
         node.held = true;
-        $states.context.setKey("heldNode", node);
         holdStartTime = performance.now();
     });
 
@@ -66,11 +66,6 @@ export const initNodeGraphics = (node: RenderedNode, $states: GraphStoresContain
     sprite.on('pointerout', () => {
         // if (!app.ticker.started) return; //I think leaving this condition here is reasonable
         node.hovered = false;
-    });
-    sprite.on('pointerupoutside', () => {
-        node.held = false;
-        node.hovered = false;
-        $states.context.setKey("heldNode", undefined);
     });
     sprite.on('wheel', (e) => {
         const $graphics = $states.graphics.get();
@@ -97,11 +92,10 @@ export const initNodeGraphics = (node: RenderedNode, $states: GraphStoresContain
             // setTimeout(() => thoughtClicked(thought.id), 30); //timeout to prevent overlay from registering the click too
         }
         node.held = false;
-        $states.context.setKey("heldNode", undefined);
     }
     sprite.on('pointerup', handlePointerUp);
     sprite.on("pointerupoutside", handlePointerUp);
-
+    // sprite.on("pointercancel", handlePointerUp);
     // text
     node.text && node.text.destroy({children: true});
 

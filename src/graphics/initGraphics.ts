@@ -18,9 +18,12 @@ export const initGraphics = (app: Application, $states: GraphStoresContainer) =>
     const nodeContainer = $states.graphics.get().nodeContainer;
     const textContainer = $states.graphics.get().textContainer;
     const debugContainer = $states.graphics.get().debugContainer;
-    textContainer.eventMode = "none";
-
     const edgeContainer = $states.graphics.get().edgeContainer;
+
+    nodeContainer.eventMode = "passive";
+    textContainer.eventMode = "none";
+    debugContainer.eventMode = "none";
+    edgeContainer.eventMode = "none";
 
     const viewport = $states.graphics.get().viewport;
 

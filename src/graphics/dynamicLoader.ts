@@ -18,7 +18,7 @@ export const handleNodeLoading = (node: RenderedNode, $graphics: GraphicsStore, 
             node.sprite && $graphics.nodeContainer.addChild(node.sprite);
             node.text && $graphics.textContainer.addChild(node.text);
         }
-    } else if (!isInside) {
+    } else if (!isInside && !node.held) {
         node.isOnScreen = false;
         node.sprite && $graphics.nodeContainer.removeChild(node.sprite);
         node.text && $graphics.textContainer.removeChild(node.text);
