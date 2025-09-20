@@ -60,7 +60,6 @@ export function removeDataByIds($states: GraphStoresContainer, dataToRemove: Gra
     filterInPlace($states.context.get().notRenderedEdges,
         ne =>
             dataToRemove.edges?.find(e => e.sourceId === ne.sourceId && e.targetId === ne.targetId) === undefined // edge is not in requested removal
-            && ($states.context.get().renderedNodes.find(n => n.id === ne.sourceId || n.id === ne.targetId) !== undefined)// egde is referenced by a node
     );
 
     filterInPlace($states.context.get().proxyEdgesList,

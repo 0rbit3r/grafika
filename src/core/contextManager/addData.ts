@@ -2,9 +2,10 @@ import { initializeRenderedEdge } from "../renderedEdge";
 import { initializeRenderedNode } from "../renderedNode";
 import { GraphStoresContainer } from "../../state/storesContainer";
 import { INITIAL_POSITIONS_RADIUS } from "../defaultGraphOptions";
-import { GraphDataInit } from "../../api/dataTypes";
+import { GraphDataInit, GraphEdgeInit } from "../../api/dataTypes";
 import { getNodeProxy } from "../../api/proxyNode";
 import { getEdgeProxy } from "../../api/proxyEdge";
+import { filterInPlace } from "../../util/filterInPlace";
 
 export function addData($states: GraphStoresContainer, data: GraphDataInit) {
     if (data.nodes === undefined) data.nodes = [];
@@ -23,6 +24,8 @@ export function addData($states: GraphStoresContainer, data: GraphDataInit) {
         $context.proxyNodesList.push(getNodeProxy(newRenderedNode, $states));
     });
 
+    // handle finding notrenderedEdge that should be instantiated by the new data 
+    const instantiatedNotRenderedEdges = new Set<GraphEdgeInit>();
     $context.notRenderedEdges.forEach(notRenderedEdge => {
         const sourceRenderedNode = $context.renderedNodes.find(n => n.id == notRenderedEdge.sourceId);
         const targetRenderedNode = $context.renderedNodes.find(n => n.id == notRenderedEdge.targetId);
@@ -32,8 +35,11 @@ export function addData($states: GraphStoresContainer, data: GraphDataInit) {
             sourceRenderedNode.outEdges.add(newRenderedEdge);
             targetRenderedNode.inEdges.add(newRenderedEdge);
             $context.proxyEdgesList.push(getEdgeProxy(newRenderedEdge, $states));
+            instantiatedNotRenderedEdges.add(notRenderedEdge);
         }
-    })
+    });
+    // remove notRenderedEdges that have been instantiated
+    filterInPlace($context.notRenderedEdges, nre => !instantiatedNotRenderedEdges.has(nre));
 
     data.edges.forEach(newEdge => {
         const sourceRenderedNode = $context.renderedNodes.find(n => n.id == newEdge.sourceId);
@@ -54,8 +60,10 @@ export function addData($states: GraphStoresContainer, data: GraphDataInit) {
         if ($context.edgesAdjacency.get(targetRenderedNode?.id ?? -1) === undefined)
             $context.edgesAdjacency.set(targetRenderedNode?.id ?? -1, new Set());
         $context.edgesAdjacency.get(targetRenderedNode?.id ?? -1)?.add(sourceRenderedNode?.id ?? -1);
-
     });
 
-
-}
+    console.log(
+`renderedEdges size:   ${$context.renderedEdges.length}
+notRenderedEdgesSize: ${$context.notRenderedEdges.length}
+renderedNodesSize:    ${$context.renderedNodes.length}`);
+}   
