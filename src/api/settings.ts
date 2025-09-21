@@ -18,6 +18,7 @@ export interface GraphicsSettings {
     floatingNodes?: boolean;
 
     overlay?: OverlaySettings;
+    initialZoom?: number;
 }
 
 export interface GraphSettings {

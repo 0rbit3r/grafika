@@ -1,5 +1,5 @@
 import { Application, Container, DisplayObject, Rectangle } from "pixi.js";
-import { INITIAL_ZOOM, MIN_ZOOM, ZOOM_STEP_MULTIPLICATOR_BUTTONS, MAX_ZOOM, ZOOM_STEP_MULTIPLICATOR_WHEEL } from "../core/defaultGraphOptions";
+import { MIN_ZOOM, ZOOM_STEP_MULTIPLICATOR_BUTTONS, MAX_ZOOM, ZOOM_STEP_MULTIPLICATOR_WHEEL } from "../core/defaultGraphOptions";
 import { XAndY } from "../api/dataTypes";
 import { GraphInteractionEvents } from "../api/events";
 import { Emitter } from "mitt";
@@ -19,10 +19,10 @@ export class Viewport {
 
     dragContainer: Container;
 
-    constructor(width: number, height: number, dragContainer: Container, interactionEvents: Emitter<GraphInteractionEvents>) {
+    constructor(width: number, height: number, dragContainer: Container, interactionEvents: Emitter<GraphInteractionEvents>, initialZoom?: number) {
         this.width = width;
         this.height = height;
-        this.zoom = INITIAL_ZOOM;
+        this.zoom = initialZoom ?? 1;
         this.position = { x: 0, y: 0 };
         this.dragged = false;
         this.lockedOnNode = false;
@@ -90,11 +90,11 @@ export class Viewport {
     }
 }
 
-export const addDraggableViewport = (app: Application, interactionevents: Emitter<GraphInteractionEvents>, containers: Container<DisplayObject>[]) => {
+export const addDraggableViewport = (app: Application, interactionevents: Emitter<GraphInteractionEvents>, initialZoom?: number) => {
     const dragContainer = new Container();
     dragContainer.hitArea = new Rectangle(0, 0, app.screen.width, app.screen.height);
 
-    const viewport = new Viewport(app.screen.width, app.screen.height, dragContainer, interactionevents);
+    const viewport = new Viewport(app.screen.width, app.screen.height, dragContainer, interactionevents, initialZoom);
 
     window.addEventListener("resize", _ =>
         setTimeout(() => viewport.resizeHitArea(app.screen.width, app.screen.height), 60));
@@ -107,7 +107,7 @@ export const addDraggableViewport = (app: Application, interactionevents: Emitte
 
     const activeTouches = new Map<number, XAndY>();
     let initialPinchDistance: number | null = null;
-    let initialZoom = viewport.zoom;
+    let lastZoom = viewport.zoom;
     let pinchCenter: XAndY | null = null;
 
     const getDistance = (a: XAndY, b: XAndY) =>
@@ -149,14 +149,14 @@ export const addDraggableViewport = (app: Application, interactionevents: Emitte
 
             if (initialPinchDistance === null) {
                 initialPinchDistance = dist;
-                initialZoom = viewport.zoom;
+                lastZoom = viewport.zoom;
                 pinchCenter = viewport.toGlobalCoordinates({
                     x: (p1.x + p2.x) / 2,
                     y: (p1.y + p2.y) / 2
                 });
             } else if (pinchCenter) {
                 const scale = dist / initialPinchDistance;
-                viewport.updateZoom(initialZoom * scale, pinchCenter);
+                viewport.updateZoom(lastZoom * scale, pinchCenter);
             }
         }
     });

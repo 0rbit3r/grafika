@@ -61,9 +61,4 @@ export function addData($states: GraphStoresContainer, data: GraphDataInit) {
             $context.edgesAdjacency.set(targetRenderedNode?.id ?? -1, new Set());
         $context.edgesAdjacency.get(targetRenderedNode?.id ?? -1)?.add(sourceRenderedNode?.id ?? -1);
     });
-
-    console.log(
-`renderedEdges size:   ${$context.renderedEdges.length}
-notRenderedEdgesSize: ${$context.notRenderedEdges.length}
-renderedNodesSize:    ${$context.renderedNodes.length}`);
 }   

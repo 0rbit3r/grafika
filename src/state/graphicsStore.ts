@@ -41,7 +41,7 @@ export const createGraphicsStore = (app: Application, interactionEvents: Emitter
     debugContainer: new Container(),
     edgeContainer: edgeContainer, 
     floatingNodes: settings?.floatingNodes ?? false,
-    viewport: addDraggableViewport(app, interactionEvents, [nodeContainer, edgeContainer]),
+    viewport: addDraggableViewport(app, interactionEvents, settings?.initialZoom),
     defaultEdgeType: settings?.defaultEdgeType ?? EdgeType.Line,
     overlay: settings?.overlay
   });

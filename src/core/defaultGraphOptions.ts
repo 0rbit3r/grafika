@@ -70,7 +70,6 @@ export const NEW_NODE_FADE_IN_FRAMES = 0;
 // zoom
 export const MAX_ZOOM = 5;
 export const MIN_ZOOM = 0.004;
-export const INITIAL_ZOOM = 0.025;
 // Titles are visible when the zoom is bigger than this value
 export const ZOOM_TEXT_VISIBLE_THRESHOLD = 0.2;
 export const ZOOM_TEXT_INVISIBLE_THRESHOLD = 0.1;
@@ -79,9 +78,6 @@ export const ZOOM_STEP_MULTIPLICATOR_WHEEL = 1.04;
 export const ZOOM_STEP_MULTIPLICATOR_BUTTONS = 1.02;
 
 export const TEXT_WORD_WRAP = 160;
-
-// Graph exploration - BFS depth
-export const NEIGHBORHOOD_DEPTH = 2;
 
 // FDL force functions
 export const pushForce = (borderDist: number) => {

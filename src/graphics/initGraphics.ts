@@ -5,7 +5,7 @@ import { EdgeType } from "../api/dataTypes";
 import { ZOOM_TEXT_INVISIBLE_THRESHOLD, ZOOM_TEXT_VISIBLE_THRESHOLD } from "../core/defaultGraphOptions";
 import { initOverlay } from "./overlay/initOverlay";
 import { SPRITE_TEXTURE_RADIUS } from "./sprites/nodeSprites";
-import { EDGE_SPRITE_LENGTH } from "./sprites/edgeSprites";
+import { EDGE_SPRITE_LENGTH, TAPERED_EDGE_WIDTH } from "./sprites/edgeSprites";
 import { handleOverlay } from "./overlay/handleOverlay";
 import { handleNodeLoading, handleEdgeLoading } from "./dynamicLoader";
 
@@ -148,9 +148,12 @@ export const initGraphics = (app: Application, $states: GraphStoresContainer) =>
             const dy = tgtViewportCoors.y - srcViewportCoors.y;
             const length = Math.hypot(dx, dy);
             const scaleX = length / EDGE_SPRITE_LENGTH;
+            const scaleY = edge.type === EdgeType.Tapered
+                ? Math.max(1, Math.min(3, edge.source.radius / TAPERED_EDGE_WIDTH)) * zoom
+                : zoom;
             const angle = Math.atan2(dy, dx);
 
-            edge.sprite && edge.sprite.setTransform(srcViewportCoors.x, srcViewportCoors.y, scaleX, zoom, angle);
+            edge.sprite && edge.sprite.setTransform(srcViewportCoors.x, srcViewportCoors.y, scaleX, scaleY, angle);
         })
     };
 

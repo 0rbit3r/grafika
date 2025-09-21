@@ -5,6 +5,8 @@ export const EDGE_SPRITE_LENGTH = 1000;
 const ARROWHEAD_LENGTH = EDGE_SPRITE_LENGTH / 2;
 const ARROWHEAD_THICKNESS = 100;
 
+export const TAPERED_EDGE_WIDTH = 100;
+
 interface BaseTexturesContainer {
     arrowEdge: Texture | undefined;
     lineEdge: Texture | undefined;
@@ -67,7 +69,6 @@ export function getEdgeSprite(app: Application, type: EdgeType): Sprite | null {
             if (!baseTextures.taperedEdge) {
                 const edgeGraphics = new Graphics();
                 const segments = 100;
-                const thickness = 100;
 
                 edgeGraphics.lineStyle(0); // no outline
 
@@ -86,8 +87,8 @@ export function getEdgeSprite(app: Application, type: EdgeType): Sprite | null {
                     const endX = ux * len * t1;
                     const endY = uy * len * t1;
 
-                    const w0 = (1 - t0) * thickness;
-                    const w1 = (1 - t1) * thickness;
+                    const w0 = (1 - t0) * TAPERED_EDGE_WIDTH;
+                    const w1 = (1 - t1) * TAPERED_EDGE_WIDTH;
 
                     const quad = [
                         startX + px * w0 / 2, startY + py * w0 / 2,
