@@ -1,6 +1,6 @@
 import { Application } from "pixi.js";
 import { initGraphics } from "../graphics/initGraphics";
-import { GraphSettings } from "./settings";
+import { GrafikaSettings } from "./settings";
 import { createGraphStores } from "../state/storesContainer";
 import { addData } from "../core/contextManager/addData";
 import { removeDataByIds } from "../core/contextManager/removeData";
@@ -10,7 +10,7 @@ import { DataInit } from "./dataTypes";
 import mitt from "mitt";
 import {type InteractionEvents} from "./events";
 
-export function addGrafika(element: HTMLElement, settings: GraphSettings): GrafikaInstance {
+export function addGrafika(element: HTMLElement, settings: GrafikaSettings): GrafikaInstance {
 
     const app = new Application<HTMLCanvasElement>(
         {
@@ -77,6 +77,7 @@ export function addGrafika(element: HTMLElement, settings: GraphSettings): Grafi
         start: () => app.ticker.start(),
         stop: () => app.ticker.stop(),
         dispose: () => {
+            console.log(`disposing od grafika instance ${id}`);
             element.removeEventListener("resize", resizeElementHandler);
             app.ticker.stop();
             app.destroy(true, { children: true, texture: true, baseTexture: true });

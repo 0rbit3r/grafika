@@ -4,7 +4,7 @@ import { Application } from "pixi.js";
 import {createGraphicsStore, GraphicsStore } from "./graphicsStore"
 import { createDebugStore, DebugStore } from "./debugStore";
 import {ContextStore, createContextStore} from "./contextStore";
-import { GraphSettings } from "../api/settings";
+import { GrafikaSettings } from "../api/settings";
 import { Emitter } from "mitt";
 import { InteractionEvents } from "../api/events";
 
@@ -17,7 +17,7 @@ export interface GraphStoresContainer {
     context: PreinitializedMapStore<ContextStore>
 }
 
-export function createGraphStores(pixiApp: Application, settings: GraphSettings, interactionEvents: Emitter<InteractionEvents>): GraphStoresContainer {
+export function createGraphStores(pixiApp: Application, settings: GrafikaSettings, interactionEvents: Emitter<InteractionEvents>): GraphStoresContainer {
     return {
         simulation: createSimulationStore(settings.simulation),
         graphics: createGraphicsStore(pixiApp, interactionEvents, settings.graphics),

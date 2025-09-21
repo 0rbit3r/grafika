@@ -21,7 +21,7 @@ export interface GraphicsSettings {
     initialZoom?: number;
 }
 
-export interface GraphSettings {
+export interface GrafikaSettings {
     data?: DataInit,
     graphics?: GraphicsSettings,
     simulation?: SimulationSettings,
