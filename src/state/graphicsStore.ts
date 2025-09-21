@@ -19,7 +19,8 @@ export interface GraphicsStore {
   // nodes turning around a point to make the graph a bit more alive
   floatingNodes: boolean;
 
-  overlay?: OverlaySettings;
+  overlaySettings?: OverlaySettings;
+  unloadOverlayTexture: () => Promise<void>;
 }
 
 export const createGraphicsStore = (app: Application, interactionEvents: Emitter<InteractionEvents>, settings?: GraphicsSettings) => {
@@ -43,6 +44,8 @@ export const createGraphicsStore = (app: Application, interactionEvents: Emitter
     floatingNodes: settings?.floatingNodes ?? false,
     viewport: addDraggableViewport(app, interactionEvents, settings?.initialZoom),
     defaultEdgeType: settings?.defaultEdgeType ?? EdgeType.Line,
-    overlay: settings?.overlay
+    overlaySettings: settings?.overlay,
+
+    unloadOverlayTexture: () => Promise.resolve()
   });
 }

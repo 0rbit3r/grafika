@@ -1,4 +1,4 @@
-import { Application, Container, TextStyle, Text, Sprite } from "pixi.js";
+import { Application, Container, TextStyle, Text, Sprite, Assets } from "pixi.js";
 import { DRAG_Z, EDGES_Z, NODES_Z, TEXT_Z } from "./zIndexes";
 import { GraphStoresContainer } from "../state/storesContainer";
 import { EdgeType } from "../api/dataTypes";
@@ -62,16 +62,20 @@ export const initGraphics = (app: Application, $states: GraphStoresContainer) =>
     let displacementAngleRotation = 0;
 
     let overlaySprite: Sprite;
-    if ($graphics.overlay !== undefined) {
-        overlaySprite = initOverlay($graphics.overlay.url);
+    if ($graphics.overlaySettings !== undefined) {
+        overlaySprite = initOverlay($graphics.overlaySettings.url);
         zSortedContainer.addChild(overlaySprite);
+        $states.graphics.setKey("unloadOverlayTexture", () => {
+            if ($graphics.overlaySettings?.url) return Assets.unload($graphics.overlaySettings.url);
+            else { return Promise.resolve() }
+        }
+        );
     }
 
     zSortedContainer.sortChildren();
 
     const fpsCounter: Text = new Text('0', new TextStyle({ fontSize: 20, fill: "#ffffff" }));
     fpsCounter.x = 20;
-    fpsCounter.y = app.screen.height - 40;
     const updateFpsEveryNFrames = 10;
     const fpsRollingHistory: number[] = [];
     if ($states.debug.get().showFps) {
@@ -94,6 +98,7 @@ export const initGraphics = (app: Application, $states: GraphStoresContainer) =>
             if ($simulation.frame % updateFpsEveryNFrames === 0 && $simulation.frame >= 10) {
                 fpsCounter.text = Math.floor(fpsRollingHistory.reduce((a, b) => a + b) / fpsRollingHistory.length);
             }
+            fpsCounter.y = app.screen.height - 40;
         }
 
         $graphics.textContainer.alpha = zoom <= ZOOM_TEXT_INVISIBLE_THRESHOLD
@@ -103,13 +108,14 @@ export const initGraphics = (app: Application, $states: GraphStoresContainer) =>
                 : 1 - (ZOOM_TEXT_VISIBLE_THRESHOLD - zoom) /
                 (ZOOM_TEXT_VISIBLE_THRESHOLD - ZOOM_TEXT_INVISIBLE_THRESHOLD);
 
-        if ($graphics.overlay !== undefined) handleOverlay(overlaySprite, $graphics);
+        if ($graphics.overlaySettings !== undefined) handleOverlay(overlaySprite, $graphics);
 
         // render thoughts on screen
         $graphics.floatingNodes && (displacementAngleRotation += 0.005);
 
         $context.renderedNodes
             .forEach(node => {
+
                 // handle positions
                 if ($graphics.floatingNodes) {
                     const angle = (node.x / 100 + node.y / 100);

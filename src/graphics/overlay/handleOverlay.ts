@@ -2,19 +2,19 @@ import { Sprite } from "pixi.js";
 import { GraphicsStore } from "../../state/graphicsStore";
 
 export const handleOverlay = (overlaySprite: Sprite, $graphics: GraphicsStore) => {
-    if (!$graphics.overlay) return;
+    if (!$graphics.overlaySettings) return;
 
-    const sizeOnScreen =  $graphics.overlay.scale * $graphics.viewport.zoom;
+    const sizeOnScreen =  $graphics.overlaySettings.scale * $graphics.viewport.zoom;
     const onScreenCoors = $graphics.viewport.toViewportCoordinates(
-        { x: $graphics.overlay.position, y: $graphics.overlay.position }
+        { x: $graphics.overlaySettings.position, y: $graphics.overlaySettings.position }
     );
 
     overlaySprite.setTransform(
         onScreenCoors.x, onScreenCoors.y,
         sizeOnScreen, sizeOnScreen);
     const overlayOpacity =
-        1 - Math.min(1, Math.max(0, $graphics.viewport.zoom - $graphics.overlay.startDisappearingAt)
-            / ($graphics.overlay.disappearCompletelyAt - $graphics.overlay.startDisappearingAt));
+        1 - Math.min(1, Math.max(0, $graphics.viewport.zoom - $graphics.overlaySettings.startDisappearingAt)
+            / ($graphics.overlaySettings.disappearCompletelyAt - $graphics.overlaySettings.startDisappearingAt));
 
     overlaySprite.alpha = overlayOpacity;
 

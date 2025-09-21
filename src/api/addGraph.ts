@@ -8,7 +8,8 @@ import { simulate_one_frame_of_FDL } from "../simulation/forcesSimulation";
 import { GrafikaInstance } from "./controlTypes";
 import { DataInit } from "./dataTypes";
 import mitt from "mitt";
-import {type InteractionEvents} from "./events";
+import { type InteractionEvents } from "./events";
+import { disposeState } from "../core/dispose";
 
 export function addGrafika(element: HTMLElement, settings: GrafikaSettings): GrafikaInstance {
 
@@ -31,8 +32,17 @@ export function addGrafika(element: HTMLElement, settings: GrafikaSettings): Gra
 
     const renderGraph = initGraphics(app, $states);
 
-    const resizeElementHandler = () => $states.graphics.get().viewport.resizeHitArea(app.screen.width, app.screen.height); //todo -removed callback - ensure it is not needed
-    element.addEventListener("resize", resizeElementHandler);
+    const resizeObserver = new ResizeObserver((entries => {
+        for (const entry of entries) {
+            if (entry.contentBoxSize) {
+                app.screen.width = entry.contentRect.width;
+                app.screen.height = entry.contentRect.height;
+                app.queueResize();
+                $states.graphics.get().viewport.resizeHitArea(app.screen.width, app.screen.height)
+            }
+        }
+    }));
+    resizeObserver.observe(element);
 
 
     addData($states, settings.data ?? { edges: [], nodes: [] });
@@ -43,7 +53,6 @@ export function addGrafika(element: HTMLElement, settings: GrafikaSettings): Gra
 
     const handleTick = () => {
         $states.simulation.setKey("frame", $states.simulation.get().frame + 1);
-        
         // force simulation
         if ($states.simulation.get().simulationEnabled) {
             simulate_one_frame_of_FDL($states);
@@ -59,38 +68,48 @@ export function addGrafika(element: HTMLElement, settings: GrafikaSettings): Gra
         handleTick();
     });
 
-    const id = Math.floor(Math.random() * 10000); 
-    console.log("initialized graph " + id.toString());
+    const id = Math.floor(Math.random() * 10000);
+    console.log("initialized grafika instance " + id.toString());
+    let isDisposed = false;
 
     return {
         id: id.toString(),
         interactionEvents: interactionEvents,
 
-        addData: (data: DataInit) => addData($states, data),
-        removeData: (data: DataInit) => removeDataByIds($states, data),
-        getData: () => ({
-            nodes: $states.context.get().proxyNodesList,
-            edges: $states.context.get().proxyEdgesList,
-            unusedEdges: $states.context.get().notRenderedEdges
-        }),
-
-        start: () => app.ticker.start(),
-        stop: () => app.ticker.stop(),
-        dispose: () => {
-            console.log(`disposing od grafika instance ${id}`);
-            element.removeEventListener("resize", resizeElementHandler);
-            app.ticker.stop();
-            app.destroy(true, { children: true, texture: true, baseTexture: true });
+        addData: (data: DataInit) => { if (!isDisposed) addData($states, data) },
+        removeData: (data: DataInit) => { if (!isDisposed) removeDataByIds($states, data) },
+        getData: () => {
+            if (isDisposed) return { edges: [], nodes: [], unusedEdges: [] };
+            return {
+                nodes: $states.context.get().proxyNodesList,
+                edges: $states.context.get().proxyEdgesList,
+                unusedEdges: $states.context.get().notRenderedEdges
+            }
         },
 
-        simStart: () => $states.simulation.setKey("simulationEnabled", true),
-        simStop: () => $states.simulation.setKey("simulationEnabled", false),
+        start: () => { if (!isDisposed) app.ticker.start() },
+        stop: () => { if (!isDisposed) app.ticker.stop() },
+        dispose: () => {
+            if (isDisposed) return;
+            isDisposed = true;
+            console.log(`disposing grafika instance ${id}`);
+            resizeObserver.disconnect();
+            app.ticker.stop();
+
+            disposeState($states);
+        },
+        isDisposed: () => isDisposed,
+
+        simStart: () => { if (!isDisposed) $states.simulation.setKey("simulationEnabled", true) },
+        simStop: () => { if (!isDisposed) $states.simulation.setKey("simulationEnabled", false) },
 
         render: () => {
+            if (isDisposed) return;
             renderGraph();
             app.renderer.render(app.stage);
         },
         tick: (frames: number) => {
+            if (isDisposed) return;
             for (let i = 0; i <= frames; i++) handleTick();
             app.renderer.render(app.stage);
         }
