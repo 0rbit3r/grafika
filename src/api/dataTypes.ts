@@ -1,9 +1,9 @@
-export interface GraphDataInit {
-    nodes?: GraphNodeInit[];
-    edges?: GraphEdgeInit[];
+export interface DataInit {
+    nodes?: NodeInit[];
+    edges?: EdgeInit[];
 }
 
-export interface GraphNodeInit {
+export interface NodeInit {
     id: number;
 
     x?: number;
@@ -29,7 +29,7 @@ export enum NodeShape {
     // todo: exclamation mark, question mark, dash, checked and unchecked "checkbox-like",  
 }
 
-export interface GraphEdgeInit {
+export interface EdgeInit {
     sourceId: number;
     targetId: number;
 

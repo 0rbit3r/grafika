@@ -1,23 +1,23 @@
 import { RenderedNode } from "../core/renderedNode";
-import { EdgeType, GraphEdgeInit, GraphNodeInit, NodeShape } from "./dataTypes";
+import { EdgeType, EdgeInit, NodeInit, NodeShape } from "./dataTypes";
 import { GraphStoresContainer } from "../state/storesContainer";
 // import { drawNode } from "../graphics/drawNode";
 import { RenderedEdge } from "../core/renderedEdge";
 // import { drawEdge } from "../graphics/drawEdge";
 import { Graphics } from "pixi.js";
-import { getNodeProxy, GraphProxyNode } from "./proxyNode";
+import { getNodeProxy, ProxyNode } from "./proxyNode";
 import { initEdgeGraphics } from "../graphics/initEdgeGraphics";
 import { handleEdgeLoading } from "../graphics/dynamicLoader";
 
-export interface GraphProxyEdge {
+export interface ProxyEdge {
     // same as RenderedEdge - fall through
     color: string;
     type: EdgeType;
     weight: number;
 
     // different than renderedEdge - require traps
-    source: GraphProxyNode;
-    target: GraphProxyNode;
+    source: ProxyNode;
+    target: ProxyNode;
     sourceId: number;
     targetId: number;
 }
@@ -26,7 +26,7 @@ const allowedSetWithRedraw = new Set(["color", "type"]);
 const allowedSet = new Set([...allowedSetWithRedraw, "weight"]);
 const allowedGet = new Set([...allowedSet, "source", "target", "sourceId", "targetId"]);
 
-export function getEdgeProxy(n: RenderedEdge, states: GraphStoresContainer): GraphProxyEdge {
+export function getEdgeProxy(n: RenderedEdge, states: GraphStoresContainer): ProxyEdge {
     let p = states.context.get().proxyEdgesMap.get(n);
     if (!p) {
         p = createEdgeProxy(n, states);
@@ -35,7 +35,7 @@ export function getEdgeProxy(n: RenderedEdge, states: GraphStoresContainer): Gra
     return p;
 }
 
-function createEdgeProxy(target: RenderedEdge, $states: GraphStoresContainer): GraphProxyEdge {
+function createEdgeProxy(target: RenderedEdge, $states: GraphStoresContainer): ProxyEdge {
     return new Proxy(target as any, {
         get(_, prop) {
             if (allowedGet.has(prop as string)) {
@@ -63,5 +63,5 @@ function createEdgeProxy(target: RenderedEdge, $states: GraphStoresContainer): G
             console.error(`property ${prop as string} cannot be modified on the GraphProxyEdge.`);
             return false;
         }
-    }) as GraphProxyEdge;
+    }) as ProxyEdge;
 }

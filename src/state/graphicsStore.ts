@@ -4,7 +4,7 @@ import { GraphicsSettings, OverlaySettings } from "../api/settings";
 import { Container, Application, DisplayObject, ParticleContainer } from "pixi.js";
 import { EdgeType } from "../api/dataTypes";
 import { Emitter } from "mitt";
-import { GraphInteractionEvents } from "../api/events";
+import { InteractionEvents } from "../api/events";
 
 export interface GraphicsStore {
   viewport: Viewport;
@@ -22,7 +22,7 @@ export interface GraphicsStore {
   overlay?: OverlaySettings;
 }
 
-export const createGraphicsStore = (app: Application, interactionEvents: Emitter<GraphInteractionEvents>, settings?: GraphicsSettings) => {
+export const createGraphicsStore = (app: Application, interactionEvents: Emitter<InteractionEvents>, settings?: GraphicsSettings) => {
   const nodeContainer = new Container();
   const edgeContainer = new ParticleContainer(50000, {
       alpha: true,

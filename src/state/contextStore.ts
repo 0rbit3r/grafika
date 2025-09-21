@@ -1,9 +1,9 @@
 import { map } from "nanostores";
-import { GraphDataInit, GraphEdgeInit } from "../api/dataTypes";
+import { DataInit, EdgeInit } from "../api/dataTypes";
 import { RenderedNode } from "../core/renderedNode";
 import { RenderedEdge } from "../core/renderedEdge";
-import { GraphProxyNode } from "../api/proxyNode";
-import { GraphProxyEdge } from "../api/proxyEdge";
+import { ProxyNode } from "../api/proxyNode";
+import { ProxyEdge } from "../api/proxyEdge";
 
 export interface ContextStore{
     renderedNodes: RenderedNode[];
@@ -11,13 +11,13 @@ export interface ContextStore{
 
     edgesAdjacency: Map<number, Set<number>>;
 
-    notRenderedEdges: GraphEdgeInit[]; // edges that are defined, but missing either source or target node
+    notRenderedEdges: EdgeInit[]; // edges that are defined, but missing either source or target node
 
-    proxyNodesList: GraphProxyNode[];
-    proxyEdgesList: GraphProxyEdge[];
+    proxyNodesList: ProxyNode[];
+    proxyEdgesList: ProxyEdge[];
 
-    proxyNodesMap: WeakMap<RenderedNode, GraphProxyNode>;
-    proxyEdgesMap: WeakMap<RenderedEdge, GraphProxyEdge>;
+    proxyNodesMap: WeakMap<RenderedNode, ProxyNode>;
+    proxyEdgesMap: WeakMap<RenderedEdge, ProxyEdge>;
 }
 
 export const createContextStore = () =>

@@ -1,5 +1,5 @@
 import { RenderedEdge } from "../core/renderedEdge";
-import { NodeShape, GraphNodeInit } from "../api/dataTypes";
+import { NodeShape, NodeInit } from "../api/dataTypes";
 import { Graphics, TextStyle, Text, Sprite } from "pixi.js";
 import { DEFAULT_RADIUS, TEXT_WORD_WRAP, ZOOM_STEP_MULTIPLICATOR_WHEEL } from "../core/defaultGraphOptions";
 import { GraphStoresContainer } from "../state/storesContainer";
@@ -46,7 +46,7 @@ export interface RenderedNode {
 }
 
 // Will initialize graphics and put it in the nodeContainer
-export const initializeRenderedNode = (node: GraphNodeInit, $states: GraphStoresContainer) => {
+export const initializeRenderedNode = (node: NodeInit, $states: GraphStoresContainer) => {
 
     const renderedNode: RenderedNode = {
         id: node.id,

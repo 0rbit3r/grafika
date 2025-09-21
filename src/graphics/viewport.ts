@@ -1,7 +1,7 @@
 import { Application, Container, DisplayObject, Rectangle } from "pixi.js";
 import { MIN_ZOOM, ZOOM_STEP_MULTIPLICATOR_BUTTONS, MAX_ZOOM, ZOOM_STEP_MULTIPLICATOR_WHEEL } from "../core/defaultGraphOptions";
 import { XAndY } from "../api/dataTypes";
-import { GraphInteractionEvents } from "../api/events";
+import { InteractionEvents } from "../api/events";
 import { Emitter } from "mitt";
 
 
@@ -15,11 +15,11 @@ export class Viewport {
     // indicates whether the viewport follows a highlighted node
     lockedOnNode: boolean;
     // onScreenSizeChange: () => void;
-    interactionEvents: Emitter<GraphInteractionEvents>;
+    interactionEvents: Emitter<InteractionEvents>;
 
     dragContainer: Container;
 
-    constructor(width: number, height: number, dragContainer: Container, interactionEvents: Emitter<GraphInteractionEvents>, initialZoom?: number) {
+    constructor(width: number, height: number, dragContainer: Container, interactionEvents: Emitter<InteractionEvents>, initialZoom?: number) {
         this.width = width;
         this.height = height;
         this.zoom = initialZoom ?? 1;
@@ -112,7 +112,7 @@ export class Viewport {
     // }
 }
 
-export const addDraggableViewport = (app: Application, interactionevents: Emitter<GraphInteractionEvents>, initialZoom?: number) => {
+export const addDraggableViewport = (app: Application, interactionevents: Emitter<InteractionEvents>, initialZoom?: number) => {
     const dragContainer = new Container();
     dragContainer.hitArea = new Rectangle(0, 0, app.screen.width, app.screen.height);
 

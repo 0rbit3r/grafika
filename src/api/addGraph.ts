@@ -5,12 +5,12 @@ import { createGraphStores } from "../state/storesContainer";
 import { addData } from "../core/contextManager/addData";
 import { removeDataByIds } from "../core/contextManager/removeData";
 import { simulate_one_frame_of_FDL } from "../simulation/forcesSimulation";
-import { GraphInstance } from "./controlTypes";
-import { GraphDataInit } from "./dataTypes";
+import { GrafikaInstance } from "./controlTypes";
+import { DataInit } from "./dataTypes";
 import mitt from "mitt";
-import {type GraphInteractionEvents} from "./events";
+import {type InteractionEvents} from "./events";
 
-export function addGraph(element: HTMLElement, settings: GraphSettings): GraphInstance {
+export function addGrafika(element: HTMLElement, settings: GraphSettings): GrafikaInstance {
 
     const app = new Application<HTMLCanvasElement>(
         {
@@ -25,7 +25,7 @@ export function addGraph(element: HTMLElement, settings: GraphSettings): GraphIn
 
     element.appendChild(app.view as HTMLCanvasElement);
 
-    const interactionEvents = mitt<GraphInteractionEvents>()
+    const interactionEvents = mitt<InteractionEvents>()
 
     const $states = createGraphStores(app, settings, interactionEvents);
 
@@ -66,8 +66,8 @@ export function addGraph(element: HTMLElement, settings: GraphSettings): GraphIn
         id: id.toString(),
         interactionEvents: interactionEvents,
 
-        addData: (data: GraphDataInit) => addData($states, data),
-        removeData: (data: GraphDataInit) => removeDataByIds($states, data),
+        addData: (data: DataInit) => addData($states, data),
+        removeData: (data: DataInit) => removeDataByIds($states, data),
         getData: () => ({
             nodes: $states.context.get().proxyNodesList,
             edges: $states.context.get().proxyEdgesList,

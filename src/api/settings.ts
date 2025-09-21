@@ -1,4 +1,4 @@
-import { EdgeType, GraphDataInit } from "./dataTypes";
+import { EdgeType, DataInit } from "./dataTypes";
 
 
 export interface SimulationSettings {
@@ -22,7 +22,7 @@ export interface GraphicsSettings {
 }
 
 export interface GraphSettings {
-    data?: GraphDataInit,
+    data?: DataInit,
     graphics?: GraphicsSettings,
     simulation?: SimulationSettings,
     debug?: DebugSettings

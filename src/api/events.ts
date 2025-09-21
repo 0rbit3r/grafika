@@ -1,9 +1,9 @@
 import { XAndY } from "./dataTypes";
-import { GraphProxyNode } from "./proxyNode";
+import { ProxyNode } from "./proxyNode";
 
-export type GraphInteractionEvents = {
-    nodeClicked: GraphProxyNode; // event name -> payload type
-    nodeDragged: GraphProxyNode;
+export type InteractionEvents = {
+    nodeClicked: ProxyNode; // event name -> payload type
+    nodeDragged: ProxyNode;
     viewportMoved: XAndY;
     viewportZoomed: number;
     framePassed: number;

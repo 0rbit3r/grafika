@@ -1,18 +1,18 @@
 import { Emitter } from "mitt";
-import { GraphDataInit, GraphEdgeInit } from "./dataTypes";
-import { GraphProxyEdge } from "./proxyEdge";
-import { GraphProxyNode } from "./proxyNode";
-import { GraphInteractionEvents } from "./events";
+import { DataInit, EdgeInit } from "./dataTypes";
+import { ProxyEdge } from "./proxyEdge";
+import { ProxyNode } from "./proxyNode";
+import { InteractionEvents } from "./events";
 
-export interface GraphInstance {
+export interface GrafikaInstance {
     id: string;
 
-    interactionEvents: Emitter<GraphInteractionEvents>;
+    interactionEvents: Emitter<InteractionEvents>;
 
     // data management
-    addData: (data: GraphDataInit) => void;
-    removeData: (data: GraphDataInit) => void;
-    getData: () => GraphDataProxy;
+    addData: (data: DataInit) => void;
+    removeData: (data: DataInit) => void;
+    getData: () => DataProxy;
 
     // Renders a single frame
     render: () => void;
@@ -29,8 +29,8 @@ export interface GraphInstance {
     simStop: () => void;
 }
 
-export interface GraphDataProxy {
-    nodes: GraphProxyNode[];
-    edges: GraphProxyEdge[];
-    unusedEdges: GraphEdgeInit[];
+export interface DataProxy {
+    nodes: ProxyNode[];
+    edges: ProxyEdge[];
+    unusedEdges: EdgeInit[];
 }

@@ -1,13 +1,13 @@
 import { RenderedNode } from "../core/renderedNode";
-import { GraphNodeInit, NodeShape } from "./dataTypes";
+import { NodeInit, NodeShape } from "./dataTypes";
 import { GraphStoresContainer } from "../state/storesContainer";
 // import { drawNode } from "../graphics/drawNode";
-import { getEdgeProxy, GraphProxyEdge } from "./proxyEdge";
+import { getEdgeProxy, ProxyEdge } from "./proxyEdge";
 import { mapSet } from "../util/mapSet";
 import { initNodeGraphics } from "../graphics/initNodeGraphics";
 import { handleNodeLoading } from "../graphics/dynamicLoader";
 
-export interface GraphProxyNode {
+export interface ProxyNode {
     id: number;
 
     x: number;
@@ -22,15 +22,15 @@ export interface GraphProxyNode {
     glowEffect: boolean;
     blinkEffect: boolean;
 
-    inEdges: Set<GraphProxyEdge>; //edges are readonly - modifying this array will not change anything
-    outEdges: Set<GraphProxyEdge>;
+    inEdges: Set<ProxyEdge>; //edges are readonly - modifying this array will not change anything
+    outEdges: Set<ProxyEdge>;
 }
 
 const allowedSetWithRedraw = new Set(["color", "radius", "shape", "title", "hollowEffect", "glowEffect", "blinkEffect"])
 const allowedSet = new Set([...allowedSetWithRedraw, "x", "y",]);
 const allowedGet = new Set([...allowedSet, "id", "inEdges", "outEdges"]);
 
-export function getNodeProxy(n: RenderedNode, states: GraphStoresContainer): GraphProxyNode {
+export function getNodeProxy(n: RenderedNode, states: GraphStoresContainer): ProxyNode {
     let p = states.context.get().proxyNodesMap.get(n);
     if (!p) {
         p = createNodeProxy(n, states);
@@ -39,7 +39,7 @@ export function getNodeProxy(n: RenderedNode, states: GraphStoresContainer): Gra
     return p;
 }
 
-function createNodeProxy(target: RenderedNode, $states: GraphStoresContainer): GraphProxyNode {
+function createNodeProxy(target: RenderedNode, $states: GraphStoresContainer): ProxyNode {
     return new Proxy(target as any, {
         get(_, prop) {
             if (allowedGet.has(prop as string)) {
@@ -63,5 +63,5 @@ function createNodeProxy(target: RenderedNode, $states: GraphStoresContainer): G
             console.error(`property ${prop as string} cannot be modified on the GraphProxyNode.`);
             return false;
         }
-    }) as GraphProxyNode;
+    }) as ProxyNode;
 }
