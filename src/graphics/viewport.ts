@@ -33,7 +33,7 @@ export class Viewport {
     public resizeHitArea = (width: number, height: number) => {
         this.width = width;
         this.height = height;
-        this.dragContainer.hitArea = new Rectangle(0, 0, width, height);
+        if (!this.dragContainer.destroyed) this.dragContainer.hitArea = new Rectangle(0, 0, width, height);
     }
 
     // Moves the viewport by zoom-corrected amount
@@ -59,7 +59,7 @@ export class Viewport {
         //         this.position.y = -GRAVITY_FREE_RADIUS;
         // }
     }
-    
+
     toViewportCoordinates = (position: XAndY): XAndY => {
         return {
             x: (position.x - this.position.x) * this.zoom + this.width / 2,
@@ -88,6 +88,28 @@ export class Viewport {
         this.interactionEvents.emit("viewportZoomed", this.zoom);
         this.interactionEvents.emit("viewportMoved", { x: this.position.x, y: this.position.y });
     }
+
+    // //move the viewport to the highlighted node
+    // const lockedOnHighlighted = graphState.lockedOnHighlighted;
+    // if (lockedOnHighlighted && !controlsState.disableFollowHighlightedThought) {
+    //     const highlightedThought = graphState.highlightedThought;
+    //     const viewport = graphState.viewport;
+    //     if (highlightedThought !== null) {
+    //         const dx = viewport.position.x - highlightedThought.position.x;
+    //         const dy = viewport.position.y - highlightedThought.position.y;
+    //         // console.log(dx, dy, lockedOnHighlighted);
+    //         const threshold = 10;
+    //         if (Math.abs(dx) > threshold && Math.abs(dy) > threshold) {
+    //             graphState.viewport.moveBy({ x: (dx - threshold) / 50, y: (dy - threshold) / 50 });
+    //         }
+    //         // const idealZoom = INITIAL_ZOOM - ((INITIAL_ZOOM) / (highlightedThought.radius / MAX_RADIUS));
+    //         // const dz = idealZoom - viewport.zoom;
+    //         // console.log(dz);
+    //         // if (Math.abs(dz) > 0.1) {
+    //         //     graphState.viewport.zoomByButtonDelta(Math.sign(dz));
+    //         // }
+    //     }
+    // }
 }
 
 export const addDraggableViewport = (app: Application, interactionevents: Emitter<GraphInteractionEvents>, initialZoom?: number) => {
@@ -96,8 +118,8 @@ export const addDraggableViewport = (app: Application, interactionevents: Emitte
 
     const viewport = new Viewport(app.screen.width, app.screen.height, dragContainer, interactionevents, initialZoom);
 
-    window.addEventListener("resize", _ =>
-        setTimeout(() => viewport.resizeHitArea(app.screen.width, app.screen.height), 60));
+    // window.addEventListener("resize", _ =>
+    //     setTimeout(() => viewport.resizeHitArea(app.screen.width, app.screen.height), 60));
     // timeout to let the app screen react first (hacky but oh well)
     // anyway, this will not work for programatically-driven changes of the canvas size - todo 
 

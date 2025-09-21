@@ -15,7 +15,7 @@ const baseTextures: BaseTexturesContainer = {
 
 export const getGlowSprite = (app: Application) => {
     let sprite: Sprite = null!;
-    if (!baseTextures.glow) {
+    if (!baseTextures.glow || baseTextures.glow.destroyed) {
         const graphics = new Graphics();
         graphics.lineStyle(500, "#ffffff", 0.05);
         graphics.drawCircle(0, 0, (SPRITE_TEXTURE_RADIUS + 400));
@@ -47,7 +47,7 @@ export const getGlowSprite = (app: Application) => {
 
 export const getHollowRimSprite = (app: Application) => {
     let sprite: Sprite = null!;
-    if (!baseTextures.hollowRim) {
+    if (!baseTextures.hollowRim || baseTextures.hollowRim.destroyed) {
         const graphics = new Graphics();
         graphics.lineStyle(SPRITE_TEXTURE_RADIUS * 0.1, "#888888", 1);
         graphics.drawCircle(0, 0, (SPRITE_TEXTURE_RADIUS * 0.45));
@@ -68,7 +68,7 @@ export const getHollowRimSprite = (app: Application) => {
 // We need to make the hole from two parts because the inside has background color, whilst the rim is tinted to node color
 export const getHollowHoleSprite = (app: Application) => {
     let sprite: Sprite = null!;
-    if (!baseTextures.hollowHole) {
+    if (!baseTextures.hollowHole || baseTextures.hollowHole.destroyed) {
         const graphics = new Graphics();
         graphics.beginFill(app.renderer.background.backgroundColor.toHex(), 1);
         graphics.lineStyle();

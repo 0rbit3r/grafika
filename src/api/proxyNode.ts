@@ -65,18 +65,3 @@ function createNodeProxy(target: RenderedNode, $states: GraphStoresContainer): G
         }
     }) as GraphProxyNode;
 }
-
-export const testProxy = ($states: GraphStoresContainer) => {
-    const firstNode = $states.context.get().renderedNodes[0];
-
-    const exposedNode = createNodeProxy(firstNode, $states);
-    console.log(exposedNode);
-    console.log(exposedNode.shape);
-    console.log(exposedNode.color);
-    setTimeout(() => exposedNode.color = "#ff0000", 1000);
-    setTimeout(() => exposedNode.x = 0, 2000);
-    setTimeout(() => exposedNode.radius = 300, 3000);
-    setTimeout(() => exposedNode.shape = NodeShape.Diamond, 4000);
-    setTimeout(() => exposedNode.glowEffect = true, 5000);
-    setTimeout(() => exposedNode.hollowEffect = true, 6000);
-}

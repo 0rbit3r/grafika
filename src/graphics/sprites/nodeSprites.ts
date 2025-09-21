@@ -30,7 +30,7 @@ export function getNodeSprite(app: Application, node: RenderedNode): Sprite {
     switch (node.shape) {
         default:
         case NodeShape.Circle:
-            if (!baseTextures.circle) {
+            if (!baseTextures.circle || baseTextures.circle.destroyed) {
                 const graphics = new Graphics();
                 graphics.beginFill("#ffffff");
                 graphics.lineStyle(SPRITE_TEXTURE_RADIUS * NODE_BORDER_THICKNESS, "#888888");
@@ -46,7 +46,7 @@ export function getNodeSprite(app: Application, node: RenderedNode): Sprite {
             sprite.anchor.set(0.5);
             break;
         case NodeShape.Square:
-            if (!baseTextures.square) {
+            if (!baseTextures.square || baseTextures.square.destroyed) {
                 const graphics = new Graphics();
                 graphics.beginFill("#ffffff");
                 graphics.lineStyle(SPRITE_TEXTURE_RADIUS * NODE_BORDER_THICKNESS, "#888888");
@@ -64,7 +64,7 @@ export function getNodeSprite(app: Application, node: RenderedNode): Sprite {
             sprite.anchor.set(0.5);
             break;
         case NodeShape.Diamond:
-            if (!baseTextures.diamond) {
+            if (!baseTextures.diamond|| baseTextures.diamond.destroyed) {
                 const graphics = new Graphics();
                 graphics.moveTo(0, 0 - SPRITE_TEXTURE_RADIUS);
                 graphics.arcTo(0 - SPRITE_TEXTURE_RADIUS, 0, 0, 0 + SPRITE_TEXTURE_RADIUS, SPRITE_TEXTURE_RADIUS / 3);
@@ -84,7 +84,7 @@ export function getNodeSprite(app: Application, node: RenderedNode): Sprite {
             sprite.anchor.set(0.5);
             break;
         case NodeShape.UpTriangle:
-            if (!baseTextures.upTriangle) {
+            if (!baseTextures.upTriangle|| baseTextures.upTriangle.destroyed) {
                 const graphics = new Graphics();
                 graphics.moveTo(0, 0 - SPRITE_TEXTURE_RADIUS);
                 graphics.beginFill("#ffffff");
@@ -102,7 +102,7 @@ export function getNodeSprite(app: Application, node: RenderedNode): Sprite {
             sprite.anchor.set(0.5, 1.95 / 3) //I was lazy to do math...
             break;
         case NodeShape.DownTriangle:
-            if (!baseTextures.downTriangle) {
+            if (!baseTextures.downTriangle|| baseTextures.downTriangle.destroyed) {
                 const graphics = new Graphics();
                 graphics.moveTo(0, SPRITE_TEXTURE_RADIUS);
                 graphics.beginFill("#ffffff");
@@ -120,7 +120,7 @@ export function getNodeSprite(app: Application, node: RenderedNode): Sprite {
             sprite.anchor.set(0.5, 1 - 1.95 / 3)
             break;
         case NodeShape.Cross:
-            if (!baseTextures.cross) {
+            if (!baseTextures.cross|| baseTextures.cross.destroyed) {
                 const graphics = new Graphics();
                 graphics.beginFill("#ffffff");
                 graphics.lineStyle(SPRITE_TEXTURE_RADIUS * NODE_BORDER_THICKNESS, "#888888");
@@ -151,7 +151,7 @@ export function getNodeSprite(app: Application, node: RenderedNode): Sprite {
             sprite.anchor.set(0.5)
             break;
         case NodeShape.Heart:
-            if (!baseTextures.heart) {
+            if (!baseTextures.heart|| baseTextures.heart.destroyed) {
                 const graphics = new Graphics();
                 const yOffset = SPRITE_TEXTURE_RADIUS * 0.3;
                 graphics.beginFill("#ffffff");

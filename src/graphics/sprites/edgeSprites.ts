@@ -28,7 +28,7 @@ export function getEdgeSprite(app: Application, type: EdgeType): Sprite | null {
             return null;
         case EdgeType.Line:
         default:
-            if (!baseTextures.lineEdge) {
+            if (!baseTextures.lineEdge || baseTextures.lineEdge.destroyed) {
                 const edgeGraphics = new Graphics();
                 edgeGraphics.lineStyle({ width: 30, color: "#ffffff", alpha: 0.2 });
                 edgeGraphics.moveTo(0, 0);
@@ -44,7 +44,7 @@ export function getEdgeSprite(app: Application, type: EdgeType): Sprite | null {
             sprite = Sprite.from(baseTextures.lineEdge);
             break;
         case EdgeType.Arrow:
-            if (!baseTextures.arrowEdge) {
+            if (!baseTextures.arrowEdge || baseTextures.arrowEdge.destroyed) {
                 const edgeGraphics = new Graphics();
                 edgeGraphics.moveTo(0, 0);
                 edgeGraphics.lineTo(EDGE_SPRITE_LENGTH - ARROWHEAD_LENGTH, 0);
@@ -66,7 +66,7 @@ export function getEdgeSprite(app: Application, type: EdgeType): Sprite | null {
             sprite = Sprite.from(baseTextures.arrowEdge);
             break;
         case EdgeType.Tapered:
-            if (!baseTextures.taperedEdge) {
+            if (!baseTextures.taperedEdge || baseTextures.taperedEdge.destroyed) {
                 const edgeGraphics = new Graphics();
                 const segments = 100;
 
@@ -114,7 +114,7 @@ export function getEdgeSprite(app: Application, type: EdgeType): Sprite | null {
             sprite = Sprite.from(baseTextures.taperedEdge);
             break;
         case EdgeType.CurvedLine:
-            if (!baseTextures.curvedEdge) {
+            if (!baseTextures.curvedEdge || baseTextures.curvedEdge.destroyed) {
                 const edgeGraphics = new Graphics();
                 edgeGraphics.moveTo(0, 0);
                 edgeGraphics.lineStyle({ width: 30, color: "#ffffff", alpha: 0.2 });

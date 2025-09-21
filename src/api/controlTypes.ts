@@ -5,6 +5,8 @@ import { GraphProxyNode } from "./proxyNode";
 import { GraphInteractionEvents } from "./events";
 
 export interface GraphInstance {
+    id: string;
+
     interactionEvents: Emitter<GraphInteractionEvents>;
 
     // data management

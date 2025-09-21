@@ -89,7 +89,6 @@ export const initNodeGraphics = (node: RenderedNode, $states: GraphStoresContain
                 $states.interactionEvents.emit("nodeClicked", nodeProxy);
             else
                 console.error("Not initialized node proxy for node " + node.id);
-            // setTimeout(() => thoughtClicked(thought.id), 30); //timeout to prevent overlay from registering the click too
         }
         node.held = false;
     }
