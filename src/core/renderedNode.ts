@@ -12,11 +12,11 @@ import { computeTextBoxRadius } from "../api/computeTextBoxRadius";
 export interface RenderedNode {
     id: number;
     inEdges: Set<RenderedEdge>;
-    outEdges:Set<RenderedEdge>;
+    outEdges: Set<RenderedEdge>;
 
     x: number;
     y: number;
-    title: string;
+    text: string;
     color: string;
     shape: NodeShape;
 
@@ -24,9 +24,9 @@ export interface RenderedNode {
     glowEffect: boolean;
     blinkEffect: boolean;
 
-    sprite: Sprite | null;
+    sprite?: Sprite;
     // blinkingGraphics: Graphics;
-    text: Text | null;
+    renderedText?: Text;
     radius: number;
 
     held: boolean;
@@ -46,10 +46,12 @@ export interface RenderedNode {
 // Will initialize graphics and put it in the nodeContainer
 export const initializeRenderedNode = (node: NodeInit, $states: GraphStoresContainer) => {
 
+    const $graphics = $states.graphics.get();
+
     const renderedNode: RenderedNode = {
         id: node.id,
-        shape: node.shape ?? NodeShape.Circle,
-        title: node.text ?? node.id.toString(),
+        shape: node.shape ?? $graphics.defaultNodeShape ?? NodeShape.Circle,
+        text: node.text ?? node.id.toString(),
         x: node.x ?? Math.random() * 2 - 1,
         y: node.y ?? Math.random() * 2 - 1,
         color: node.color ?? "#dddddd",
@@ -60,23 +62,23 @@ export const initializeRenderedNode = (node: NodeInit, $states: GraphStoresConta
         blinkEffect: node.blinkEffect ?? false,
         glowEffect: node.glowEffect ?? false,
 
-        sprite: null,
+        sprite: undefined,
         // blinkingGraphics: new Graphics(),
-        radius: node.radius ?? 
-            node.shape === NodeShape.TextBox
-                ? computeTextBoxRadius(node.text?? node.id.toString())
-                : DEFAULT_RADIUS,
-        text: null,
+        radius: node.radius ??
+            (node.shape === NodeShape.TextBox || (!node.shape &&  $graphics.defaultNodeShape === NodeShape.TextBox))
+            ? computeTextBoxRadius(node.text ?? node.id.toString())
+            : DEFAULT_RADIUS,
+        renderedText: undefined,
         held: false,
         hovered: false,
         framesAlive: 0,
         forces: { x: 0, y: 0 },
         momentum: { x: 0, y: 0 },
         isOnScreen: false,
-        renderDisplacement: {x: 0, y: 0}
+        renderDisplacement: { x: 0, y: 0 }
     };
     initNodeGraphics(renderedNode, $states);
-    handleNodeLoading(renderedNode, $states.graphics.get())
+    handleNodeLoading(renderedNode, $graphics)
 
     return renderedNode;
 };

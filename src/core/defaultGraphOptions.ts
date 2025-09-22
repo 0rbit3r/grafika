@@ -11,7 +11,7 @@ export const FRAMES_WITH_OVERLAP = 0;
 export const DEFAULT_RADIUS = 60;
 
 // Radius of the initial positions circle
-export const INITIAL_POSITIONS_RADIUS = 9000;
+export const INITIAL_POSITIONS_RADIUS = 1000;
 
 // forces simulation
 export const DEFAULT_EDGE_LENGTH = 350;

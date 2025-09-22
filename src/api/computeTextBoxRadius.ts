@@ -3,11 +3,8 @@
 // for the sake of sanity disallow new lines (new line = new node anyway?)
 export const computeTextBoxRadius = (text: string) => {
     const textLength = text.length;
-
     const numberOfNewLines = text.split('\n').length - 1;
-
-    console.log("new lines = " + numberOfNewLines);
-    return Math.floor(Math.max(20, Math.sqrt(textLength * 0.85) * 3.8 + 10));
+    return Math.floor(Math.max(20, Math.sqrt(textLength * 0.85) * 3.8 + 10)) + numberOfNewLines * 4.6;
 };
 
 // This is just a best human-effort at fitting curves through a bunch of datapoints:

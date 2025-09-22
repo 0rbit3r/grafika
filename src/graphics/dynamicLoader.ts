@@ -16,12 +16,12 @@ export const handleNodeLoading = (node: RenderedNode, $graphics: GraphicsStore, 
         if (isInside) {
             node.isOnScreen = true;
             node.sprite && $graphics.nodeContainer.addChild(node.sprite);
-            node.text && $graphics.textContainer.addChild(node.text);
+            node.renderedText && $graphics.textContainer.addChild(node.renderedText);
         }
     } else if (!isInside && !node.held) {
         node.isOnScreen = false;
         node.sprite && $graphics.nodeContainer.removeChild(node.sprite);
-        node.text && $graphics.textContainer.removeChild(node.text);
+        node.renderedText && $graphics.textContainer.removeChild(node.renderedText);
     }
 }
 

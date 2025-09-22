@@ -1,25 +1,4 @@
-import { EdgeType, DataInit } from "./dataTypes";
-
-
-export interface SimulationSettings {
-    forceMultiplier?: number;
-    linkDistance?: number;
-}
-
-export interface DebugSettings {
-    showFps?: boolean
-}
-
-export interface GraphicsSettings {
-    antialiasing?: boolean;
-    backgroundColor?: string;
-
-    defaultEdgeType?: EdgeType;
-    floatingNodes?: boolean;
-
-    overlay?: OverlaySettings;
-    initialZoom?: number;
-}
+import { EdgeType, DataInit, NodeShape } from "./dataTypes";
 
 export interface GrafikaSettings {
     data?: DataInit,
@@ -28,6 +7,34 @@ export interface GrafikaSettings {
     debug?: DebugSettings
 }
 
+// SIMULATION
+export interface SimulationSettings {
+    forceMultiplier?: number;
+    defaultEdgeLength?: number;
+
+    initialPositionsRadius?: number;
+    pushThreshold?: number;
+}
+
+// DEBUG
+export interface DebugSettings {
+    showFps?: boolean
+}
+
+// GRAPHICS
+export interface GraphicsSettings {
+    antialiasing?: boolean;
+    backgroundColor?: string;
+
+    defaultNodeShape?: NodeShape;
+    defaultEdgeType?: EdgeType;
+    floatingNodes?: boolean;
+
+    overlay?: OverlaySettings;
+    initialZoom?: number;
+
+    defaultEdgeColor?: "source" | "target" | string;
+}
 
 export interface OverlaySettings {
     url: string;

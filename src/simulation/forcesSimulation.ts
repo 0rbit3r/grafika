@@ -1,5 +1,6 @@
+import { NodeShape } from "../api/dataTypes";
 import {
-    PUSH_THRESH, MOMENTUM_DAMPENING_START_AT, MOMENTUM_DAMPENING_EASE_IN_FRAMES, MAX_MOMENTUM_DAMPENING,
+    MOMENTUM_DAMPENING_START_AT, MOMENTUM_DAMPENING_EASE_IN_FRAMES, MAX_MOMENTUM_DAMPENING,
     MAX_MOVEMENT_SPEED, GRAVITY_FREE_RADIUS, gravityForce,
     inEdgesLengthForceDivisor,
     FRAMES_WITH_NO_INFLUENCE,
@@ -11,28 +12,22 @@ import {
     FRAMES_WITH_OVERLAP,
     MAX_MASS_DIFFERENCE_PUSH_FORCE_MULTIPLIER,
     MIN_MASS_DIFFERENCE_PUSH_FORCE_MULTIPLIER,
-    pushForce
+    pushForce,
+    TEXT_BOX_NODE_WIDTH_MULTIPLIER
 } from "../core/defaultGraphOptions";
 import { RenderedEdge } from "../core/renderedEdge";
 import { RenderedNode } from "../core/renderedNode";
 import { GraphStoresContainer } from "../state/storesContainer";
 
 export const get_border_distance = (node1: RenderedNode, node2: RenderedNode) => {
-    const dx = node1.x - node2.x;
+    const dx = (node1.x - node2.x)
     const dy = node1.y - node2.y;
-    const centerDistance = Math.hypot(dx, dy); 
+    const centerDistance = Math.hypot(dx, dy);
     return centerDistance - node1.radius - node2.radius;
 };
 
-export const get_x_distance = (node1: RenderedNode, node2: RenderedNode) => {
-    return Math.abs(node1.x - node2.x);
-}
-export const get_y_distance = (node1: RenderedNode, node2: RenderedNode) => {
-    return Math.abs(node1.y - node2.y);
-}
-
 const get_center_distance = (node1: RenderedNode, node2: RenderedNode) => {
-    const dx = node1.x - node2.x;
+    const dx = node1.x - node2.x
     const dy = node1.y - node2.y;
     const dist = Math.hypot(dx, dy);
 
@@ -54,7 +49,7 @@ export const simulate_one_frame_of_FDL = ($states: GraphStoresContainer) => {
         handleOutOfBounds(renderedNodes[node1Index]);
         for (let node2Index = 0; node2Index < node1Index; node2Index++) {
             const borderDistance = get_border_distance(renderedNodes[node1Index], renderedNodes[node2Index]);
-            if (borderDistance < PUSH_THRESH
+            if (borderDistance < $simulationState.pushThreshold
                 && !$context.edgesAdjacency.get(renderedNodes[node1Index].id)?.has(renderedNodes[node2Index].id)) {
                 push_unconnected(renderedNodes[node1Index], renderedNodes[node2Index], $states);
             }
@@ -96,12 +91,12 @@ export const simulate_one_frame_of_FDL = ($states: GraphStoresContainer) => {
 export const pull_or_push_connected_to_ideal_distance = (edge: RenderedEdge, $states: GraphStoresContainer) => {
     const simState = $states.simulation.get();
 
-    const dx = edge.target.x - edge.source.x;
+    const dx = edge.target.x - edge.source.x
     const dy = edge.target.y - edge.source.y;
     const centerDistance = get_center_distance(edge.source, edge.target);
     const borderDistance = get_border_distance(edge.source, edge.target);
 
-    const force = pullForce(borderDistance, simState.edgeLength)
+    const force = pullForce(borderDistance, simState.defaultEdgeLength)
         / inEdgesLengthForceDivisor(edge.target.inEdges.size); //todo check the logic + potential bottleneck?
 
     const nodeMassMultiplier = NODE_MASS_ON
@@ -133,6 +128,7 @@ export const pull_or_push_connected_to_ideal_distance = (edge: RenderedEdge, $st
 
 export const push_unconnected = (sourceNode: RenderedNode, targetNode: RenderedNode, $states: GraphStoresContainer) => {
 
+    const $sim = $states.simulation.get();
     const dx = targetNode.x - sourceNode.x;
     const dy = targetNode.y - sourceNode.y;
     const centerDistance = get_center_distance(sourceNode, targetNode);
@@ -143,9 +139,9 @@ export const push_unconnected = (sourceNode: RenderedNode, targetNode: RenderedN
     //     : pushForce(centerDistance);
     // const force = pushForce(centerDistance);
 
-    const forceAtPushThresh = pushForce(PUSH_THRESH); //this might be a bit weird but hey... it works to eliminate the noncontinuity of the push force at the edge
+    const forceAtPushThresh = pushForce($sim.pushThreshold); //this might be a bit weird but hey... it works to eliminate the noncontinuity of the push force at the edge
 
-    const force = $states.simulation.get().frame > FRAMES_WITH_OVERLAP
+    const force = $sim.frame > FRAMES_WITH_OVERLAP
         ? pushForce(borderDistance) - forceAtPushThresh
         : 0;
 

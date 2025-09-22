@@ -1,6 +1,6 @@
 import { TextStyle, Text, Sprite, MSAA_QUALITY } from "pixi.js";
 import { getNodeProxy } from "../api/proxyNode";
-import { DEFAULT_RADIUS, TEXT_BOX_NODE_WIDTH_MULTIPLIER, TEXT_WORD_WRAP_WIDTH, ZOOM_STEP_MULTIPLICATOR_WHEEL } from "../core/defaultGraphOptions";
+import { DEFAULT_RADIUS, NODE_BORDER_THICKNESS, TEXT_BOX_NODE_WIDTH_MULTIPLIER, TEXT_WORD_WRAP_WIDTH, ZOOM_STEP_MULTIPLICATOR_WHEEL } from "../core/defaultGraphOptions";
 import { RenderedNode } from "../core/renderedNode";
 import { GraphStoresContainer } from "../state/storesContainer";
 import { getGlowSprite, getHollowHoleSprite, getHollowRimSprite } from "./sprites/effectSprites";
@@ -98,9 +98,9 @@ export const initNodeGraphics = (node: RenderedNode, $states: GraphStoresContain
     sprite.on("pointerupoutside", handlePointerUp);
     // sprite.on("pointercancel", handlePointerUp);
     // text
-    node.text && node.text.destroy({ children: true });
+    node.renderedText && node.renderedText.destroy({ children: true });
 
-    node.text = node.shape === NodeShape.TextBox
+    node.renderedText = node.shape === NodeShape.TextBox
         ? getTextBoxText(node)
         : getStandardNodeText(node);
 
@@ -122,7 +122,7 @@ const getStandardNodeText = (node: RenderedNode, colorfulText?: boolean) => {
         stroke: "#000000",
     });
 
-    const text = new Text(node.title, style);
+    const text = new Text(node.text, style);
     if (colorfulText) text.tint = new tinycolor(node.color).lighten(30).toString();
     text.anchor.set(0.5, 0);
     text.zIndex = TEXT_Z;
@@ -140,11 +140,11 @@ const getTextBoxText = (node: RenderedNode, colorfulText?: boolean) => {
         fontFamily: 'Monospace',
         fontSize: 14,
         fill: 'white',
-        wordWrapWidth: node.radius * 2 * TEXT_BOX_NODE_WIDTH_MULTIPLIER - TEXT_BOX_MARGIN * 2,
+        wordWrapWidth: node.radius * 2 * TEXT_BOX_NODE_WIDTH_MULTIPLIER - 2 * (NODE_BORDER_THICKNESS * node.radius + TEXT_BOX_MARGIN),
         stroke: "#000000",
     });
 
-    const text = new Text(node.title, style);
+    const text = new Text(node.text, style);
     if (colorfulText) text.tint = new tinycolor(node.color).lighten(30).toString();
     text.anchor.set(0.5, 0);
     text.zIndex = TEXT_Z;

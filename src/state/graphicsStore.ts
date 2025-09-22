@@ -2,7 +2,7 @@ import { map } from "nanostores";
 import { addDraggableViewport, Viewport } from "../graphics/viewport";
 import { GraphicsSettings, OverlaySettings } from "../api/settings";
 import { Container, Application, DisplayObject, ParticleContainer } from "pixi.js";
-import { EdgeType } from "../api/dataTypes";
+import { EdgeType, NodeShape } from "../api/dataTypes";
 import { Emitter } from "mitt";
 import { InteractionEvents } from "../api/events";
 
@@ -14,6 +14,7 @@ export interface GraphicsStore {
   textContainer: Container<DisplayObject>;
   debugContainer: Container<DisplayObject>;
 
+  defaultNodeShape: NodeShape;
   defaultEdgeType: EdgeType;
 
   // nodes turning around a point to make the graph a bit more alive
@@ -21,6 +22,8 @@ export interface GraphicsStore {
 
   overlaySettings?: OverlaySettings;
   unloadOverlayTexture: () => Promise<void>;
+
+  defaultEdgeColor: "source" | "target" | string;
 }
 
 export const createGraphicsStore = (app: Application, interactionEvents: Emitter<InteractionEvents>, settings?: GraphicsSettings) => {
@@ -46,6 +49,9 @@ export const createGraphicsStore = (app: Application, interactionEvents: Emitter
     defaultEdgeType: settings?.defaultEdgeType ?? EdgeType.Line,
     overlaySettings: settings?.overlay,
 
-    unloadOverlayTexture: () => Promise.resolve()
+    unloadOverlayTexture: () => Promise.resolve(),
+
+    defaultEdgeColor: settings?.defaultEdgeColor ?? "#dddddd",
+    defaultNodeShape: settings?.defaultNodeShape ?? NodeShape.Circle,
   });
 }

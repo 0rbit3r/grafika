@@ -31,7 +31,7 @@ export function removeDataByIds($states: GraphStoresContainer, dataToRemove: Dat
     nodesToDestroy.forEach(node => {
         node.sprite?.removeAllListeners();
         node.sprite?.destroy({children: true});
-        node.text?.destroy({children: true});
+        node.renderedText?.destroy({children: true});
         // remove deleted edges from nodes' references
         node.inEdges.forEach(e => edgesToDestroy.add(e));
         node.outEdges.forEach(e => edgesToDestroy.add(e));

@@ -12,11 +12,12 @@ export function addData($states: GraphStoresContainer, data: DataInit) {
     if (data.edges === undefined) data.edges = [];
 
     let $context = $states.context.get();
+    const $simulation = $states.simulation.get();
 
     let angle = 0;
     data.nodes.forEach(newNode => {
-        if (newNode.x === undefined && data.nodes!.length > 1) newNode.x = Math.cos(angle) * INITIAL_POSITIONS_RADIUS;
-        if (newNode.y === undefined && data.nodes!.length > 1) newNode.y = Math.sin(angle) * INITIAL_POSITIONS_RADIUS;
+        if (newNode.x === undefined && data.nodes!.length > 1) newNode.x = Math.cos(angle) * $simulation.initialPositionsRadius;
+        if (newNode.y === undefined && data.nodes!.length > 1) newNode.y = Math.sin(angle) * $simulation.initialPositionsRadius;
 
         angle += Math.PI * 2 / data.nodes!.length;
         const newRenderedNode = initializeRenderedNode(newNode, $states);
