@@ -1,4 +1,4 @@
-import { TextStyle, Text } from "pixi.js";
+import { TextStyle, Text, Sprite, MSAA_QUALITY } from "pixi.js";
 import { getNodeProxy } from "../api/proxyNode";
 import { DEFAULT_RADIUS, TEXT_WORD_WRAP, ZOOM_STEP_MULTIPLICATOR_WHEEL } from "../core/defaultGraphOptions";
 import { RenderedNode } from "../core/renderedNode";
@@ -6,6 +6,7 @@ import { GraphStoresContainer } from "../state/storesContainer";
 import { getGlowSprite, getHollowHoleSprite, getHollowRimSprite } from "./sprites/effectSprites";
 import { getNodeSprite } from "./sprites/nodeSprites";
 import { TEXT_Z } from "./zIndexes";
+import { NodeShape } from "../api/dataTypes";
 
 export const initNodeGraphics = (node: RenderedNode, $states: GraphStoresContainer) => {
     const app = $states.graphics.get().app;
@@ -96,26 +97,24 @@ export const initNodeGraphics = (node: RenderedNode, $states: GraphStoresContain
     sprite.on("pointerupoutside", handlePointerUp);
     // sprite.on("pointercancel", handlePointerUp);
     // text
-    node.text && node.text.destroy({children: true});
+    node.text && node.text.destroy({ children: true });
 
     const style = new TextStyle({
         breakWords: false,
         wordWrap: true,
-        align: "center",
-        fontFamily: 'Arial',
+        align: "left",
+        fontFamily: 'Monospace',
         fontSize: 14,
-        fontWeight: 'bold',
         fill: 'white',
-        wordWrapWidth: TEXT_WORD_WRAP,
+        wordWrapWidth:  node.shape === NodeShape.TextBox ? node.radius * 3 : TEXT_WORD_WRAP,
         stroke: "#000000",
         // dropShadow: true,
         // dropShadowDistance: 2,
     });
 
     const text = new Text(node.title, style);
+    text.anchor.set(0.5, 0);
     text.zIndex = TEXT_Z;
-    text.x = node.x - text.width / 2;
-    text.y = node.y - text.height / 2 + text.height / 2 + DEFAULT_RADIUS + 5;
     node.text = text;
 
     // $states.graphics.get().textContainer.addChild(text); -> handled in loader

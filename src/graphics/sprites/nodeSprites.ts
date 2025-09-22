@@ -1,4 +1,4 @@
-import { Application, Circle, Graphics, SCALE_MODES, Sprite, Texture } from "pixi.js";
+import { Application, Circle, Graphics, SCALE_MODES, Sprite, Texture, Text } from "pixi.js";
 import { NodeShape } from "../../api/dataTypes";
 import { NODE_BORDER_THICKNESS } from "../../core/defaultGraphOptions";
 import { RenderedNode } from "../../core/renderedNode";
@@ -13,6 +13,8 @@ interface BaseTexturesContainer {
     downTriangle: Texture | undefined;
     cross: Texture | undefined;
     heart: Texture | undefined;
+
+    textBox: Texture | undefined;
 }
 
 const baseTextures: BaseTexturesContainer = {
@@ -23,6 +25,8 @@ const baseTextures: BaseTexturesContainer = {
     downTriangle: undefined,
     cross: undefined,
     heart: undefined,
+
+    textBox: undefined
 }
 
 export function getNodeSprite(app: Application, node: RenderedNode): Sprite {
@@ -64,7 +68,7 @@ export function getNodeSprite(app: Application, node: RenderedNode): Sprite {
             sprite.anchor.set(0.5);
             break;
         case NodeShape.Diamond:
-            if (!baseTextures.diamond|| baseTextures.diamond.destroyed) {
+            if (!baseTextures.diamond || baseTextures.diamond.destroyed) {
                 const graphics = new Graphics();
                 graphics.moveTo(0, 0 - SPRITE_TEXTURE_RADIUS);
                 graphics.arcTo(0 - SPRITE_TEXTURE_RADIUS, 0, 0, 0 + SPRITE_TEXTURE_RADIUS, SPRITE_TEXTURE_RADIUS / 3);
@@ -84,7 +88,7 @@ export function getNodeSprite(app: Application, node: RenderedNode): Sprite {
             sprite.anchor.set(0.5);
             break;
         case NodeShape.UpTriangle:
-            if (!baseTextures.upTriangle|| baseTextures.upTriangle.destroyed) {
+            if (!baseTextures.upTriangle || baseTextures.upTriangle.destroyed) {
                 const graphics = new Graphics();
                 graphics.moveTo(0, 0 - SPRITE_TEXTURE_RADIUS);
                 graphics.beginFill("#ffffff");
@@ -102,7 +106,7 @@ export function getNodeSprite(app: Application, node: RenderedNode): Sprite {
             sprite.anchor.set(0.5, 1.95 / 3) //I was lazy to do math...
             break;
         case NodeShape.DownTriangle:
-            if (!baseTextures.downTriangle|| baseTextures.downTriangle.destroyed) {
+            if (!baseTextures.downTriangle || baseTextures.downTriangle.destroyed) {
                 const graphics = new Graphics();
                 graphics.moveTo(0, SPRITE_TEXTURE_RADIUS);
                 graphics.beginFill("#ffffff");
@@ -120,7 +124,7 @@ export function getNodeSprite(app: Application, node: RenderedNode): Sprite {
             sprite.anchor.set(0.5, 1 - 1.95 / 3)
             break;
         case NodeShape.Cross:
-            if (!baseTextures.cross|| baseTextures.cross.destroyed) {
+            if (!baseTextures.cross || baseTextures.cross.destroyed) {
                 const graphics = new Graphics();
                 graphics.beginFill("#ffffff");
                 graphics.lineStyle(SPRITE_TEXTURE_RADIUS * NODE_BORDER_THICKNESS, "#888888");
@@ -151,7 +155,7 @@ export function getNodeSprite(app: Application, node: RenderedNode): Sprite {
             sprite.anchor.set(0.5)
             break;
         case NodeShape.Heart:
-            if (!baseTextures.heart|| baseTextures.heart.destroyed) {
+            if (!baseTextures.heart || baseTextures.heart.destroyed) {
                 const graphics = new Graphics();
                 const yOffset = SPRITE_TEXTURE_RADIUS * 0.3;
                 graphics.beginFill("#ffffff");
@@ -169,6 +173,27 @@ export function getNodeSprite(app: Application, node: RenderedNode): Sprite {
                     });
             }
             sprite = Sprite.from(baseTextures.heart);
+            sprite.anchor.set(0.5);
+            break;
+        case NodeShape.TextBox:
+            if (!baseTextures.textBox || baseTextures.textBox.destroyed) {
+                const graphics = new Graphics();
+                graphics.beginFill("#222222");
+                graphics.lineStyle(SPRITE_TEXTURE_RADIUS * NODE_BORDER_THICKNESS / 2, "#ffffff");
+
+                graphics.drawRoundedRect(
+                    - SPRITE_TEXTURE_RADIUS / 2 * 3, - SPRITE_TEXTURE_RADIUS / 3 * 2,
+                    SPRITE_TEXTURE_RADIUS * 3, SPRITE_TEXTURE_RADIUS * 4 / 3, SPRITE_TEXTURE_RADIUS / 6
+                );
+
+                graphics.endFill();
+                baseTextures.textBox = app.renderer.generateTexture(graphics,
+                    {
+                        scaleMode: SCALE_MODES.LINEAR,
+                        resolution: 1
+                    });
+            }
+            sprite = Sprite.from(baseTextures.textBox);
             sprite.anchor.set(0.5);
             break;
     }

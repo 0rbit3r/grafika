@@ -1,7 +1,7 @@
 import { Application, Container, TextStyle, Text, Sprite, Assets } from "pixi.js";
 import { DRAG_Z, EDGES_Z, NODES_Z, TEXT_Z } from "./zIndexes";
 import { GraphStoresContainer } from "../state/storesContainer";
-import { EdgeType } from "../api/dataTypes";
+import { EdgeType, NodeShape } from "../api/dataTypes";
 import { ZOOM_TEXT_INVISIBLE_THRESHOLD, ZOOM_TEXT_VISIBLE_THRESHOLD } from "../core/defaultGraphOptions";
 import { initOverlay } from "./overlay/initOverlay";
 import { SPRITE_TEXTURE_RADIUS } from "./sprites/nodeSprites";
@@ -136,8 +136,13 @@ export const initGraphics = (app: Application, $states: GraphStoresContainer) =>
                 //     ? 1 - ($simulation.frame % 50) / 50
                 //     : 0;
 
-                zoom >= ZOOM_TEXT_INVISIBLE_THRESHOLD &&
-                    node.text?.setTransform(viewportPos.x - node.text.width / 2, viewportPos.y + node.radius * 1.1 * zoom);
+                if (zoom >= ZOOM_TEXT_INVISIBLE_THRESHOLD){
+                    if (node.shape != NodeShape.TextBox)
+                        node.text?.setTransform(viewportPos.x, viewportPos.y + node.radius * 1.1 * zoom);
+                    else
+                        node.text?.setTransform(viewportPos.x, viewportPos.y - node.radius * 2 / 3 * zoom, zoom / 2, zoom / 2);
+                    
+                }
             });
 
         $context.renderedEdges.forEach(edge => {
