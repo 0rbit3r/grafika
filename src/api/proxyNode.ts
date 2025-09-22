@@ -16,7 +16,7 @@ export interface ProxyNode {
     color: string;
     radius: number;
     shape: NodeShape;
-    title: string;
+    text: string;
 
     hollowEffect: boolean;
     glowEffect: boolean;
@@ -26,7 +26,7 @@ export interface ProxyNode {
     outEdges: Set<ProxyEdge>;
 }
 
-const allowedSetWithRedraw = new Set(["color", "radius", "shape", "title", "hollowEffect", "glowEffect", "blinkEffect"])
+const allowedSetWithRedraw = new Set(["color", "radius", "shape", "text", "hollowEffect", "glowEffect", "blinkEffect"])
 const allowedSet = new Set([...allowedSetWithRedraw, "x", "y",]);
 const allowedGet = new Set([...allowedSet, "id", "inEdges", "outEdges"]);
 

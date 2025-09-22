@@ -1,13 +1,10 @@
 import { RenderedEdge } from "../core/renderedEdge";
 import { NodeShape, NodeInit } from "../api/dataTypes";
-import { Graphics, TextStyle, Text, Sprite } from "pixi.js";
-import { DEFAULT_RADIUS, TEXT_WORD_WRAP, ZOOM_STEP_MULTIPLICATOR_WHEEL } from "../core/defaultGraphOptions";
+import { Text, Sprite } from "pixi.js";
+import { DEFAULT_RADIUS } from "../core/defaultGraphOptions";
 import { GraphStoresContainer } from "../state/storesContainer";
-import { TEXT_Z } from "../graphics/zIndexes";
 // import { drawNode } from "../graphics/drawNode";
 import { XAndY } from "../api/dataTypes";
-import { getNodeProxy } from "../api/proxyNode";
-import { getNodeSprite } from "../graphics/sprites/nodeSprites";
 import { initNodeGraphics } from "../graphics/initNodeGraphics";
 import { handleNodeLoading } from "../graphics/dynamicLoader";
 

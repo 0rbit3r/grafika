@@ -1,12 +1,13 @@
 import { TextStyle, Text, Sprite, MSAA_QUALITY } from "pixi.js";
 import { getNodeProxy } from "../api/proxyNode";
-import { DEFAULT_RADIUS, TEXT_WORD_WRAP, ZOOM_STEP_MULTIPLICATOR_WHEEL } from "../core/defaultGraphOptions";
+import { DEFAULT_RADIUS, TEXT_BOX_NODE_WIDTH_MULTIPLIER, TEXT_WORD_WRAP_WIDTH, ZOOM_STEP_MULTIPLICATOR_WHEEL } from "../core/defaultGraphOptions";
 import { RenderedNode } from "../core/renderedNode";
 import { GraphStoresContainer } from "../state/storesContainer";
 import { getGlowSprite, getHollowHoleSprite, getHollowRimSprite } from "./sprites/effectSprites";
 import { getNodeSprite } from "./sprites/nodeSprites";
 import { TEXT_Z } from "./zIndexes";
 import { NodeShape } from "../api/dataTypes";
+import tinycolor from "tinycolor2";
 
 export const initNodeGraphics = (node: RenderedNode, $states: GraphStoresContainer) => {
     const app = $states.graphics.get().app;
@@ -99,6 +100,39 @@ export const initNodeGraphics = (node: RenderedNode, $states: GraphStoresContain
     // text
     node.text && node.text.destroy({ children: true });
 
+    node.text = node.shape === NodeShape.TextBox
+        ? getTextBoxText(node)
+        : getStandardNodeText(node);
+
+    // $states.graphics.get().textContainer.addChild(text); -> handled in loader
+}
+
+
+const getStandardNodeText = (node: RenderedNode, colorfulText?: boolean) => {
+
+    const style = new TextStyle({
+        breakWords: false,
+        wordWrap: true,
+        align: "center",
+        fontFamily: 'Monospace',
+        fontSize: 14,
+        fontWeight: "bold",
+        fill: '#ffffff',
+        wordWrapWidth: TEXT_WORD_WRAP_WIDTH,
+        stroke: "#000000",
+    });
+
+    const text = new Text(node.title, style);
+    if (colorfulText) text.tint = new tinycolor(node.color).lighten(30).toString();
+    text.anchor.set(0.5, 0);
+    text.zIndex = TEXT_Z;
+
+    return text;
+}
+
+const TEXT_BOX_MARGIN = 3;
+const getTextBoxText = (node: RenderedNode, colorfulText?: boolean) => {
+
     const style = new TextStyle({
         breakWords: false,
         wordWrap: true,
@@ -106,16 +140,14 @@ export const initNodeGraphics = (node: RenderedNode, $states: GraphStoresContain
         fontFamily: 'Monospace',
         fontSize: 14,
         fill: 'white',
-        wordWrapWidth:  node.shape === NodeShape.TextBox ? node.radius * 3 : TEXT_WORD_WRAP,
+        wordWrapWidth: node.radius * 2 * TEXT_BOX_NODE_WIDTH_MULTIPLIER - TEXT_BOX_MARGIN * 2,
         stroke: "#000000",
-        // dropShadow: true,
-        // dropShadowDistance: 2,
     });
 
     const text = new Text(node.title, style);
+    if (colorfulText) text.tint = new tinycolor(node.color).lighten(30).toString();
     text.anchor.set(0.5, 0);
     text.zIndex = TEXT_Z;
-    node.text = text;
 
-    // $states.graphics.get().textContainer.addChild(text); -> handled in loader
+    return text;
 }

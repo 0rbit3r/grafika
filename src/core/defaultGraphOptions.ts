@@ -77,7 +77,7 @@ export const ZOOM_TEXT_INVISIBLE_THRESHOLD = 0.1;
 export const ZOOM_STEP_MULTIPLICATOR_WHEEL = 1.04;
 export const ZOOM_STEP_MULTIPLICATOR_BUTTONS = 1.02;
 
-export const TEXT_WORD_WRAP = 160;
+export const TEXT_WORD_WRAP_WIDTH = 160;
 
 // FDL force functions
 export const pushForce = (borderDist: number) => {
@@ -149,3 +149,6 @@ export const NODE_BORDER_THICKNESS = 0.1;
 
 // Rendered edge is rendered with this length and then scaled and rotated appropriately
 export const RENDERED_EDGE_DEFAULT_LENGTH = 100;
+
+// The textbox node will be this times wider than regular node (height is always equal to radius)
+export const TEXT_BOX_NODE_WIDTH_MULTIPLIER = 3;

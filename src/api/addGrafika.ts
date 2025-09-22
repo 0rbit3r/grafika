@@ -35,6 +35,7 @@ export function addGrafika(element: HTMLElement, settings: GrafikaSettings): Gra
     const resizeObserver = new ResizeObserver((entries => {
         for (const entry of entries) {
             if (entry.contentBoxSize) {
+                console.log("resizing grafika");
                 app.screen.width = entry.contentRect.width;
                 app.screen.height = entry.contentRect.height;
                 app.queueResize();

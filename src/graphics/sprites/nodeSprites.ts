@@ -1,9 +1,10 @@
 import { Application, Circle, Graphics, SCALE_MODES, Sprite, Texture, Text } from "pixi.js";
 import { NodeShape } from "../../api/dataTypes";
-import { NODE_BORDER_THICKNESS } from "../../core/defaultGraphOptions";
+import { NODE_BORDER_THICKNESS, TEXT_BOX_NODE_WIDTH_MULTIPLIER } from "../../core/defaultGraphOptions";
 import { RenderedNode } from "../../core/renderedNode";
 
 export const SPRITE_TEXTURE_RADIUS = 200;
+export const TEXT_BOX_CORNER_RADIUS = 10;
 
 interface BaseTexturesContainer {
     circle: Texture | undefined;
@@ -182,8 +183,8 @@ export function getNodeSprite(app: Application, node: RenderedNode): Sprite {
                 graphics.lineStyle(SPRITE_TEXTURE_RADIUS * NODE_BORDER_THICKNESS / 2, "#ffffff");
 
                 graphics.drawRoundedRect(
-                    - SPRITE_TEXTURE_RADIUS / 2 * 3, - SPRITE_TEXTURE_RADIUS / 3 * 2,
-                    SPRITE_TEXTURE_RADIUS * 3, SPRITE_TEXTURE_RADIUS * 4 / 3, SPRITE_TEXTURE_RADIUS / 6
+                    - SPRITE_TEXTURE_RADIUS * TEXT_BOX_NODE_WIDTH_MULTIPLIER, - SPRITE_TEXTURE_RADIUS ,
+                    SPRITE_TEXTURE_RADIUS * TEXT_BOX_NODE_WIDTH_MULTIPLIER * 2, SPRITE_TEXTURE_RADIUS * 2, TEXT_BOX_CORNER_RADIUS
                 );
 
                 graphics.endFill();

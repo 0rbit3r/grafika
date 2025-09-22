@@ -26,9 +26,10 @@ export enum NodeShape {
     Diamond = 4,
     Cross = 5,
     Heart = 6,
-
-    TextBox = 100
     // todo: exclamation mark, question mark, dash, checked and unchecked "checkbox-like",  
+
+    // Text box renderes a box with text inside of it.
+    TextBox = 100
 }
 
 export interface EdgeInit {

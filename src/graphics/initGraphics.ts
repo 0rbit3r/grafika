@@ -2,7 +2,7 @@ import { Application, Container, TextStyle, Text, Sprite, Assets } from "pixi.js
 import { DRAG_Z, EDGES_Z, NODES_Z, TEXT_Z } from "./zIndexes";
 import { GraphStoresContainer } from "../state/storesContainer";
 import { EdgeType, NodeShape } from "../api/dataTypes";
-import { ZOOM_TEXT_INVISIBLE_THRESHOLD, ZOOM_TEXT_VISIBLE_THRESHOLD } from "../core/defaultGraphOptions";
+import { NODE_BORDER_THICKNESS, ZOOM_TEXT_INVISIBLE_THRESHOLD, ZOOM_TEXT_VISIBLE_THRESHOLD } from "../core/defaultGraphOptions";
 import { initOverlay } from "./overlay/initOverlay";
 import { SPRITE_TEXTURE_RADIUS } from "./sprites/nodeSprites";
 import { EDGE_SPRITE_LENGTH, TAPERED_EDGE_WIDTH } from "./sprites/edgeSprites";
@@ -138,9 +138,9 @@ export const initGraphics = (app: Application, $states: GraphStoresContainer) =>
 
                 if (zoom >= ZOOM_TEXT_INVISIBLE_THRESHOLD){
                     if (node.shape != NodeShape.TextBox)
-                        node.text?.setTransform(viewportPos.x, viewportPos.y + node.radius * 1.1 * zoom);
+                        node.text?.setTransform(viewportPos.x, viewportPos.y + (node.radius * (1 + NODE_BORDER_THICKNESS)) * zoom);
                     else
-                        node.text?.setTransform(viewportPos.x, viewportPos.y - node.radius * 2 / 3 * zoom, zoom / 2, zoom / 2);
+                        node.text?.setTransform(viewportPos.x, viewportPos.y + (node.radius * (NODE_BORDER_THICKNESS - 1)) * zoom, zoom, zoom);
                     
                 }
             });
