@@ -9,7 +9,7 @@ export interface NodeInit {
     x?: number;
     y?: number;
     radius?: number;
-    title?: string;
+    text?: string;
     color?: string;
     shape?: NodeShape;
 

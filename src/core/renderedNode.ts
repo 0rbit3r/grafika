@@ -7,6 +7,7 @@ import { GraphStoresContainer } from "../state/storesContainer";
 import { XAndY } from "../api/dataTypes";
 import { initNodeGraphics } from "../graphics/initNodeGraphics";
 import { handleNodeLoading } from "../graphics/dynamicLoader";
+import { computeTextBoxRadius } from "../api/computeTextBoxRadius";
 
 export interface RenderedNode {
     id: number;
@@ -48,7 +49,7 @@ export const initializeRenderedNode = (node: NodeInit, $states: GraphStoresConta
     const renderedNode: RenderedNode = {
         id: node.id,
         shape: node.shape ?? NodeShape.Circle,
-        title: node.title ?? node.id.toString(),
+        title: node.text ?? node.id.toString(),
         x: node.x ?? Math.random() * 2 - 1,
         y: node.y ?? Math.random() * 2 - 1,
         color: node.color ?? "#dddddd",
@@ -61,7 +62,10 @@ export const initializeRenderedNode = (node: NodeInit, $states: GraphStoresConta
 
         sprite: null,
         // blinkingGraphics: new Graphics(),
-        radius: node.radius ?? DEFAULT_RADIUS,
+        radius: node.radius ?? 
+            node.shape === NodeShape.TextBox
+                ? computeTextBoxRadius(node.text?? node.id.toString())
+                : DEFAULT_RADIUS,
         text: null,
         held: false,
         hovered: false,
