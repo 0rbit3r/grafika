@@ -50,7 +50,7 @@ export const initializeRenderedNode = (node: NodeInit, $states: GraphStoresConta
 
     const renderedNode: RenderedNode = {
         id: node.id,
-        shape: node.shape ?? $graphics.defaultNodeShape ?? NodeShape.Circle,
+        shape: node.shape ?? ($graphics.defaultNodeShape ?? NodeShape.Circle),
         text: node.text ?? node.id.toString(),
         x: node.x ?? Math.random() * 2 - 1,
         y: node.y ?? Math.random() * 2 - 1,
@@ -65,9 +65,9 @@ export const initializeRenderedNode = (node: NodeInit, $states: GraphStoresConta
         sprite: undefined,
         // blinkingGraphics: new Graphics(),
         radius: node.radius ??
-            (node.shape === NodeShape.TextBox || (!node.shape &&  $graphics.defaultNodeShape === NodeShape.TextBox))
+            ((node.shape === NodeShape.TextBox || (!node.shape &&  $graphics.defaultNodeShape === NodeShape.TextBox))
             ? computeTextBoxRadius(node.text ?? node.id.toString())
-            : DEFAULT_RADIUS,
+            : DEFAULT_RADIUS),
         renderedText: undefined,
         held: false,
         hovered: false,

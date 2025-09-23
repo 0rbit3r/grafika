@@ -1,11 +1,14 @@
-import { Application, Graphics, SCALE_MODES, Sprite, Texture } from "pixi.js";
+import { Application, Graphics, SCALE_MODES, Sprite, Texture, TYPES } from "pixi.js";
 import { EdgeType } from "../../api/dataTypes";
+import { RenderedEdge } from "../../core/renderedEdge";
 
-export const EDGE_SPRITE_LENGTH = 1000;
+export const EDGE_SPRITE_LENGTH = 800;
 const ARROWHEAD_LENGTH = EDGE_SPRITE_LENGTH / 2;
 const ARROWHEAD_THICKNESS = 100;
 
-export const TAPERED_EDGE_WIDTH = 100;
+export const TAPERED_EDGE_WIDTH = EDGE_SPRITE_LENGTH / 10;
+
+const LINE_EDGE_WIDTH = EDGE_SPRITE_LENGTH / 20;
 
 interface BaseTexturesContainer {
     arrowEdge: Texture | undefined;
@@ -21,25 +24,28 @@ const baseTextures: BaseTexturesContainer = {
     curvedEdge: undefined
 }
 
-export function getEdgeSprite(app: Application, type: EdgeType): Sprite | null {
+export function getEdgeSprite(app: Application, edge: RenderedEdge): Sprite | null {
     let sprite: Sprite = null!;
-    switch (type) {
+
+    console.log(edge.type);
+
+    switch (edge.type) {
         case EdgeType.None:
             return null;
         case EdgeType.Line:
         default:
             if (!baseTextures.lineEdge || baseTextures.lineEdge.destroyed) {
                 const edgeGraphics = new Graphics();
-                edgeGraphics.lineStyle({ width: 30, color: "#ffffff", alpha: 0.2 });
+                edgeGraphics.lineStyle({ width: LINE_EDGE_WIDTH, color: "#ffffff", alpha: 0.2 });
                 edgeGraphics.moveTo(0, 0);
                 edgeGraphics.lineTo(EDGE_SPRITE_LENGTH, 0);
                 baseTextures.lineEdge = app.renderer.generateTexture(edgeGraphics,
                     {
                         scaleMode: SCALE_MODES.LINEAR,
-                        resolution: 1,
+                        resolution: 1
                     }
                 );
-                // circleGraphics.destroy({children: true, baseTexture: true, texture: true});
+                //edgeGraphics.destroy({ children: true, baseTexture: true, texture: true });
             }
             sprite = Sprite.from(baseTextures.lineEdge);
             break;
@@ -61,7 +67,8 @@ export function getEdgeSprite(app: Application, type: EdgeType): Sprite | null {
                         resolution: 1,
                     }
                 );
-                // circleGraphics.destroy({children: true, baseTexture: true, texture: true});
+               // edgeGraphics.destroy({ children: true, baseTexture: true, texture: true });
+
             }
             sprite = Sprite.from(baseTextures.arrowEdge);
             break;
@@ -109,7 +116,8 @@ export function getEdgeSprite(app: Application, type: EdgeType): Sprite | null {
                         resolution: 1,
                     }
                 );
-                // circleGraphics.destroy({children: true, baseTexture: true, texture: true});
+                //edgeGraphics.destroy({ children: true, baseTexture: true, texture: true });
+
             }
             sprite = Sprite.from(baseTextures.taperedEdge);
             break;
@@ -130,13 +138,17 @@ export function getEdgeSprite(app: Application, type: EdgeType): Sprite | null {
                         resolution: 1,
                     }
                 );
-                // circleGraphics.destroy({children: true, baseTexture: true, texture: true});
+               // edgeGraphics.destroy({ children: true, baseTexture: true, texture: true });
+
             }
             sprite = Sprite.from(baseTextures.curvedEdge);
             break;
     }
 
-    type === EdgeType.CurvedLine
+    console.log(`sprite for edge ${edge.source.id}->${edge.target.id}:`);
+    console.log(sprite);
+
+    edge.type === EdgeType.CurvedLine
         ? sprite.anchor.set(0, 1)
         : sprite.anchor.set(0, 0.5);
     return sprite;

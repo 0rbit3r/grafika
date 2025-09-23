@@ -27,11 +27,11 @@ export function initializeRenderedEdge(
         sprite: null,
         type: edge.type ?? $graphics.defaultEdgeType,
         weight: edge.weight ?? 1,
-        color: edge.color ?? $graphics.defaultEdgeColor === "source"
+        color: edge.color ?? ($graphics.defaultEdgeColor === "source"
             ? sourceNode.color
             : $graphics.defaultEdgeColor === "target"
                 ? targetNode.color
-                : $graphics.defaultEdgeColor,
+                : $graphics.defaultEdgeColor),
         isOnScreen: false
     };
 

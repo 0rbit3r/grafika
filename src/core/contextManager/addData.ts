@@ -28,8 +28,8 @@ export function addData($states: GraphStoresContainer, data: DataInit) {
     // handle finding notrenderedEdge that should be instantiated by the new data 
     const instantiatedNotRenderedEdges = new Set<EdgeInit>();
     $context.notRenderedEdges.forEach(notRenderedEdge => {
-        const sourceRenderedNode = $context.renderedNodes.find(n => n.id == notRenderedEdge.sourceId);
-        const targetRenderedNode = $context.renderedNodes.find(n => n.id == notRenderedEdge.targetId);
+        const sourceRenderedNode = $context.renderedNodes.find(n => n.id === notRenderedEdge.sourceId);
+        const targetRenderedNode = $context.renderedNodes.find(n => n.id === notRenderedEdge.targetId);
         if (sourceRenderedNode && targetRenderedNode) {
             const newRenderedEdge = initializeRenderedEdge(notRenderedEdge, sourceRenderedNode, targetRenderedNode, $states);
             $context.renderedEdges.push(newRenderedEdge);
@@ -43,8 +43,8 @@ export function addData($states: GraphStoresContainer, data: DataInit) {
     filterInPlace($context.notRenderedEdges, nre => !instantiatedNotRenderedEdges.has(nre));
 
     data.edges.forEach(newEdge => {
-        const sourceRenderedNode = $context.renderedNodes.find(n => n.id == newEdge.sourceId);
-        const targetRenderedNode = $context.renderedNodes.find(n => n.id == newEdge.targetId);
+        const sourceRenderedNode = $context.renderedNodes.find(n => n.id === newEdge.sourceId);
+        const targetRenderedNode = $context.renderedNodes.find(n => n.id === newEdge.targetId);
         if (sourceRenderedNode && targetRenderedNode) {
             const newRenderedEdge = initializeRenderedEdge(newEdge, sourceRenderedNode, targetRenderedNode, $states);
             $context.renderedEdges.push(newRenderedEdge);

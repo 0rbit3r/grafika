@@ -19,15 +19,25 @@ import { RenderedEdge } from "../core/renderedEdge";
 import { RenderedNode } from "../core/renderedNode";
 import { GraphStoresContainer } from "../state/storesContainer";
 
+// makes text box nodes more repellent horizontally 
+function anisotropic_dx(node1: RenderedNode, node2: RenderedNode) {
+    let dx = node1.x - node2.x;
+    // if either is a textbox, shrink dx so the distance grows faster in x
+    if (node1.shape === NodeShape.TextBox || node2.shape === NodeShape.TextBox) {
+        dx /= TEXT_BOX_NODE_WIDTH_MULTIPLIER;
+    }
+    return dx;
+}
+
 export const get_border_distance = (node1: RenderedNode, node2: RenderedNode) => {
-    const dx = (node1.x - node2.x)
+    const dx = anisotropic_dx(node1, node2);
     const dy = node1.y - node2.y;
     const centerDistance = Math.hypot(dx, dy);
     return centerDistance - node1.radius - node2.radius;
 };
 
 const get_center_distance = (node1: RenderedNode, node2: RenderedNode) => {
-    const dx = node1.x - node2.x
+    const dx = anisotropic_dx(node1, node2);
     const dy = node1.y - node2.y;
     const dist = Math.hypot(dx, dy);
 

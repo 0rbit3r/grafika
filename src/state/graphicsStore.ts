@@ -10,7 +10,7 @@ export interface GraphicsStore {
   viewport: Viewport;
   app: Application;
   nodeContainer: Container<DisplayObject>;
-  edgeContainer: ParticleContainer;
+  edgeContainer: Container<DisplayObject>;
   textContainer: Container<DisplayObject>;
   debugContainer: Container<DisplayObject>;
 
@@ -28,15 +28,7 @@ export interface GraphicsStore {
 
 export const createGraphicsStore = (app: Application, interactionEvents: Emitter<InteractionEvents>, settings?: GraphicsSettings) => {
   const nodeContainer = new Container();
-  const edgeContainer = new ParticleContainer(50000, {
-      alpha: true,
-      position: true,
-      rotation: true,
-      scale: true,
-      tint: true,
-      uvs: false,
-      vertices: false,
-    });//todo - parametrize?
+  const edgeContainer = new Container();//todo - add parametr to allow ParticleContainer for better performance?
 
   return map<GraphicsStore>({
     app: app,
