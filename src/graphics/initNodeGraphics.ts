@@ -1,4 +1,4 @@
-import { TextStyle, Text, Sprite, MSAA_QUALITY } from "pixi.js";
+import { TextStyle, Text, Sprite, MSAA_QUALITY, ColorMatrixFilter, Color } from "pixi.js";
 import { getNodeProxy } from "../api/proxyNode";
 import { DEFAULT_RADIUS, NODE_BORDER_THICKNESS, TEXT_BOX_NODE_WIDTH_MULTIPLIER, TEXT_WORD_WRAP_WIDTH, ZOOM_STEP_MULTIPLICATOR_WHEEL } from "../core/defaultGraphOptions";
 import { RenderedNode } from "../core/renderedNode";
@@ -101,8 +101,8 @@ export const initNodeGraphics = (node: RenderedNode, $states: GraphStoresContain
     node.renderedText && node.renderedText.destroy({ children: true });
 
     node.renderedText = node.shape === NodeShape.TextBox
-        ? getTextBoxText(node)
-        : getStandardNodeText(node);
+        ? getTextBoxText(node, $states.graphics.colorfulText)
+        : getStandardNodeText(node, $states.graphics.colorfulText);
 
     // $states.graphics.textContainer.addChild(text); -> handled in loader
 }

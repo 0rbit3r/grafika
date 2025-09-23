@@ -28,8 +28,6 @@ const baseTextures: BaseTexturesContainer = {
 export function getEdgeSprite(app: Application, edge: RenderedEdge): Sprite | null {
     let sprite: Sprite = null!;
 
-    console.log(edge.type);
-
     switch (edge.type) {
         case EdgeType.None:
             return null;

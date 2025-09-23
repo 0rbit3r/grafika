@@ -137,7 +137,7 @@ export const initGraphics = (app: Application, $states: GraphStoresContainer) =>
 
                 if (zoom >= ZOOM_TEXT_INVISIBLE_THRESHOLD){
                     if (node.shape != NodeShape.TextBox)
-                        node.renderedText?.setTransform(viewportPos.x, viewportPos.y + (node.radius * (1 + NODE_BORDER_THICKNESS)) * zoom);
+                        node.renderedText?.setTransform(viewportPos.x, viewportPos.y + (node.radius * (1 + NODE_BORDER_THICKNESS * 2)) * zoom);
                     else
                         node.renderedText?.setTransform(viewportPos.x, viewportPos.y + (node.radius * (NODE_BORDER_THICKNESS - 1)) * zoom, zoom, zoom);
                     

@@ -23,11 +23,12 @@ export interface GraphicsStore {
   unloadOverlayTexture: () => Promise<void>;
 
   defaultEdgeColor: "source" | "target" | string;
+  colorfulText: boolean;
 }
 
 export function createGraphicsStore
   (app: Application, interactionEvents: Emitter<InteractionEvents>, settings?: GraphicsSettings): GraphicsStore {
-    
+
   const nodeContainer = new Container();
   const edgeContainer = new Container();//todo - add parametr to allow ParticleContainer for better performance?
 
@@ -46,5 +47,7 @@ export function createGraphicsStore
 
     defaultEdgeColor: settings?.defaultEdgeColor ?? "#dddddd",
     defaultNodeShape: settings?.defaultNodeShape ?? NodeShape.Circle,
+
+    colorfulText: settings?.colorfulText ?? false
   };
 }

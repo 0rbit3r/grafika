@@ -32,6 +32,7 @@ export interface GraphicsSettings {
 
     overlay?: OverlaySettings;
     initialZoom?: number;
+    colorfulText?: boolean;
 
     defaultEdgeColor?: "source" | "target" | string;
 }
