@@ -47,7 +47,8 @@ export enum EdgeType {
     Line = 1,
     Arrow = 2,
     Tapered = 3,
-    CurvedLine = 4
+    CurvedLine = 4,
+    // Animated = 5
     // Animated = 4 animated edges will be pain to optimize...
 }
 

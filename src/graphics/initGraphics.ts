@@ -165,6 +165,7 @@ export const initGraphics = (app: Application, $states: GraphStoresContainer) =>
             const angle = Math.atan2(dy, dx);
 
             edge.sprite && edge.sprite.setTransform(srcViewportCoors.x, srcViewportCoors.y, scaleX, scaleY, angle);
+            // (edge.sprite instanceof AnimatedSprite) && edge.sprite.update(1);
         })
     };
 

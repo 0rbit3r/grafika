@@ -1,4 +1,4 @@
-import { Application, Graphics, SCALE_MODES, Sprite, Texture, TYPES } from "pixi.js";
+import { Application, Graphics, SCALE_MODES, Sprite, Texture } from "pixi.js";
 import { EdgeType } from "../../api/dataTypes";
 import { RenderedEdge } from "../../core/renderedEdge";
 
@@ -14,13 +14,15 @@ interface BaseTexturesContainer {
     lineEdge: Texture | undefined;
     taperedEdge: Texture | undefined;
     curvedEdge: Texture | undefined;
+    animated: Texture[] | undefined;
 }
 
 const baseTextures: BaseTexturesContainer = {
     lineEdge: undefined,
     arrowEdge: undefined,
     taperedEdge: undefined,
-    curvedEdge: undefined
+    curvedEdge: undefined,
+    animated: undefined
 }
 
 export function getEdgeSprite(app: Application, edge: RenderedEdge): Sprite | null {
@@ -44,7 +46,6 @@ export function getEdgeSprite(app: Application, edge: RenderedEdge): Sprite | nu
                         resolution: 1
                     }
                 );
-                //edgeGraphics.destroy({ children: true, baseTexture: true, texture: true });
             }
             sprite = Sprite.from(baseTextures.lineEdge);
             break;
@@ -62,7 +63,7 @@ export function getEdgeSprite(app: Application, edge: RenderedEdge): Sprite | nu
                 edgeGraphics.lineTo(0, LINE_EDGE_WIDTH / 2);
                 edgeGraphics.lineTo(0, -LINE_EDGE_WIDTH / 2);
 
-                
+
                 edgeGraphics.endFill();
                 baseTextures.arrowEdge = app.renderer.generateTexture(edgeGraphics,
                     {
@@ -70,8 +71,6 @@ export function getEdgeSprite(app: Application, edge: RenderedEdge): Sprite | nu
                         resolution: 1,
                     }
                 );
-               // edgeGraphics.destroy({ children: true, baseTexture: true, texture: true });
-
             }
             sprite = Sprite.from(baseTextures.arrowEdge);
             break;
@@ -119,8 +118,6 @@ export function getEdgeSprite(app: Application, edge: RenderedEdge): Sprite | nu
                         resolution: 1,
                     }
                 );
-                //edgeGraphics.destroy({ children: true, baseTexture: true, texture: true });
-
             }
             sprite = Sprite.from(baseTextures.taperedEdge);
             break;
@@ -141,15 +138,50 @@ export function getEdgeSprite(app: Application, edge: RenderedEdge): Sprite | nu
                         resolution: 1,
                     }
                 );
-               // edgeGraphics.destroy({ children: true, baseTexture: true, texture: true });
-
             }
             sprite = Sprite.from(baseTextures.curvedEdge);
             break;
-    }
+        // case EdgeType.Animated:
+        //     const SEGMENTS = 10;
+        //     const FRAMES = 16;
+        //     if (!baseTextures.animated || baseTextures.animated.some(t => t.destroyed)) {
+        //         const frames: Texture[] = [];
 
-    console.log(`sprite for edge ${edge.source.id}->${edge.target.id}:`);
-    console.log(sprite);
+        //         for (let frame = 0; frame < FRAMES; frame++) {
+        //             const g = new Graphics();
+        //             g.lineStyle({ width: LINE_EDGE_WIDTH, color: 0xffffff, alpha: 0.2 });
+        //             g.moveTo(0, 0);
+        //             g.lineTo(EDGE_SPRITE_LENGTH, 0);
+
+        //             for (let segment = 0; segment < SEGMENTS; segment++) {
+
+        //                 // draw a small dot shifting to the right each frame
+        //                 const dotX = EDGE_SPRITE_LENGTH / SEGMENTS * segment + (EDGE_SPRITE_LENGTH / SEGMENTS / FRAMES) * frame;
+        //                 console.log(`f: ${frame} s: ${segment} x: ${dotX}`);
+        //                 g.beginFill(0xffffff, 0.6);
+        //                 g.drawCircle(dotX, 0, 5);
+        //                 g.endFill();
+        //             }
+
+        //             frames.push(
+        //                 app.renderer.generateTexture(g, {
+        //                     scaleMode: SCALE_MODES.LINEAR,
+        //                     resolution: 1
+        //                 })
+        //             );
+        //         }
+        //         baseTextures.animated = frames;
+        //     }
+
+        //     const animatedSprite = new AnimatedSprite(baseTextures.animated);
+        //     animatedSprite.animationSpeed = 1;
+        //     animatedSprite.autoUpdate = false;
+        //     animatedSprite.play();
+        //     animatedSprite.anchor.set(0, 0.5);
+        //     animatedSprite.loop = true;
+        //     return animatedSprite;
+        //     break;
+    }
 
     edge.type === EdgeType.CurvedLine
         ? sprite.anchor.set(0, 1)
