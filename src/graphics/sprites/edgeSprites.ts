@@ -3,11 +3,10 @@ import { EdgeType } from "../../api/dataTypes";
 import { RenderedEdge } from "../../core/renderedEdge";
 
 export const EDGE_SPRITE_LENGTH = 800;
-const ARROWHEAD_LENGTH = EDGE_SPRITE_LENGTH / 2;
-const ARROWHEAD_THICKNESS = 100;
+const ARROWHEAD_LENGTH = EDGE_SPRITE_LENGTH / 4;
 
 export const TAPERED_EDGE_WIDTH = EDGE_SPRITE_LENGTH / 10;
-
+const ARROWHEAD_WIDTH = EDGE_SPRITE_LENGTH / 20;
 const LINE_EDGE_WIDTH = EDGE_SPRITE_LENGTH / 20;
 
 interface BaseTexturesContainer {
@@ -52,14 +51,18 @@ export function getEdgeSprite(app: Application, edge: RenderedEdge): Sprite | nu
         case EdgeType.Arrow:
             if (!baseTextures.arrowEdge || baseTextures.arrowEdge.destroyed) {
                 const edgeGraphics = new Graphics();
-                edgeGraphics.moveTo(0, 0);
-                edgeGraphics.lineTo(EDGE_SPRITE_LENGTH - ARROWHEAD_LENGTH, 0);
-                edgeGraphics.beginFill("#ffffff", 0.2);
                 edgeGraphics.lineStyle();
-                edgeGraphics.lineTo(EDGE_SPRITE_LENGTH - ARROWHEAD_LENGTH, -ARROWHEAD_THICKNESS);
+                edgeGraphics.lineTo(0, -LINE_EDGE_WIDTH / 2);
+                edgeGraphics.beginFill("#ffffff", 0.2);
+                edgeGraphics.lineTo(EDGE_SPRITE_LENGTH - ARROWHEAD_LENGTH, -LINE_EDGE_WIDTH / 3);
+                edgeGraphics.lineTo(EDGE_SPRITE_LENGTH - ARROWHEAD_LENGTH, -ARROWHEAD_WIDTH);
                 edgeGraphics.lineTo(EDGE_SPRITE_LENGTH, 0);
-                edgeGraphics.lineTo(EDGE_SPRITE_LENGTH - ARROWHEAD_LENGTH, ARROWHEAD_THICKNESS);
-                edgeGraphics.lineTo(EDGE_SPRITE_LENGTH - ARROWHEAD_LENGTH, 0);
+                edgeGraphics.lineTo(EDGE_SPRITE_LENGTH - ARROWHEAD_LENGTH, ARROWHEAD_WIDTH);
+                edgeGraphics.lineTo(EDGE_SPRITE_LENGTH - ARROWHEAD_LENGTH, LINE_EDGE_WIDTH / 3);
+                edgeGraphics.lineTo(0, LINE_EDGE_WIDTH / 2);
+                edgeGraphics.lineTo(0, -LINE_EDGE_WIDTH / 2);
+
+                
                 edgeGraphics.endFill();
                 baseTextures.arrowEdge = app.renderer.generateTexture(edgeGraphics,
                     {
