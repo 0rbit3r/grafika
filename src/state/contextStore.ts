@@ -1,11 +1,10 @@
-import { map } from "nanostores";
 import { DataInit, EdgeInit } from "../api/dataTypes";
 import { RenderedNode } from "../core/renderedNode";
 import { RenderedEdge } from "../core/renderedEdge";
 import { ProxyNode } from "../api/proxyNode";
 import { ProxyEdge } from "../api/proxyEdge";
 
-export interface ContextStore{
+export interface ContextStore {
     renderedNodes: RenderedNode[];
     renderedEdges: RenderedEdge[];
 
@@ -20,12 +19,12 @@ export interface ContextStore{
     proxyEdgesMap: WeakMap<RenderedEdge, ProxyEdge>;
 }
 
-export const createContextStore = () =>
-    map<ContextStore>({
+export function createContextStore(): ContextStore {
+    return {
         renderedNodes: [],
         renderedEdges: [],
         edgesAdjacency: new Map(),
-        
+
         notRenderedEdges: [],
 
         proxyNodesList: [],
@@ -33,4 +32,5 @@ export const createContextStore = () =>
 
         proxyEdgesMap: new WeakMap(),
         proxyNodesMap: new WeakMap(),
-    });
+    };
+}

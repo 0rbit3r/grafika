@@ -11,8 +11,8 @@ export function addData($states: GraphStoresContainer, data: DataInit) {
     if (data.nodes === undefined) data.nodes = [];
     if (data.edges === undefined) data.edges = [];
 
-    let $context = $states.context.get();
-    const $simulation = $states.simulation.get();
+    let $context = $states.context;
+    const $simulation = $states.simulation;
 
     let angle = 0;
     data.nodes.forEach(newNode => {

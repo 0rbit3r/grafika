@@ -1,4 +1,3 @@
-import { map } from "nanostores";
 import { addDraggableViewport, Viewport } from "../graphics/viewport";
 import { GraphicsSettings, OverlaySettings } from "../api/settings";
 import { Container, Application, DisplayObject, ParticleContainer } from "pixi.js";
@@ -26,16 +25,18 @@ export interface GraphicsStore {
   defaultEdgeColor: "source" | "target" | string;
 }
 
-export const createGraphicsStore = (app: Application, interactionEvents: Emitter<InteractionEvents>, settings?: GraphicsSettings) => {
+export function createGraphicsStore
+  (app: Application, interactionEvents: Emitter<InteractionEvents>, settings?: GraphicsSettings): GraphicsStore {
+    
   const nodeContainer = new Container();
   const edgeContainer = new Container();//todo - add parametr to allow ParticleContainer for better performance?
 
-  return map<GraphicsStore>({
+  return {
     app: app,
     nodeContainer: new Container(),
     textContainer: new Container(),
     debugContainer: new Container(),
-    edgeContainer: edgeContainer, 
+    edgeContainer: edgeContainer,
     floatingNodes: settings?.floatingNodes ?? false,
     viewport: addDraggableViewport(app, interactionEvents, settings?.initialZoom),
     defaultEdgeType: settings?.defaultEdgeType ?? EdgeType.Line,
@@ -45,5 +46,5 @@ export const createGraphicsStore = (app: Application, interactionEvents: Emitter
 
     defaultEdgeColor: settings?.defaultEdgeColor ?? "#dddddd",
     defaultNodeShape: settings?.defaultNodeShape ?? NodeShape.Circle,
-  });
+  };
 }

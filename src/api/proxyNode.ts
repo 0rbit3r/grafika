@@ -31,10 +31,10 @@ const allowedSet = new Set([...allowedSetWithRedraw, "x", "y",]);
 const allowedGet = new Set([...allowedSet, "id", "inEdges", "outEdges"]);
 
 export function getNodeProxy(n: RenderedNode, states: GraphStoresContainer): ProxyNode {
-    let p = states.context.get().proxyNodesMap.get(n);
+    let p = states.context.proxyNodesMap.get(n);
     if (!p) {
         p = createNodeProxy(n, states);
-        states.context.get().proxyNodesMap.set(n, p);
+        states.context.proxyNodesMap.set(n, p);
     }
     return p;
 }
@@ -56,7 +56,7 @@ function createNodeProxy(target: RenderedNode, $states: GraphStoresContainer): P
                 (target as any)[prop] = value;
                 if (allowedSetWithRedraw.has(prop as string)){
                     initNodeGraphics(target, $states);
-                    handleNodeLoading(target, $states.graphics.get())
+                    handleNodeLoading(target, $states.graphics)
                 }
                 return true;
             }

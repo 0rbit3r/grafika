@@ -27,10 +27,10 @@ const allowedSet = new Set([...allowedSetWithRedraw, "weight"]);
 const allowedGet = new Set([...allowedSet, "source", "target", "sourceId", "targetId"]);
 
 export function getEdgeProxy(n: RenderedEdge, states: GraphStoresContainer): ProxyEdge {
-    let p = states.context.get().proxyEdgesMap.get(n);
+    let p = states.context.proxyEdgesMap.get(n);
     if (!p) {
         p = createEdgeProxy(n, states);
-        states.context.get().proxyEdgesMap.set(n, p);
+        states.context.proxyEdgesMap.set(n, p);
     }
     return p;
 }
@@ -56,7 +56,7 @@ function createEdgeProxy(target: RenderedEdge, $states: GraphStoresContainer): P
                 (target as any)[prop] = value;
                 if (allowedSetWithRedraw.has(prop as string)){
                     initEdgeGraphics(target, $states);
-                    handleEdgeLoading(target, $states.graphics.get())
+                    handleEdgeLoading(target, $states.graphics)
                 }
                 return true;
             }

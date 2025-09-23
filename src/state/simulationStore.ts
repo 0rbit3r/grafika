@@ -1,4 +1,3 @@
-import { map } from "nanostores"
 import { SimulationSettings } from "../api/settings";
 import { DEFAULT_EDGE_LENGTH, INITIAL_POSITIONS_RADIUS, PUSH_THRESH } from "../core/defaultGraphOptions";
 
@@ -15,8 +14,8 @@ export interface SimulationStore {
     pushThreshold: number;
 }
 
-export const createSimulationStore = (settings?: SimulationSettings) =>
-    map<SimulationStore>({
+export function createSimulationStore(settings?: SimulationSettings): SimulationStore {
+    return {
         frame: 0,
         simulationEnabled: false,
         gravityEnabled: false,
@@ -24,4 +23,5 @@ export const createSimulationStore = (settings?: SimulationSettings) =>
         upflowEnabled: false,
         initialPositionsRadius: settings?.initialPositionsRadius ?? INITIAL_POSITIONS_RADIUS,
         pushThreshold: settings?.pushThreshold ?? PUSH_THRESH
-    });
+    };
+}

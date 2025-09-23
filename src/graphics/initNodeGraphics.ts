@@ -10,7 +10,7 @@ import { NodeShape } from "../api/dataTypes";
 import tinycolor from "tinycolor2";
 
 export const initNodeGraphics = (node: RenderedNode, $states: GraphStoresContainer) => {
-    const app = $states.graphics.get().app;
+    const app = $states.graphics.app;
 
     node.sprite?.removeAllListeners();
     node.sprite?.destroy({ baseTexture: false, children: true, texture: false });
@@ -19,7 +19,7 @@ export const initNodeGraphics = (node: RenderedNode, $states: GraphStoresContain
     const sprite = getNodeSprite(app, node);
     sprite.tint = node.color;
 
-    // $states.graphics.get().nodeContainer.addChild(sprite); -> handled in loader
+    // $states.graphics.nodeContainer.addChild(sprite); -> handled in loader
 
     node.sprite = sprite;
 
@@ -44,9 +44,9 @@ export const initNodeGraphics = (node: RenderedNode, $states: GraphStoresContain
     let holdStartTime = 0;
 
     sprite.on('globalpointermove', e => {
-        const $graphics = $states.graphics.get();
+        const $graphics = $states.graphics;
         if (node.held && $graphics.app.ticker.started) {
-            const zoom = $states.graphics.get().viewport.zoom;
+            const zoom = $states.graphics.viewport.zoom;
             node.x += e.movementX / zoom;
             node.y += e.movementY / zoom;
             $states.interactionEvents.emit("nodeDragged", getNodeProxy(node, $states));
@@ -56,7 +56,7 @@ export const initNodeGraphics = (node: RenderedNode, $states: GraphStoresContain
 
     sprite.on('pointerdown', () => {
         if (!app.ticker.started) return;
-        $states.simulation.setKey("frame", 0);
+        $states.simulation.frame = 0;
         node.held = true;
         holdStartTime = performance.now();
     });
@@ -70,7 +70,7 @@ export const initNodeGraphics = (node: RenderedNode, $states: GraphStoresContain
         node.hovered = false;
     });
     sprite.on('wheel', (e) => {
-        const $graphics = $states.graphics.get();
+        const $graphics = $states.graphics;
         if (!$graphics.app.ticker.started) return;
         e.preventDefault();
         e.stopPropagation();
@@ -86,7 +86,7 @@ export const initNodeGraphics = (node: RenderedNode, $states: GraphStoresContain
 
         if (node.held && performance.now() - holdStartTime < DRAG_TIME_THRESHOLD
             && app.ticker.started) {
-            const nodeProxy = $states.context.get().proxyNodesMap.get(node);
+            const nodeProxy = $states.context.proxyNodesMap.get(node);
             if (nodeProxy)
                 $states.interactionEvents.emit("nodeClicked", nodeProxy);
             else
@@ -104,7 +104,7 @@ export const initNodeGraphics = (node: RenderedNode, $states: GraphStoresContain
         ? getTextBoxText(node)
         : getStandardNodeText(node);
 
-    // $states.graphics.get().textContainer.addChild(text); -> handled in loader
+    // $states.graphics.textContainer.addChild(text); -> handled in loader
 }
 
 

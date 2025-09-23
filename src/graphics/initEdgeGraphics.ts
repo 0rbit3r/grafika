@@ -3,7 +3,7 @@ import { GraphStoresContainer } from "../state/storesContainer";
 import { getEdgeSprite } from "./sprites/edgeSprites";
 
 export const initEdgeGraphics = (edge: RenderedEdge, $states: GraphStoresContainer) => {
-    const $graphics = $states.graphics.get();
+    const $graphics = $states.graphics;
     const sprite = getEdgeSprite($graphics.app, edge);
 
     edge.sprite = sprite;

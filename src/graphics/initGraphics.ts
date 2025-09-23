@@ -15,17 +15,17 @@ export const initGraphics = (app: Application, $states: GraphStoresContainer) =>
     zSortedContainer.sortableChildren = true;
     app.stage.addChild(zSortedContainer);
 
-    const nodeContainer = $states.graphics.get().nodeContainer;
-    const textContainer = $states.graphics.get().textContainer;
-    const debugContainer = $states.graphics.get().debugContainer;
-    const edgeContainer = $states.graphics.get().edgeContainer;
+    const nodeContainer = $states.graphics.nodeContainer;
+    const textContainer = $states.graphics.textContainer;
+    const debugContainer = $states.graphics.debugContainer;
+    const edgeContainer = $states.graphics.edgeContainer;
 
     nodeContainer.eventMode = "passive";
     textContainer.eventMode = "none";
     debugContainer.eventMode = "none";
     edgeContainer.eventMode = "none";
 
-    const viewport = $states.graphics.get().viewport;
+    const viewport = $states.graphics.viewport;
 
     zSortedContainer.addChild(viewport.dragContainer);
 
@@ -43,7 +43,7 @@ export const initGraphics = (app: Application, $states: GraphStoresContainer) =>
 
     // Handle node dragging logic here as not to plague individual nodes with pointermove events...
     // app.stage.on('pointermove', e => {
-    //     const heldNode = $states.context.get().heldNode;
+    //     const heldNode = $states.context.heldNode;
     //     if (app.ticker.started && heldNode !== undefined) {
     //             if (!heldNode.held) return; 
     //             const zoom = viewport.zoom;
@@ -54,10 +54,10 @@ export const initGraphics = (app: Application, $states: GraphStoresContainer) =>
     //     }
     // });
 
-    let $simulation = $states.simulation.get();
-    let $debug = $states.debug.get();
-    let $graphics = $states.graphics.get();
-    let $context = $states.context.get();
+    let $simulation = $states.simulation;
+    let $debug = $states.debug;
+    let $graphics = $states.graphics;
+    let $context = $states.context;
     let zoom = 0;
     let displacementAngleRotation = 0;
 
@@ -65,11 +65,10 @@ export const initGraphics = (app: Application, $states: GraphStoresContainer) =>
     if ($graphics.overlaySettings !== undefined) {
         overlaySprite = initOverlay($graphics.overlaySettings.url);
         zSortedContainer.addChild(overlaySprite);
-        $states.graphics.setKey("unloadOverlayTexture", () => {
+        $states.graphics.unloadOverlayTexture = () => {
             if ($graphics.overlaySettings?.url) return Assets.unload($graphics.overlaySettings.url);
             else { return Promise.resolve() }
-        }
-        );
+        };
     }
 
     zSortedContainer.sortChildren();
@@ -78,15 +77,15 @@ export const initGraphics = (app: Application, $states: GraphStoresContainer) =>
     fpsCounter.x = 20;
     const updateFpsEveryNFrames = 10;
     const fpsRollingHistory: number[] = [];
-    if ($states.debug.get().showFps) {
+    if ($states.debug.showFps) {
         debugContainer.addChild(fpsCounter);
     }
 
     const renderGraph = () => {
-        $simulation = $states.simulation.get();
-        $debug = $states.debug.get();
-        $graphics = $states.graphics.get();
-        $context = $states.context.get();
+        $simulation = $states.simulation;
+        $debug = $states.debug;
+        $graphics = $states.graphics;
+        $context = $states.context;
         zoom = $graphics.viewport.zoom;
 
         // FPS counter

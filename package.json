@@ -44,7 +44,6 @@
   },
   "dependencies": {
     "mitt": "^3.0.1",
-    "nanostores": "^1.0.1",
     "pixi.js": "^7.4.3",
     "tinycolor2": "^1.6.0"
   },

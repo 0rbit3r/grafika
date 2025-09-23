@@ -39,7 +39,7 @@ export function addGrafika(element: HTMLElement, settings: GrafikaSettings): Gra
                 app.screen.width = entry.contentRect.width;
                 app.screen.height = entry.contentRect.height;
                 app.queueResize();
-                $states.graphics.get().viewport.resizeHitArea(app.screen.width, app.screen.height)
+                $states.graphics.viewport.resizeHitArea(app.screen.width, app.screen.height)
             }
         }
     }));
@@ -53,15 +53,15 @@ export function addGrafika(element: HTMLElement, settings: GrafikaSettings): Gra
     // testProxy($states);
 
     const handleTick = () => {
-        $states.simulation.setKey("frame", $states.simulation.get().frame + 1);
+        $states.simulation.frame = $states.simulation.frame + 1;
         // force simulation
-        if ($states.simulation.get().simulationEnabled) {
+        if ($states.simulation.simulationEnabled) {
             simulate_one_frame_of_FDL($states);
         }
 
         // render the graph
         renderGraph();
-        interactionEvents.emit("framePassed", $states.simulation.get().frame);
+        interactionEvents.emit("framePassed", $states.simulation.frame);
     }
 
     // main application loop
@@ -82,9 +82,9 @@ export function addGrafika(element: HTMLElement, settings: GrafikaSettings): Gra
         getData: () => {
             if (isDisposed) return { edges: [], nodes: [], unusedEdges: [] };
             return {
-                nodes: $states.context.get().proxyNodesList,
-                edges: $states.context.get().proxyEdgesList,
-                unusedEdges: $states.context.get().notRenderedEdges
+                nodes: $states.context.proxyNodesList,
+                edges: $states.context.proxyEdgesList,
+                unusedEdges: $states.context.notRenderedEdges
             }
         },
 
@@ -101,8 +101,8 @@ export function addGrafika(element: HTMLElement, settings: GrafikaSettings): Gra
         },
         isDisposed: () => isDisposed,
 
-        simStart: () => { if (!isDisposed) $states.simulation.setKey("simulationEnabled", true) },
-        simStop: () => { if (!isDisposed) $states.simulation.setKey("simulationEnabled", false) },
+        simStart: () => { if (!isDisposed) $states.simulation.simulationEnabled = true },
+        simStop: () => { if (!isDisposed) $states.simulation.simulationEnabled = false },
 
         render: () => {
             if (isDisposed) return;

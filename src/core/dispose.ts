@@ -1,8 +1,8 @@
 import { GraphStoresContainer } from "../state/storesContainer"
 
 export const disposeState = ($states: GraphStoresContainer) => {
-    const $graphics = $states.graphics.get();
-    const $context = $states.context.get();
+    const $graphics = $states.graphics;
+    const $context = $states.context;
 
     $context.renderedEdges.forEach(e => {
         e.sprite?.destroy(true);
@@ -11,15 +11,15 @@ export const disposeState = ($states: GraphStoresContainer) => {
         n.sprite?.destroy(true);
     });
 
-    $states.context.setKey("edgesAdjacency", new Map());
-    $states.context.setKey("notRenderedEdges", []);
-    $states.context.setKey("renderedEdges", []);
-    $states.context.setKey("renderedNodes", []);
-    $states.context.setKey("proxyEdgesMap", new Map());
-    $states.context.setKey("proxyEdgesMap", new Map());
+    $states.context.edgesAdjacency = new Map();
+    $states.context.notRenderedEdges = [];
+    $states.context.renderedEdges = [];
+    $states.context.renderedNodes = [];
+    $states.context.proxyEdgesMap = new Map();
+    $states.context.proxyEdgesMap = new Map();
 
 
-    $states.graphics.get().unloadOverlayTexture().then(() => {
+    $states.graphics.unloadOverlayTexture().then(() => {
         $graphics.app.destroy(true, { children: true, texture: true, baseTexture: true });
     });
 }

@@ -21,11 +21,11 @@ export function removeDataByIds($states: GraphStoresContainer, dataToRemove: Dat
     // then check my sanity nd try to find a better architecture than this...
 
     // remove nodes and dispose their graphics
-    const nodesToDestroy = $states.context.get().renderedNodes.filter(existingNode =>
+    const nodesToDestroy = $states.context.renderedNodes.filter(existingNode =>
         (dataToRemove.nodes?.find(n => n.id === existingNode.id)));
 
-    $states.context.setKey("renderedNodes",
-        $states.context.get().renderedNodes.filter(n => !nodesToDestroy.includes(n)));
+    $states.context.renderedNodes =
+        $states.context.renderedNodes.filter(n => !nodesToDestroy.includes(n));
 
     const edgesToDestroy: Set<RenderedEdge> = new Set();
     nodesToDestroy.forEach(node => {
@@ -39,36 +39,36 @@ export function removeDataByIds($states: GraphStoresContainer, dataToRemove: Dat
 
     // remove edges requested to delete
     dataToRemove.edges?.forEach(e => {
-        const renderedEdge = $states.context.get().renderedEdges.find(
+        const renderedEdge = $states.context.renderedEdges.find(
             re => re.source.id === e.sourceId && re.target.id === e.targetId
         );
         if (renderedEdge) edgesToDestroy.add(renderedEdge);
     });
 
 
-    $states.context.setKey("renderedEdges",
-        $states.context.get().renderedEdges.filter(e => !edgesToDestroy.has(e)));
+    $states.context.renderedEdges =
+        $states.context.renderedEdges.filter(e => !edgesToDestroy.has(e));
 
     edgesToDestroy.forEach(e => {
         e.sprite?.destroy({children: true});
         e.target.inEdges.delete(e);
         e.source.outEdges.delete(e);
 
-        $states.context.get().edgesAdjacency.get(e.source.id)?.delete(e.target.id);
-        $states.context.get().edgesAdjacency.get(e.target.id)?.delete(e.source.id);
+        $states.context.edgesAdjacency.get(e.source.id)?.delete(e.target.id);
+        $states.context.edgesAdjacency.get(e.target.id)?.delete(e.source.id);
     });
 
     // remove stale notRenderedEdges and notRenderedEdges requested for removal
-    filterInPlace($states.context.get().notRenderedEdges,
+    filterInPlace($states.context.notRenderedEdges,
         ne =>
             dataToRemove.edges?.find(e => e.sourceId === ne.sourceId && e.targetId === ne.targetId) === undefined // edge is not in requested removal
     );
 
-    filterInPlace($states.context.get().proxyEdgesList,
+    filterInPlace($states.context.proxyEdgesList,
         re => dataToRemove.edges?.find(e => e.sourceId === re.sourceId && e.targetId === re.targetId) === undefined // edge is not in requested removal
-            && ($states.context.get().renderedNodes.find(n => n.id === re.sourceId || n.id === re.targetId) !== undefined));// egde is referenced by a node);
+            && ($states.context.renderedNodes.find(n => n.id === re.sourceId || n.id === re.targetId) !== undefined));// egde is referenced by a node);
 
-    filterInPlace($states.context.get().proxyNodesList,
+    filterInPlace($states.context.proxyNodesList,
         rn => dataToRemove.nodes?.find(n => rn.id === n.id) === undefined);
     
 }

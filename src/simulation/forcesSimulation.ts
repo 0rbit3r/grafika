@@ -46,12 +46,12 @@ const get_center_distance = (node1: RenderedNode, node2: RenderedNode) => {
 }
 
 export const simulate_one_frame_of_FDL = ($states: GraphStoresContainer) => {
-    const $simulationState = $states.simulation.get();
-    const renderedNodes = $states.context.get().renderedNodes;
+    const $simulationState = $states.simulation;
+    const renderedNodes = $states.context.renderedNodes;
     const frame = $simulationState.frame;
-    const $context = $states.context.get();
+    const $context = $states.context;
 
-    $states.context.get().renderedEdges.forEach(e => {
+    $states.context.renderedEdges.forEach(e => {
         pull_or_push_connected_to_ideal_distance(e, $states);
     });
 
@@ -99,7 +99,7 @@ export const simulate_one_frame_of_FDL = ($states: GraphStoresContainer) => {
 }
 
 export const pull_or_push_connected_to_ideal_distance = (edge: RenderedEdge, $states: GraphStoresContainer) => {
-    const simState = $states.simulation.get();
+    const simState = $states.simulation;
 
     const dx = edge.target.x - edge.source.x
     const dy = edge.target.y - edge.source.y;
@@ -138,7 +138,7 @@ export const pull_or_push_connected_to_ideal_distance = (edge: RenderedEdge, $st
 
 export const push_unconnected = (sourceNode: RenderedNode, targetNode: RenderedNode, $states: GraphStoresContainer) => {
 
-    const $sim = $states.simulation.get();
+    const $sim = $states.simulation;
     const dx = targetNode.x - sourceNode.x;
     const dy = targetNode.y - sourceNode.y;
     const centerDistance = get_center_distance(sourceNode, targetNode);

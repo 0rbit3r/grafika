@@ -19,7 +19,7 @@ export interface RenderedEdge {
 export function initializeRenderedEdge(
     edge: EdgeInit, sourceNode: RenderedNode, targetNode: RenderedNode,
     $states: GraphStoresContainer): RenderedEdge {
-    const $graphics = $states.graphics.get();
+    const $graphics = $states.graphics;
 
     const renderedEdge: RenderedEdge = {
         source: sourceNode,

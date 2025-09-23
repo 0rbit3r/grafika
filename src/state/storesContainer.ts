@@ -1,4 +1,3 @@
-import { PreinitializedMapStore } from "nanostores";
 import {createSimulationStore, SimulationStore} from "./simulationStore";
 import { Application } from "pixi.js";
 import {createGraphicsStore, GraphicsStore } from "./graphicsStore"
@@ -11,10 +10,10 @@ import { InteractionEvents } from "../api/events";
 // nanostores creates a singleton state - for multiple graphs (and ths states) per page we need to compartmentalize
 export interface GraphStoresContainer {
     interactionEvents: Emitter<InteractionEvents>,
-    simulation: PreinitializedMapStore<SimulationStore>,
-    graphics: PreinitializedMapStore<GraphicsStore>,
-    debug: PreinitializedMapStore<DebugStore>,
-    context: PreinitializedMapStore<ContextStore>
+    simulation: SimulationStore,
+    graphics: GraphicsStore,
+    debug: DebugStore,
+    context: ContextStore
 }
 
 export function createGraphStores(pixiApp: Application, settings: GrafikaSettings, interactionEvents: Emitter<InteractionEvents>): GraphStoresContainer {

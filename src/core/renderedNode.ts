@@ -46,7 +46,7 @@ export interface RenderedNode {
 // Will initialize graphics and put it in the nodeContainer
 export const initializeRenderedNode = (node: NodeInit, $states: GraphStoresContainer) => {
 
-    const $graphics = $states.graphics.get();
+    const $graphics = $states.graphics;
 
     const renderedNode: RenderedNode = {
         id: node.id,
