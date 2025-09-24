@@ -13,17 +13,21 @@ export interface ProxyEdge {
     // same as RenderedEdge - fall through
     color: string;
     type: EdgeType;
-    weight: number;
-
+    
     // different than renderedEdge - require traps
     source: ProxyNode;
     target: ProxyNode;
     sourceId: number;
     targetId: number;
+    
+    weight: number;
+    alpha: number;
+    length: number;
+
 }
 
-const allowedSetWithRedraw = new Set(["color", "type"]);
-const allowedSet = new Set([...allowedSetWithRedraw, "weight"]);
+const allowedSetWithRedraw = new Set(["color", "type", "alpha"]);
+const allowedSet = new Set([...allowedSetWithRedraw, "weight", "length"]);
 const allowedGet = new Set([...allowedSet, "source", "target", "sourceId", "targetId"]);
 
 export function getEdgeProxy(n: RenderedEdge, states: GraphStoresContainer): ProxyEdge {

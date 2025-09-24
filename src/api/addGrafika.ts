@@ -13,6 +13,8 @@ import { disposeState } from "../core/dispose";
 
 export function addGrafika(element: HTMLElement, settings: GrafikaSettings): GrafikaInstance {
 
+    Object.assign(element.style, {width: "100%", height: "100%"});
+
     const app = new Application<HTMLCanvasElement>(
         {
             background: settings.graphics?.backgroundColor ?? '#000000',
@@ -26,7 +28,7 @@ export function addGrafika(element: HTMLElement, settings: GrafikaSettings): Gra
 
     element.appendChild(app.view as HTMLCanvasElement);
 
-    const interactionEvents = mitt<InteractionEvents>()
+    const interactionEvents = mitt<InteractionEvents>();
 
     const $states = createGraphStores(app, settings, interactionEvents);
 
@@ -36,9 +38,7 @@ export function addGrafika(element: HTMLElement, settings: GrafikaSettings): Gra
         for (const entry of entries) {
             if (entry.contentBoxSize) {
                 console.log("resizing grafika");
-                app.screen.width = entry.contentRect.width;
-                app.screen.height = entry.contentRect.height;
-                app.queueResize();
+                app.resize();
                 $states.graphics.viewport.resizeHitArea(app.screen.width, app.screen.height)
             }
         }

@@ -4,16 +4,21 @@ import { EdgeType, EdgeInit } from "../api/dataTypes";
 import { GraphStoresContainer } from "../state/storesContainer";
 import { initEdgeGraphics } from "../graphics/initEdgeGraphics";
 import { handleEdgeLoading } from "../graphics/dynamicLoader";
+import { DEFAULT_EDGE_ALPHA, IDEAL_DIST_SIZE_MULTIPLIER } from "./defaultGraphOptions";
+import { pull_or_push_connected_to_ideal_distance } from "../simulation/forcesSimulation";
 
 export interface RenderedEdge {
     source: RenderedNode;
     target: RenderedNode;
     color: string;
     type: EdgeType;
-    weight: number;
     sprite: Sprite | null;
 
     isOnScreen: boolean;
+
+    weight: number;
+    alpha: number;
+    length: number;
 }
 
 export function initializeRenderedEdge(
@@ -26,12 +31,14 @@ export function initializeRenderedEdge(
         target: targetNode,
         sprite: null,
         type: edge.type ?? $graphics.defaultEdgeType,
-        weight: edge.weight ?? 1,
         color: edge.color ?? ($graphics.defaultEdgeColor === "source"
             ? sourceNode.color
             : $graphics.defaultEdgeColor === "target"
                 ? targetNode.color
                 : $graphics.defaultEdgeColor),
+        weight: edge.weight ?? 1,
+        alpha: edge.alpha ?? $states.graphics.defaultEdgeAlpha,
+        length: edge.length ?? $states.simulation.defaultEdgeLength,
         isOnScreen: false
     };
 

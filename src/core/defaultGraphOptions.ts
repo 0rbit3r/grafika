@@ -51,21 +51,11 @@ export const MAX_MASS_DIFFERENCE_PUSH_FORCE_MULTIPLIER = 2;
 export const MIN_MASS_DIFFERENCE_PUSH_FORCE_MULTIPLIER = 0.5;
 
 export const BASE_EDGE_WIDTH = 9;
-export const BASE_EDGE_ALPHA = 0.8;
-
-export const HIGHLIGHTED_EDGE_WIDTH = 14;
-export const HIGHLIGHTED_EDGE_ALPHA = 1;
-
-export const UNHIGHLIGHTED_EDGE_WIDTH = 8;
-export const UNHIGHLIGHTED_EDGE_ALPHA = 0.7;
+export const DEFAULT_EDGE_ALPHA = 0.3;
 
 // nodes appearing appearance
 export const NEW_NODE_INVISIBLE_FOR = 0;
 export const NEW_NODE_FADE_IN_FRAMES = 0;
-
-// Backdrop - delete?
-// export const OVERLAY_ZOOM_THRESHOLD_FULLY_VISIBLE = 0.05;
-// export const OVERLAY_ZOOM_THRESHOLD_HIDDEN = 0.1;
 
 // zoom
 export const MAX_ZOOM = 5;

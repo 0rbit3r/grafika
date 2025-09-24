@@ -4,6 +4,7 @@ import { Container, Application, DisplayObject, ParticleContainer } from "pixi.j
 import { EdgeType, NodeShape } from "../api/dataTypes";
 import { Emitter } from "mitt";
 import { InteractionEvents } from "../api/events";
+import { DEFAULT_EDGE_ALPHA } from "../core/defaultGraphOptions";
 
 export interface GraphicsStore {
   viewport: Viewport;
@@ -15,6 +16,7 @@ export interface GraphicsStore {
 
   defaultNodeShape: NodeShape;
   defaultEdgeType: EdgeType;
+  defaultEdgeAlpha: number;
 
   // nodes turning around a point to make the graph a bit more alive
   floatingNodes: boolean;
@@ -48,6 +50,8 @@ export function createGraphicsStore
     defaultEdgeColor: settings?.defaultEdgeColor ?? "#dddddd",
     defaultNodeShape: settings?.defaultNodeShape ?? NodeShape.Circle,
 
-    colorfulText: settings?.colorfulText ?? false
+    colorfulText: settings?.colorfulText ?? false,
+
+    defaultEdgeAlpha: settings?.defaultEdgeAlpha ?? DEFAULT_EDGE_ALPHA
   };
 }

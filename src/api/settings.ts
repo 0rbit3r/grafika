@@ -35,6 +35,7 @@ export interface GraphicsSettings {
     colorfulText?: boolean;
 
     defaultEdgeColor?: "source" | "target" | string;
+    defaultEdgeAlpha?: number;
 }
 
 export interface OverlaySettings {

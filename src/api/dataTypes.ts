@@ -40,6 +40,8 @@ export interface EdgeInit {
     type?: EdgeType;
 
     weight?: number;
+    alpha?: number;
+    length?: number;
 }
 
 export enum EdgeType {

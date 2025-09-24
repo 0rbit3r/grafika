@@ -35,7 +35,7 @@ export function getEdgeSprite(app: Application, edge: RenderedEdge): Sprite | nu
         default:
             if (!baseTextures.lineEdge || baseTextures.lineEdge.destroyed) {
                 const edgeGraphics = new Graphics();
-                edgeGraphics.lineStyle({ width: LINE_EDGE_WIDTH, color: "#ffffff", alpha: 0.2 });
+                edgeGraphics.lineStyle({ width: LINE_EDGE_WIDTH, color: "#ffffff" });
                 edgeGraphics.moveTo(0, 0);
                 edgeGraphics.lineTo(EDGE_SPRITE_LENGTH, 0);
                 baseTextures.lineEdge = app.renderer.generateTexture(edgeGraphics,
@@ -52,7 +52,7 @@ export function getEdgeSprite(app: Application, edge: RenderedEdge): Sprite | nu
                 const edgeGraphics = new Graphics();
                 edgeGraphics.lineStyle();
                 edgeGraphics.lineTo(0, -LINE_EDGE_WIDTH / 2);
-                edgeGraphics.beginFill("#ffffff", 0.2);
+                edgeGraphics.beginFill("#ffffff");
                 edgeGraphics.lineTo(EDGE_SPRITE_LENGTH - ARROWHEAD_LENGTH, -LINE_EDGE_WIDTH / 3);
                 edgeGraphics.lineTo(EDGE_SPRITE_LENGTH - ARROWHEAD_LENGTH, -ARROWHEAD_WIDTH);
                 edgeGraphics.lineTo(EDGE_SPRITE_LENGTH, 0);
@@ -104,7 +104,7 @@ export function getEdgeSprite(app: Application, edge: RenderedEdge): Sprite | nu
                         endX + px * w1 / 2, endY + py * w1 / 2,
                     ];
 
-                    const segmentAlpha = 0.5 * t0;
+                    const segmentAlpha = t0;
 
                     edgeGraphics.beginFill("#ffffff", segmentAlpha);
                     edgeGraphics.drawPolygon(quad);
@@ -123,7 +123,7 @@ export function getEdgeSprite(app: Application, edge: RenderedEdge): Sprite | nu
             if (!baseTextures.curvedEdge || baseTextures.curvedEdge.destroyed) {
                 const edgeGraphics = new Graphics();
                 edgeGraphics.moveTo(0, 0);
-                edgeGraphics.lineStyle({ width: 30, color: "#ffffff", alpha: 0.2 });
+                edgeGraphics.lineStyle({ width: 30, color: "#ffffff" });
                 edgeGraphics.quadraticCurveTo(
                     EDGE_SPRITE_LENGTH / 2,
                     -EDGE_SPRITE_LENGTH / 2,
@@ -147,7 +147,7 @@ export function getEdgeSprite(app: Application, edge: RenderedEdge): Sprite | nu
 
         //         for (let frame = 0; frame < FRAMES; frame++) {
         //             const g = new Graphics();
-        //             g.lineStyle({ width: LINE_EDGE_WIDTH, color: 0xffffff, alpha: 0.2 });
+        //             g.lineStyle({ width: LINE_EDGE_WIDTH, color: 0xffffff});
         //             g.moveTo(0, 0);
         //             g.lineTo(EDGE_SPRITE_LENGTH, 0);
 
@@ -156,7 +156,7 @@ export function getEdgeSprite(app: Application, edge: RenderedEdge): Sprite | nu
         //                 // draw a small dot shifting to the right each frame
         //                 const dotX = EDGE_SPRITE_LENGTH / SEGMENTS * segment + (EDGE_SPRITE_LENGTH / SEGMENTS / FRAMES) * frame;
         //                 console.log(`f: ${frame} s: ${segment} x: ${dotX}`);
-        //                 g.beginFill(0xffffff, 0.6);
+        //                 g.beginFill(0xffffff);
         //                 g.drawCircle(dotX, 0, 5);
         //                 g.endFill();
         //             }
@@ -184,5 +184,6 @@ export function getEdgeSprite(app: Application, edge: RenderedEdge): Sprite | nu
     edge.type === EdgeType.CurvedLine
         ? sprite.anchor.set(0, 1)
         : sprite.anchor.set(0, 0.5);
+    sprite.alpha = edge.alpha;
     return sprite;
 }

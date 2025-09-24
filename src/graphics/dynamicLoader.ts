@@ -23,6 +23,9 @@ export const handleNodeLoading = (node: RenderedNode, $graphics: GraphicsStore, 
         node.sprite && $graphics.nodeContainer.removeChild(node.sprite);
         node.renderedText && $graphics.textContainer.removeChild(node.renderedText);
     }
+
+    // if (isInside && $graphics.viewport.zoom < 0.25)
+    //     node.sprite?.eventMode && (node.sprite.eventMode= "none"); Might improve performance when zoomed out, but in practice, id doesn't really?
 }
 
 export const handleEdgeLoading = (edge: RenderedEdge, $graphics: GraphicsStore,
