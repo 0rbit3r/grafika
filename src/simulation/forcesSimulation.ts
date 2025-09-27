@@ -71,7 +71,7 @@ export const simulate_one_frame_of_FDL = ($states: GraphStoresContainer) => {
 
     renderedNodes.forEach(node => {
         node.framesAlive += 1;
-        // I'm gonna be honest, I don't really understandwhat's going on down from here...
+        // I'm gonna be honest, I don't really understand what's going on down from here...
         if (Math.abs(node.momentum.x) < Math.abs(node.forces.x)) {
             node.momentum.x = Math.abs(node.momentum.x) * Math.sign(node.forces.x);
         }
@@ -106,8 +106,9 @@ export const pull_or_push_connected_to_ideal_distance = (edge: RenderedEdge, $st
     const centerDistance = get_center_distance(edge.source, edge.target);
     const borderDistance = get_border_distance(edge.source, edge.target);
 
-    const force = pullForce(borderDistance, simState.defaultEdgeLength)
-        / inEdgesLengthForceDivisor(edge.target.inEdges.size); //todo check the logic + potential bottleneck?
+    const force = pullForce(borderDistance, edge.length)
+        * edge.weight
+        / inEdgesLengthForceDivisor(edge.target.inEdges.size);
 
     const nodeMassMultiplier = NODE_MASS_ON
         ? Math.min(Math.max(edge.target.radius / edge.source.radius, MIN_MASS_DIFFERENCE_PULL_FORCE_MULTIPLIER), MAX_MASS_DIFFERENCE_PULL_FORCE_MULTIPLIER)
@@ -149,8 +150,9 @@ export const push_unconnected = (sourceNode: RenderedNode, targetNode: RenderedN
     //     : pushForce(centerDistance);
     // const force = pushForce(centerDistance);
 
-    const forceAtPushThresh = pushForce($sim.pushThreshold); //this might be a bit weird but hey... it works to eliminate the noncontinuity of the push force at the edge
 
+    //this might be a bit weird but hey... it works to eliminate the noncontinuity of the push force at the edge
+    const forceAtPushThresh = pushForce($sim.pushThreshold); 
     const force = $sim.frame > FRAMES_WITH_OVERLAP
         ? pushForce(borderDistance) - forceAtPushThresh
         : 0;

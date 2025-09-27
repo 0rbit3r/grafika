@@ -14,18 +14,19 @@ import { disposeState } from "../core/dispose";
 export function addGrafika(element: HTMLElement, settings: GrafikaSettings): GrafikaInstance {
 
     Object.assign(element.style, {width: "100%", height: "100%"});
-
+    
     const app = new Application<HTMLCanvasElement>(
         {
             background: settings.graphics?.backgroundColor ?? '#000000',
             resizeTo: element,
             antialias: settings.graphics?.antialiasing ?? false,
-
+            
             autoDensity: true, // todo: i have a hunch this might mess up drag containers relative size to viewport or other things,
             resolution: window.devicePixelRatio // this and the above are needed for the canvas not to look like shit on mobile
         }
     );
-
+    
+    app.view.addEventListener("wheel", preventPageScrollOnWheel);
     element.appendChild(app.view as HTMLCanvasElement);
 
     const interactionEvents = mitt<InteractionEvents>();
@@ -94,6 +95,7 @@ export function addGrafika(element: HTMLElement, settings: GrafikaSettings): Gra
             if (isDisposed) return;
             isDisposed = true;
             console.log(`disposing grafika instance ${id}`);
+            app.view.removeEventListener("wheel", preventPageScrollOnWheel)
             resizeObserver.disconnect();
             app.ticker.stop();
 
@@ -115,4 +117,9 @@ export function addGrafika(element: HTMLElement, settings: GrafikaSettings): Gra
             app.renderer.render(app.stage);
         }
     };
+}
+
+const preventPageScrollOnWheel = (e: Event) => {
+    e.preventDefault();
+    console.log("preventing scroll");
 }

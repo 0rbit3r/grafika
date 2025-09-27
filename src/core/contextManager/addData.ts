@@ -48,6 +48,7 @@ export function addData($states: GraphStoresContainer, data: DataInit) {
         if (sourceRenderedNode && targetRenderedNode) {
             const newRenderedEdge = initializeRenderedEdge(newEdge, sourceRenderedNode, targetRenderedNode, $states);
             $context.renderedEdges.push(newRenderedEdge);
+            $context.proxyEdgesList.push(getEdgeProxy(newRenderedEdge, $states));
             sourceRenderedNode.outEdges.add(newRenderedEdge);
             targetRenderedNode.inEdges.add(newRenderedEdge);
         }
