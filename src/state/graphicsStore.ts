@@ -1,5 +1,5 @@
 import { addDraggableViewport, Viewport } from "../graphics/viewport";
-import { GraphicsSettings, OverlaySettings } from "../api/settings";
+import { BackdropSettings, GraphicsSettings, OverlaySettings } from "../api/settings";
 import { Container, Application, DisplayObject, ParticleContainer } from "pixi.js";
 import { EdgeType, NodeShape } from "../api/dataTypes";
 import { Emitter } from "mitt";
@@ -24,6 +24,9 @@ export interface GraphicsStore {
   overlaySettings?: OverlaySettings;
   unloadOverlayTexture: () => Promise<void>;
 
+  backdropSettings?: BackdropSettings;
+  unloadBackdropTexture: () => Promise<void>;
+
   defaultEdgeColor: "source" | "target" | string;
   colorfulText: boolean;
 }
@@ -43,9 +46,12 @@ export function createGraphicsStore
     floatingNodes: settings?.floatingNodes ?? false,
     viewport: addDraggableViewport(app, interactionEvents, settings?.initialZoom),
     defaultEdgeType: settings?.defaultEdgeType ?? EdgeType.Line,
-    overlaySettings: settings?.overlay,
 
+    overlaySettings: settings?.overlay,
     unloadOverlayTexture: () => Promise.resolve(),
+
+    backdropSettings: settings?.backdrop,
+    unloadBackdropTexture: () => Promise.resolve(),
 
     defaultEdgeColor: settings?.defaultEdgeColor ?? "#dddddd",
     defaultNodeShape: settings?.defaultNodeShape ?? NodeShape.Circle,

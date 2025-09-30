@@ -25,12 +25,14 @@ export const disposeState = ($states: GraphStoresContainer) => {
 
 
     $states.graphics.unloadOverlayTexture().then(() => {
-        $graphics.app.destroy(true, { children: true, texture: true, baseTexture: true });
-        $states.context = null!;
-        $states.debug = null!;
-        $states.graphics = null!;
-        $states.interactionEvents.all.clear();
-        $states.interactionEvents = null!
-        $states.simulation = null!;
+        $states.graphics.unloadBackdropTexture().then(() => {
+            $graphics.app.destroy(true, { children: true, texture: true, baseTexture: true });
+            $states.context = null!;
+            $states.debug = null!;
+            $states.graphics = null!;
+            $states.interactionEvents.all.clear();
+            $states.interactionEvents = null!
+            $states.simulation = null!;
+        });
     });
 }

@@ -121,5 +121,4 @@ export function addGrafika(element: HTMLElement, settings: GrafikaSettings): Gra
 
 const preventPageScrollOnWheel = (e: Event) => {
     e.preventDefault();
-    console.log("preventing scroll");
 }

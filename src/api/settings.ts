@@ -31,6 +31,7 @@ export interface GraphicsSettings {
     floatingNodes?: boolean;
 
     overlay?: OverlaySettings;
+    backdrop?: BackdropSettings;    
     initialZoom?: number;
     colorfulText?: boolean;
 
@@ -49,5 +50,11 @@ export interface OverlaySettings {
     disappearCompletelyAt: number;
 }
 
-// todo - backdrop will be parallaxed behind the nodes (past era/epoch)
-// export interface BackdropSettings
+export interface BackdropSettings {
+    url: string;
+    scale: number;
+    parallax: number;
+
+    startAppearingAt: number; //when zooming in - ie. startAppearing is lower than fullyVisibleAt
+    fullyVisibleAt: number;
+}

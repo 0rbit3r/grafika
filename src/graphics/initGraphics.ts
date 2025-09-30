@@ -8,6 +8,8 @@ import { SPRITE_TEXTURE_RADIUS } from "./sprites/nodeSprites";
 import { EDGE_SPRITE_LENGTH, TAPERED_EDGE_WIDTH } from "./sprites/edgeSprites";
 import { handleOverlay } from "./overlay/handleOverlay";
 import { handleNodeLoading, handleEdgeLoading } from "./dynamicLoader";
+import { initBackdrop } from "./backdrop/initBackdrop";
+import { handleBackdrop } from "./backdrop/handleBackdrop";
 
 export const initGraphics = (app: Application, $states: GraphStoresContainer) => {
     app.stage.eventMode = 'static';
@@ -71,6 +73,17 @@ export const initGraphics = (app: Application, $states: GraphStoresContainer) =>
         };
     }
 
+    let backdropSprite: Sprite;
+    if ($graphics.backdropSettings !== undefined) {
+        backdropSprite = initBackdrop($graphics.backdropSettings.url);
+        zSortedContainer.addChild(backdropSprite);
+        $states.graphics.unloadBackdropTexture = () => {
+            if ($graphics.backdropSettings?.url) return Assets.unload($graphics.backdropSettings.url);
+            else { return Promise.resolve() }
+        };
+    }
+    
+
     zSortedContainer.sortChildren();
 
     const fpsCounter: Text = new Text('0', new TextStyle({ fontSize: 20, fill: "#ffffff" }));
@@ -108,6 +121,7 @@ export const initGraphics = (app: Application, $states: GraphStoresContainer) =>
                 (ZOOM_TEXT_VISIBLE_THRESHOLD - ZOOM_TEXT_INVISIBLE_THRESHOLD);
 
         if ($graphics.overlaySettings !== undefined) handleOverlay(overlaySprite, $graphics);
+        if ($graphics.backdropSettings !== undefined) handleBackdrop(backdropSprite, $graphics);
 
         // render thoughts on screen
         $graphics.floatingNodes && (displacementAngleRotation += 0.005);
