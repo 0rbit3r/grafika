@@ -67,20 +67,12 @@ export const initGraphics = (app: Application, $states: GraphStoresContainer) =>
     if ($graphics.overlaySettings !== undefined) {
         overlaySprite = initOverlay($graphics.overlaySettings.url);
         zSortedContainer.addChild(overlaySprite);
-        $states.graphics.unloadOverlayTexture = () => {
-            if ($graphics.overlaySettings?.url) return Assets.unload($graphics.overlaySettings.url);
-            else { return Promise.resolve() }
-        };
     }
 
     let backdropSprite: Sprite;
     if ($graphics.backdropSettings !== undefined) {
         backdropSprite = initBackdrop($graphics.backdropSettings.url);
         zSortedContainer.addChild(backdropSprite);
-        $states.graphics.unloadBackdropTexture = () => {
-            if ($graphics.backdropSettings?.url) return Assets.unload($graphics.backdropSettings.url);
-            else { return Promise.resolve() }
-        };
     }
     
 

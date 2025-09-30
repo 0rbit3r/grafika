@@ -1,6 +1,7 @@
+import { Assets } from "pixi.js";
 import { GraphStoresContainer } from "../state/storesContainer"
 
-export const disposeState = ($states: GraphStoresContainer) => {
+export const disposeState = async ($states: GraphStoresContainer) => {
     const $graphics = $states.graphics;
     const $context = $states.context;
 
@@ -24,15 +25,11 @@ export const disposeState = ($states: GraphStoresContainer) => {
     $graphics.viewport = null!;
 
 
-    $states.graphics.unloadOverlayTexture().then(() => {
-        $states.graphics.unloadBackdropTexture().then(() => {
-            $graphics.app.destroy(true, { children: true, texture: true, baseTexture: true });
-            $states.context = null!;
-            $states.debug = null!;
-            $states.graphics = null!;
-            $states.interactionEvents.all.clear();
-            $states.interactionEvents = null!
-            $states.simulation = null!;
-        });
-    });
+    $graphics.app.destroy(true, { children: true, texture: true, baseTexture: true });
+    $states.context = null!;
+    $states.debug = null!;
+    $states.graphics = null!;
+    $states.interactionEvents.all.clear();
+    $states.interactionEvents = null!
+    $states.simulation = null!;
 }

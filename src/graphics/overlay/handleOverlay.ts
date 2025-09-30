@@ -4,11 +4,11 @@ import { GraphicsStore } from "../../state/graphicsStore";
 export const handleOverlay = (overlaySprite: Sprite, $graphics: GraphicsStore) => {
     if (!$graphics.overlaySettings) return;
 
-    const sizeOnScreen =  $graphics.overlaySettings.scale * $graphics.viewport.zoom;
+    const sizeOnScreen = $graphics.overlaySettings.scale * $graphics.viewport.zoom;
     const onScreenCoors = $graphics.viewport.toViewportCoordinates(
-        { x: $graphics.overlaySettings.position, y: $graphics.overlaySettings.position }
+        { x: 0, y: 0 }
     );
-
+    
     overlaySprite.setTransform(
         onScreenCoors.x, onScreenCoors.y,
         sizeOnScreen, sizeOnScreen);

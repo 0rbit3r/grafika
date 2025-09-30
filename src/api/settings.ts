@@ -41,9 +41,6 @@ export interface GraphicsSettings {
 
 export interface OverlaySettings {
     url: string;
-    // position and resolution are the same for x and y - the overlay is expected square
-    position: number;
-    // resolution: number;
     scale: number;
 
     startDisappearingAt: number;

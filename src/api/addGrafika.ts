@@ -13,19 +13,19 @@ import { disposeState } from "../core/dispose";
 
 export function addGrafika(element: HTMLElement, settings: GrafikaSettings): GrafikaInstance {
 
-    Object.assign(element.style, {width: "100%", height: "100%"});
-    
+    Object.assign(element.style, { width: "100%", height: "100%" });
+
     const app = new Application<HTMLCanvasElement>(
         {
             background: settings.graphics?.backgroundColor ?? '#000000',
             resizeTo: element,
             antialias: settings.graphics?.antialiasing ?? false,
-            
+
             autoDensity: true, // todo: i have a hunch this might mess up drag containers relative size to viewport or other things,
             resolution: window.devicePixelRatio // this and the above are needed for the canvas not to look like shit on mobile
         }
     );
-    
+
     app.view.addEventListener("wheel", preventPageScrollOnWheel);
     element.appendChild(app.view as HTMLCanvasElement);
 

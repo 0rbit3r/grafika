@@ -22,10 +22,7 @@ export interface GraphicsStore {
   floatingNodes: boolean;
 
   overlaySettings?: OverlaySettings;
-  unloadOverlayTexture: () => Promise<void>;
-
   backdropSettings?: BackdropSettings;
-  unloadBackdropTexture: () => Promise<void>;
 
   defaultEdgeColor: "source" | "target" | string;
   colorfulText: boolean;
@@ -34,24 +31,19 @@ export interface GraphicsStore {
 export function createGraphicsStore
   (app: Application, interactionEvents: Emitter<InteractionEvents>, settings?: GraphicsSettings): GraphicsStore {
 
-  const nodeContainer = new Container();
-  const edgeContainer = new Container();//todo - add parametr to allow ParticleContainer for better performance?
-
   return {
     app: app,
     nodeContainer: new Container(),
     textContainer: new Container(),
     debugContainer: new Container(),
-    edgeContainer: edgeContainer,
+    edgeContainer: new Container(),
     floatingNodes: settings?.floatingNodes ?? false,
     viewport: addDraggableViewport(app, interactionEvents, settings?.initialZoom),
     defaultEdgeType: settings?.defaultEdgeType ?? EdgeType.Line,
 
     overlaySettings: settings?.overlay,
-    unloadOverlayTexture: () => Promise.resolve(),
 
     backdropSettings: settings?.backdrop,
-    unloadBackdropTexture: () => Promise.resolve(),
 
     defaultEdgeColor: settings?.defaultEdgeColor ?? "#dddddd",
     defaultNodeShape: settings?.defaultNodeShape ?? NodeShape.Circle,
