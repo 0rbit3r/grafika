@@ -1,11 +1,9 @@
-import { Graphics, Sprite } from "pixi.js";
+import { Sprite } from "pixi.js";
 import { RenderedNode } from "./renderedNode";
 import { EdgeType, EdgeInit } from "../api/dataTypes";
 import { GraphStoresContainer } from "../state/storesContainer";
 import { initEdgeGraphics } from "../graphics/initEdgeGraphics";
 import { handleEdgeLoading } from "../graphics/dynamicLoader";
-import { DEFAULT_EDGE_ALPHA, IDEAL_DIST_SIZE_MULTIPLIER } from "./defaultGraphOptions";
-import { pull_or_push_connected_to_ideal_distance } from "../simulation/forcesSimulation";
 
 export interface RenderedEdge {
     source: RenderedNode;

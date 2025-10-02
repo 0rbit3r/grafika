@@ -20,8 +20,16 @@ export const EDGE_COMPRESSIBILITY_FACTOR = 1;
 
 export const MAX_PULL_FORCE = 50;
 
-// can only increase the thought (ie. first few sizes will default to 1 if set under 1)
-export const IDEAL_DIST_SIZE_MULTIPLIER = 0.1;//0.01;
+export const EDGE_COUNT_EDGE_LENGTH_INFLUENCE_FACTOR = 0.1;
+// That's a mouthful... 
+// Basically,you use this to make larger nodes distant from other nodes (better stability and looks nicer)
+// input is E:= number of neighboring edges of a node
+// during FDL lengths of edges are multiplied by this factor
+// This number can only grow and starts having influence when reaching 1
+// sizeInfluencedEdgeforce = (f, E) => Max(1, f * E);
+
+//todo - implement this
+
 
 export const PUSH_THRESH = 5000;
 export const MAX_PUSH_FORCE = 50;
@@ -116,21 +124,13 @@ export const gravityForce = (centerDistance: number) => {
     }
 }
 
-// Makes bigger (ie. more referenced) thoughts less active and thus reduces jitter after loading them
+// Makes bigger (ie. more referenced) thoughts less active and thus reduces jitter
 export const inEdgesLengthForceDivisor = (bl: number) => {
     if (bl < 3) {
         return 1;
     }
     return 1 + bl / 5;
 }
-
-// export const linksNumberForceDivisor = (source: RenderedThought, target: RenderedThought) => {
-//     const maxReferences = Math.max(source.links.length, target.links.length);
-//     const maxBacklinks = Math.max(source.backlinks.length, target.backlinks.length);
-
-//     return maxBacklinks / 3 + Math.pow(maxReferences, 1.1);
-// }
-
 
 
 // MORE SET IN STONE OBSCURE PARAMETERS
