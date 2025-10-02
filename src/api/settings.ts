@@ -1,7 +1,7 @@
-import { EdgeType, DataInit, NodeShape } from "./dataTypes";
+import { EdgeType, Data, NodeShape } from "./dataTypes";
 
 export interface GrafikaSettings {
-    data?: DataInit,
+    data?: Data,
     graphics?: GraphicsSettings,
     simulation?: SimulationSettings,
     debug?: DebugSettings

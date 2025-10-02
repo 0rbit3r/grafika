@@ -1,12 +1,12 @@
 import { checkMaxIfStatementsInShader } from "pixi.js";
-import { DataInit } from "../../api/dataTypes";
+import { Data } from "../../api/dataTypes";
 import { GraphStoresContainer } from "../../state/storesContainer";
 import { filterInPlace } from "../../util/filterInPlace";
 import { RenderedEdge } from "../renderedEdge";
 
 //todo - this might be made faster by using sets?
 
-export function removeDataByIds($states: GraphStoresContainer, dataToRemove: DataInit) {
+export function removeDataByIds($states: GraphStoresContainer, dataToRemove: Data) {
     if (dataToRemove.nodes === undefined) dataToRemove.nodes = [];
     if (dataToRemove.edges === undefined) dataToRemove.edges = [];
 

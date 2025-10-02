@@ -6,7 +6,7 @@ import { addData } from "../core/contextManager/addData";
 import { removeDataByIds } from "../core/contextManager/removeData";
 import { simulate_one_frame_of_FDL } from "../simulation/forcesSimulation";
 import { GrafikaInstance } from "./controlTypes";
-import { DataInit } from "./dataTypes";
+import { Data } from "./dataTypes";
 import mitt from "mitt";
 import { type InteractionEvents } from "./events";
 import { disposeState } from "../core/dispose";
@@ -78,8 +78,8 @@ export function addGrafika(element: HTMLElement, settings: GrafikaSettings): Gra
         id: id.toString(),
         interactionEvents: interactionEvents,
 
-        addData: (data: DataInit) => { if (!isDisposed) addData($states, data) },
-        removeData: (data: DataInit) => { if (!isDisposed) removeDataByIds($states, data) },
+        addData: (data: Data) => { if (!isDisposed) addData($states, data) },
+        removeData: (data: Data) => { if (!isDisposed) removeDataByIds($states, data) },
         getData: () => {
             if (isDisposed) return { edges: [], nodes: [], unusedEdges: [] };
             return {

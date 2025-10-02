@@ -1,9 +1,9 @@
-export interface DataInit {
-    nodes?: NodeInit[];
-    edges?: EdgeInit[];
+export interface Data {
+    nodes?: Node[];
+    edges?: Edge[];
 }
 
-export interface NodeInit {
+export interface Node {
     id: number;
 
     x?: number;
@@ -16,6 +16,8 @@ export interface NodeInit {
     hollowEffect?: boolean;
     glowEffect?: boolean;
     blinkEffect?: boolean;
+
+
 }
 
 export enum NodeShape {
@@ -32,7 +34,7 @@ export enum NodeShape {
     TextBox = 100
 }
 
-export interface EdgeInit {
+export interface Edge {
     sourceId: number;
     targetId: number;
 

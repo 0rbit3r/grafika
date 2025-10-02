@@ -1,4 +1,4 @@
-import { DataInit, EdgeInit } from "../api/dataTypes";
+import { Data, Edge } from "../api/dataTypes";
 import { RenderedNode } from "../core/renderedNode";
 import { RenderedEdge } from "../core/renderedEdge";
 import { ProxyNode } from "../api/proxyNode";
@@ -10,7 +10,7 @@ export interface ContextStore {
 
     edgesAdjacency: Map<number, Set<number>>;
 
-    notRenderedEdges: EdgeInit[]; // edges that are defined, but missing either source or target node
+    notRenderedEdges: Edge[]; // edges that are defined, but missing either source or target node
 
     proxyNodesList: ProxyNode[];
     proxyEdgesList: ProxyEdge[];

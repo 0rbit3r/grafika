@@ -1,5 +1,5 @@
 import { Emitter } from "mitt";
-import { DataInit, EdgeInit } from "./dataTypes";
+import { Data, Edge } from "./dataTypes";
 import { ProxyEdge } from "./proxyEdge";
 import { ProxyNode } from "./proxyNode";
 import { InteractionEvents } from "./events";
@@ -9,8 +9,8 @@ export interface GrafikaInstance {
     interactionEvents: Emitter<InteractionEvents>;
     
     // data management
-    addData: (data: DataInit) => void;
-    removeData: (data: DataInit) => void;
+    addData: (data: Data) => void;
+    removeData: (data: Data) => void;
     getData: () => DataProxy;
     
     // Renders a single frame
@@ -32,5 +32,5 @@ export interface GrafikaInstance {
 export interface DataProxy {
     nodes: ProxyNode[];
     edges: ProxyEdge[];
-    unusedEdges: EdgeInit[];
+    unusedEdges: Edge[];
 }

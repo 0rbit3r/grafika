@@ -1,5 +1,5 @@
 import { RenderedNode } from "../core/renderedNode";
-import { EdgeType, EdgeInit, NodeInit, NodeShape } from "./dataTypes";
+import { EdgeType, Edge, Node, NodeShape } from "./dataTypes";
 import { GraphStoresContainer } from "../state/storesContainer";
 // import { drawNode } from "../graphics/drawNode";
 import { RenderedEdge } from "../core/renderedEdge";
