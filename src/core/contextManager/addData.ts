@@ -2,7 +2,7 @@ import { initializeRenderedEdge } from "../renderedEdge";
 import { initializeRenderedNode } from "../renderedNode";
 import { GraphStoresContainer } from "../../state/storesContainer";
 import { INITIAL_POSITIONS_RADIUS } from "../defaultGraphOptions";
-import { Data, Edge } from "../../api/dataTypes";
+import { Data, GraphEdge } from "../../api/dataTypes";
 import { getNodeProxy } from "../../api/proxyNode";
 import { getEdgeProxy } from "../../api/proxyEdge";
 import { filterInPlace } from "../../util/filterInPlace";
@@ -25,8 +25,10 @@ export function addData($states: GraphStoresContainer, data: Data) {
         $context.proxyNodesList.push(getNodeProxy(newRenderedNode, $states));
     });
 
+    
+
     // handle finding notrenderedEdge that should be instantiated by the new data 
-    const instantiatedNotRenderedEdges = new Set<Edge>();
+    const instantiatedNotRenderedEdges = new Set<GraphEdge>();
     $context.notRenderedEdges.forEach(notRenderedEdge => {
         const sourceRenderedNode = $context.renderedNodes.find(n => n.id === notRenderedEdge.sourceId);
         const targetRenderedNode = $context.renderedNodes.find(n => n.id === notRenderedEdge.targetId);

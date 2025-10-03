@@ -121,24 +121,26 @@ export const initGraphics = (app: Application, $states: GraphStoresContainer) =>
         $context.renderedNodes
             .forEach(node => {
                 node.framesAlive += 1;
-                // handle positions
+                if (node.framesAlive < 1) return;
+
+                handleNodeLoading(node, $graphics);
+
                 if ($graphics.floatingNodes) {
                     const positionBasedAngle = (node.x / 100 + node.y / 100);
-                    node.renderDisplacement.x = Math.cos(positionBasedAngle + displacementAngleRotation) * 30;
-                    node.renderDisplacement.y = Math.sin(positionBasedAngle + displacementAngleRotation) * 30;
+                    node.floatingDisplacement.x = Math.cos(positionBasedAngle + displacementAngleRotation) * 30;
+                    node.floatingDisplacement.y = Math.sin(positionBasedAngle + displacementAngleRotation) * 30;
                 }
-                // console.log(displacementX, displacementY);
-                const viewportPos = $graphics.viewport.toViewportCoordinates({ x: node.x + node.renderDisplacement.x, y: node.y + node.renderDisplacement.y });
-                handleNodeLoading(node, $graphics, viewportPos);
+                const viewportPos = $graphics.viewport.toViewportCoordinates({ x: node.x + node.floatingDisplacement.x, y: node.y + node.floatingDisplacement.y });
 
                 // handle dynamic effects
                 node.blinkEffect && node.blinkingSprite &&
-                (node.blinkingSprite.alpha = $simulation.frame % 333 < 111
-                    ? Math.max(0, Math.pow((1 - ($simulation.frame % 111) / 111), 2))
-                    : 0);
-                if (!node.isOnScreen)
+                    (node.blinkingSprite.alpha = $simulation.frame % 333 < 111
+                        ? Math.max(0, Math.pow((1 - ($simulation.frame % 111) / 111), 2))
+                        : 0);
+                if (!node.isLoadedOnScreen)
                     return;
 
+                // handle scale and alpha based on time (fade effect) and zoom.
                 const scale = zoom * node.radius / NODE_SPRITE_RADIUS;
                 const timeAffectedScale = scale *
                     (node.framesAlive <= NEW_NODE_INVISIBLE_FOR
@@ -146,8 +148,8 @@ export const initGraphics = (app: Application, $states: GraphStoresContainer) =>
                         : Math.max(0, Math.min(1, (node.framesAlive - NEW_NODE_INVISIBLE_FOR) / NEW_NODE_FADE_IN_FRAMES)));
                 node.sprite?.setTransform(viewportPos.x, viewportPos.y, timeAffectedScale, timeAffectedScale);
                 node.sprite && node.sprite?.alpha
-    
 
+                // handle text
                 if (zoom >= ZOOM_TEXT_INVISIBLE_THRESHOLD) {
                     if (node.shape != NodeShape.TextBox)
                         node.renderedText?.setTransform(viewportPos.x, viewportPos.y + (node.radius * (1 + NODE_BORDER_THICKNESS * 2)) * zoom);
@@ -160,13 +162,13 @@ export const initGraphics = (app: Application, $states: GraphStoresContainer) =>
 
         $context.renderedEdges.forEach(edge => {
             const srcViewportCoors = $graphics.viewport.toViewportCoordinates(
-                { x: edge.source.x + edge.source.renderDisplacement.x, y: edge.source.y + edge.source.renderDisplacement.y });
+                { x: edge.source.x + edge.source.floatingDisplacement.x, y: edge.source.y + edge.source.floatingDisplacement.y });
             const tgtViewportCoors = $graphics.viewport.toViewportCoordinates(
-                { x: edge.target.x + edge.target.renderDisplacement.x, y: edge.target.y + edge.target.renderDisplacement.y });
+                { x: edge.target.x + edge.target.floatingDisplacement.x, y: edge.target.y + edge.target.floatingDisplacement.y });
+
             handleEdgeLoading(edge, $graphics, srcViewportCoors, tgtViewportCoors);
-            if (!edge.isOnScreen || edge.type === EdgeType.None) return;
-            if (!edge.isOnScreen)
-                return;
+
+            if (!edge.isLoadedOnScreen || edge.type === EdgeType.None) return;
 
             const dx = tgtViewportCoors.x - srcViewportCoors.x;
             const dy = tgtViewportCoors.y - srcViewportCoors.y;
@@ -185,7 +187,6 @@ export const initGraphics = (app: Application, $states: GraphStoresContainer) =>
             edge.sprite && (edge.sprite.alpha =
                 edge.alpha *
                 Math.max(0, Math.min(1, (youngerNode.framesAlive - NEW_NODE_INVISIBLE_FOR) / NEW_NODE_FADE_IN_FRAMES)));
-            // (edge.sprite instanceof AnimatedSprite) && edge.sprite.update(1);
         })
     };
 

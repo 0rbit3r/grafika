@@ -1,5 +1,5 @@
 import { RenderedEdge } from "../core/renderedEdge";
-import { NodeShape, Node } from "../api/dataTypes";
+import { NodeShape, GraphNode } from "../api/dataTypes";
 import { Text, Sprite } from "pixi.js";
 import { DEFAULT_RADIUS } from "../core/defaultGraphOptions";
 import { GraphStoresContainer } from "../state/storesContainer";
@@ -34,17 +34,19 @@ export interface RenderedNode {
 
     // counts the number of frames since the node appeared
     framesAlive: number;
+    // end of life (these implement fine-tuning of addition/ removal)
+    timeToLiveTo?: number;
 
     forces: XAndY;
     momentum: XAndY;
 
-    isOnScreen: boolean;
+    isLoadedOnScreen: boolean;
 
-    renderDisplacement: XAndY;
+    floatingDisplacement: XAndY;
 }
 
 // Will initialize graphics and put it in the nodeContainer
-export const initializeRenderedNode = (node: Node, $states: GraphStoresContainer) => {
+export const initializeRenderedNode = (node: GraphNode, $states: GraphStoresContainer) => {
 
     const $graphics = $states.graphics;
 
@@ -57,25 +59,28 @@ export const initializeRenderedNode = (node: Node, $states: GraphStoresContainer
         color: node.color ?? "#dddddd",
         inEdges: new Set(),
         outEdges: new Set(),
-
+        
         hollowEffect: node.hollowEffect ?? false,
         blinkEffect: node.blinkEffect ?? false,
         glowEffect: node.glowEffect ?? false,
-
+        
         sprite: undefined,
         // blinkingGraphics: new Graphics(),
         radius: node.radius ??
-            ((node.shape === NodeShape.TextBox || (!node.shape &&  $graphics.defaultNodeShape === NodeShape.TextBox))
-            ? computeTextBoxRadius(node.text ?? node.id.toString())
-            : DEFAULT_RADIUS),
+        ((node.shape === NodeShape.TextBox || (!node.shape &&  $graphics.defaultNodeShape === NodeShape.TextBox))
+        ? computeTextBoxRadius(node.text ?? node.id.toString())
+        : DEFAULT_RADIUS),
         renderedText: undefined,
         held: false,
         hovered: false,
-        framesAlive: 0,
+
+        framesAlive: node.timeToLiveFrom ?? 0,
+        timeToLiveTo: node.timeToLiveTo,
+
         forces: { x: 0, y: 0 },
         momentum: { x: 0, y: 0 },
-        isOnScreen: false,
-        renderDisplacement: { x: 0, y: 0 }
+        isLoadedOnScreen: false,
+        floatingDisplacement: { x: 0, y: 0 },
     };
     initNodeGraphics(renderedNode, $states);
     handleNodeLoading(renderedNode, $graphics)

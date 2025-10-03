@@ -14,7 +14,7 @@ export const initNodeGraphics = (node: RenderedNode, $states: GraphStoresContain
 
     node.sprite?.removeAllListeners();
     node.sprite?.destroy({ baseTexture: false, children: true, texture: false });
-    node.isOnScreen = false;
+    node.isLoadedOnScreen = false;
 
     const sprite = getNodeSprite(app, node);
     sprite.tint = node.color;

@@ -1,5 +1,5 @@
 import { Emitter } from "mitt";
-import { Data, Edge } from "./dataTypes";
+import { Data, GraphEdge } from "./dataTypes";
 import { ProxyEdge } from "./proxyEdge";
 import { ProxyNode } from "./proxyNode";
 import { InteractionEvents } from "./events";
@@ -32,5 +32,5 @@ export interface GrafikaInstance {
 export interface DataProxy {
     nodes: ProxyNode[];
     edges: ProxyEdge[];
-    unusedEdges: Edge[];
+    unusedEdges: GraphEdge[];
 }

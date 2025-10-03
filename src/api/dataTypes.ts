@@ -1,9 +1,9 @@
 export interface Data {
-    nodes?: Node[];
-    edges?: Edge[];
+    nodes?: GraphNode[];
+    edges?: GraphEdge[];
 }
 
-export interface Node {
+export interface GraphNode {
     id: number;
 
     x?: number;
@@ -17,7 +17,8 @@ export interface Node {
     glowEffect?: boolean;
     blinkEffect?: boolean;
 
-    
+    timeToLiveFrom?: number;
+    timeToLiveTo?: number;
 }
 
 export enum NodeShape {
@@ -34,7 +35,7 @@ export enum NodeShape {
     TextBox = 100
 }
 
-export interface Edge {
+export interface GraphEdge {
     sourceId: number;
     targetId: number;
 

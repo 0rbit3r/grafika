@@ -3,25 +3,39 @@ import { RenderedEdge } from "../core/renderedEdge";
 import { RenderedNode } from "../core/renderedNode";
 import { GraphicsStore } from "../state/graphicsStore";
 
-export const handleNodeLoading = (node: RenderedNode, $graphics: GraphicsStore, pos?: XAndY) => {
-    if (pos === undefined) pos = $graphics.viewport.toViewportCoordinates({x:node.x, y: node.y});
+const loadNode = (node: RenderedNode, $graphics: GraphicsStore) => {
+    node.isLoadedOnScreen = true;
+    node.sprite && $graphics.nodeContainer.addChild(node.sprite);
+    node.renderedText && $graphics.textContainer.addChild(node.renderedText);
+}
+const unloadNode = (node: RenderedNode, $graphics: GraphicsStore) => {
+    node.isLoadedOnScreen = false;
+    node.sprite && $graphics.nodeContainer.removeChild(node.sprite);
+    node.renderedText && $graphics.textContainer.removeChild(node.renderedText);
+};
+
+export const handleNodeLoading = (node: RenderedNode, $graphics: GraphicsStore) => {
+    if (node.framesAlive < 0) return;
+    // console.log(node.framesAlive, node.timeToLiveTo);
+    if (node.timeToLiveTo !== undefined && (node.framesAlive >= node.timeToLiveTo)) {
+        if (node.isLoadedOnScreen)
+        unloadNode(node, $graphics);
+        return;
+    }
+    const viewportPosition = $graphics.viewport.toViewportCoordinates({ x: node.x, y: node.y });
 
     const margin = node.radius * 4 * $graphics.viewport.zoom;
-    const isInside =
+    const isInsideViewport =
         (!$graphics.overlaySettings || $graphics.viewport.zoom > $graphics.overlaySettings.startDisappearingAt)
-        && pos.x > -margin && pos.x < $graphics.viewport.width + margin
-        && pos.y > -margin && pos.y < $graphics.viewport.height + margin;
+        && viewportPosition.x > -margin && viewportPosition.x < $graphics.viewport.width + margin
+        && viewportPosition.y > -margin && viewportPosition.y < $graphics.viewport.height + margin;
 
-    if (!node.isOnScreen) {
-        if (isInside) {
-            node.isOnScreen = true;
-            node.sprite && $graphics.nodeContainer.addChild(node.sprite);
-            node.renderedText && $graphics.textContainer.addChild(node.renderedText);
+    if (!node.isLoadedOnScreen) {
+        if (isInsideViewport) {
+            loadNode(node, $graphics);
         }
-    } else if (!isInside && !node.held) {
-        node.isOnScreen = false;
-        node.sprite && $graphics.nodeContainer.removeChild(node.sprite);
-        node.renderedText && $graphics.textContainer.removeChild(node.renderedText);
+    } else if (!isInsideViewport && !node.held) {
+        unloadNode(node, $graphics);
     }
 
     // if (isInside && $graphics.viewport.zoom < 0.25)
@@ -31,11 +45,21 @@ export const handleNodeLoading = (node: RenderedNode, $graphics: GraphicsStore, 
 export const handleEdgeLoading = (edge: RenderedEdge, $graphics: GraphicsStore,
     srcViewportCoors?: XAndY, tgtViewportCoors?: XAndY // yeah, I can just calculate them, but in the tight loop, I don't want to keep recalculating these
 ) => {
-    if (srcViewportCoors === undefined) srcViewportCoors = $graphics.viewport.toViewportCoordinates({x: edge.source.x, y: edge.source.y});
-    if (tgtViewportCoors === undefined) tgtViewportCoors = $graphics.viewport.toViewportCoordinates({x: edge.target.x, y: edge.target.y});
+    if (edge.source.framesAlive < 0) return;
+    if (edge.target.framesAlive < 0) return;
+
+    if (edge.source.timeToLiveTo && (edge.source.timeToLiveTo <= edge.source.framesAlive) ||
+        edge.target.timeToLiveTo && (edge.target.timeToLiveTo <= edge.target.framesAlive)) {
+        if (edge.isLoadedOnScreen) {
+            edge.isLoadedOnScreen = false;
+            edge.sprite && $graphics.edgeContainer.removeChild(edge.sprite);
+        }
+        return;
+    }
 
 
-    // todo: the bounding box checker here is spowed out by ai - double check
+    if (srcViewportCoors === undefined) srcViewportCoors = $graphics.viewport.toViewportCoordinates({ x: edge.source.x, y: edge.source.y });
+    if (tgtViewportCoors === undefined) tgtViewportCoors = $graphics.viewport.toViewportCoordinates({ x: edge.target.x, y: edge.target.y });
 
     const viewRect = { x: 0, y: 0, w: $graphics.viewport.width, h: $graphics.viewport.height };
     const margin = 100 * $graphics.viewport.zoom; // todo - parametrize
@@ -54,11 +78,11 @@ export const handleEdgeLoading = (edge: RenderedEdge, $graphics: GraphicsStore,
         maxY >= viewRect.y &&
         minY <= viewRect.y + viewRect.h;
 
-    if (!edge.isOnScreen && inside) {
-        edge.isOnScreen = true;
+    if (!edge.isLoadedOnScreen && inside) {
+        edge.isLoadedOnScreen = true;
         edge.sprite && $graphics.edgeContainer.addChild(edge.sprite);
-    } else if (edge.isOnScreen && !inside) {
-        edge.isOnScreen = false;
+    } else if (edge.isLoadedOnScreen && !inside) {
+        edge.isLoadedOnScreen = false;
         edge.sprite && $graphics.edgeContainer.removeChild(edge.sprite);
     }
 }

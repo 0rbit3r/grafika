@@ -61,8 +61,8 @@ export function addGrafika(element: HTMLElement, settings: GrafikaSettings): Gra
         }
 
         // render the graph
-        renderGraph();
         interactionEvents.emit("framePassed", $states.simulation.frame);
+        renderGraph();
     }
 
     // main application loop

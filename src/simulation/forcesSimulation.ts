@@ -52,22 +52,29 @@ export const simulate_one_frame_of_FDL = ($states: GraphStoresContainer) => {
     const $context = $states.context;
 
     $states.context.renderedEdges.forEach(e => {
+        if (e.source.framesAlive < 0 || e.target.framesAlive < 0
+            || (e.source.timeToLiveTo !== undefined && e.source.framesAlive >= e.source.timeToLiveTo)
+            || (e.target.timeToLiveTo !== undefined && e.target.framesAlive >= e.target.timeToLiveTo))
+            return;
         pull_or_push_connected_to_ideal_distance(e, $states);
     });
 
-    for (let node1Index = 0; node1Index < renderedNodes.length; node1Index++) {
-        handleOutOfBounds(renderedNodes[node1Index]);
-        for (let node2Index = 0; node2Index < node1Index; node2Index++) {
-            const borderDistance = get_border_distance(renderedNodes[node1Index], renderedNodes[node2Index]);
+    renderedNodes.forEach((n1, i1) => {
+        if (n1.framesAlive < 0 || n1.framesAlive >= (n1.timeToLiveTo ?? Number.MAX_VALUE)) return;
+        handleOutOfBounds(n1);
+        renderedNodes.forEach((n2, i2) => {
+            if (i1 <= i2) return;
+            if (n2.framesAlive < 0 || n2.framesAlive >= (n2.timeToLiveTo ?? Number.MAX_VALUE)) return;
+            const borderDistance = get_border_distance(n1, n2);
             if (borderDistance < $simulationState.pushThreshold
-                && !$context.edgesAdjacency.get(renderedNodes[node1Index].id)?.has(renderedNodes[node2Index].id)) {
-                push_unconnected(renderedNodes[node1Index], renderedNodes[node2Index], $states);
+                && !$context.edgesAdjacency.get(n1.id)?.has(n2.id)) {
+                push_unconnected(n1, n2, $states);
             }
-        }
+        });
         if ($simulationState.gravityEnabled) {
-            gravity_pull(renderedNodes[node1Index]);
+            gravity_pull(n1);
         }
-    }
+    });
 
     renderedNodes.forEach(node => {
         // I'm gonna be honest, I don't really understand what's going on down from here...
@@ -151,7 +158,7 @@ export const push_unconnected = (sourceNode: RenderedNode, targetNode: RenderedN
 
 
     //this might be a bit weird but hey... it works to eliminate the noncontinuity of the push force at the edge
-    const forceAtPushThresh = pushForce($sim.pushThreshold); 
+    const forceAtPushThresh = pushForce($sim.pushThreshold);
     const force = $sim.frame > FRAMES_WITH_OVERLAP
         ? pushForce(borderDistance) - forceAtPushThresh
         : 0;
