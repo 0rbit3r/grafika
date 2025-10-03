@@ -3,7 +3,7 @@ import { getNodeProxy } from "../api/proxyNode";
 import { DEFAULT_RADIUS, NODE_BORDER_THICKNESS, TEXT_BOX_NODE_WIDTH_MULTIPLIER, TEXT_WORD_WRAP_WIDTH, ZOOM_STEP_MULTIPLICATOR_WHEEL } from "../core/defaultGraphOptions";
 import { RenderedNode } from "../core/renderedNode";
 import { GraphStoresContainer } from "../state/storesContainer";
-import { getGlowSprite, getHollowHoleSprite, getHollowRimSprite } from "./sprites/effectSprites";
+import { getBlinkSprite, getGlowSprite, getHollowHoleSprite, getHollowRimSprite } from "./sprites/effectSprites";
 import { getNodeSprite } from "./sprites/nodeSprites";
 import { TEXT_Z } from "./zIndexes";
 import { NodeShape } from "../api/dataTypes";
@@ -34,6 +34,11 @@ export const initNodeGraphics = (node: RenderedNode, $states: GraphStoresContain
         const rim = getHollowRimSprite(app);
         rim.tint = node.color;
         sprite.addChild(rim);
+    }
+    if (node.blinkEffect ){
+        const blinkSprite = getBlinkSprite(app);
+        sprite.addChild(blinkSprite);
+        node.blinkingSprite = blinkSprite;
     }
 
     //interactivity
@@ -131,6 +136,7 @@ const getStandardNodeText = (node: RenderedNode, colorfulText?: boolean) => {
 }
 
 const TEXT_BOX_MARGIN = 3;
+
 const getTextBoxText = (node: RenderedNode, colorfulText?: boolean) => {
 
     const style = new TextStyle({

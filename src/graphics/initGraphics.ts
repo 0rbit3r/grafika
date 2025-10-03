@@ -2,9 +2,9 @@ import { Application, Container, TextStyle, Text, Sprite, Assets } from "pixi.js
 import { DRAG_Z, EDGES_Z, NODES_Z, TEXT_Z } from "./zIndexes";
 import { GraphStoresContainer } from "../state/storesContainer";
 import { EdgeType, NodeShape } from "../api/dataTypes";
-import { NODE_BORDER_THICKNESS, ZOOM_TEXT_INVISIBLE_THRESHOLD, ZOOM_TEXT_VISIBLE_THRESHOLD } from "../core/defaultGraphOptions";
+import { NEW_NODE_FADE_IN_FRAMES, NEW_NODE_INVISIBLE_FOR, NODE_BORDER_THICKNESS, ZOOM_TEXT_INVISIBLE_THRESHOLD, ZOOM_TEXT_VISIBLE_THRESHOLD } from "../core/defaultGraphOptions";
 import { initOverlay } from "./overlay/initOverlay";
-import { SPRITE_TEXTURE_RADIUS } from "./sprites/nodeSprites";
+import { NODE_SPRITE_RADIUS } from "./sprites/nodeSprites";
 import { EDGE_SPRITE_LENGTH, TAPERED_EDGE_WIDTH } from "./sprites/edgeSprites";
 import { handleOverlay } from "./overlay/handleOverlay";
 import { handleNodeLoading, handleEdgeLoading } from "./dynamicLoader";
@@ -74,7 +74,7 @@ export const initGraphics = (app: Application, $states: GraphStoresContainer) =>
         backdropSprite = initBackdrop($graphics.backdropSettings.url);
         zSortedContainer.addChild(backdropSprite);
     }
-    
+
 
     zSortedContainer.sortChildren();
 
@@ -120,33 +120,41 @@ export const initGraphics = (app: Application, $states: GraphStoresContainer) =>
 
         $context.renderedNodes
             .forEach(node => {
-
+                node.framesAlive += 1;
                 // handle positions
                 if ($graphics.floatingNodes) {
-                    const angle = (node.x / 100 + node.y / 100);
-                    node.renderDisplacement.x = Math.cos(angle + displacementAngleRotation) * 30;
-                    node.renderDisplacement.y = Math.sin(angle + displacementAngleRotation) * 30;
+                    const positionBasedAngle = (node.x / 100 + node.y / 100);
+                    node.renderDisplacement.x = Math.cos(positionBasedAngle + displacementAngleRotation) * 30;
+                    node.renderDisplacement.y = Math.sin(positionBasedAngle + displacementAngleRotation) * 30;
                 }
                 // console.log(displacementX, displacementY);
                 const viewportPos = $graphics.viewport.toViewportCoordinates({ x: node.x + node.renderDisplacement.x, y: node.y + node.renderDisplacement.y });
                 handleNodeLoading(node, $graphics, viewportPos);
 
+                // handle dynamic effects
+                node.blinkEffect && node.blinkingSprite &&
+                (node.blinkingSprite.alpha = $simulation.frame % 333 < 111
+                    ? Math.max(0, Math.pow((1 - ($simulation.frame % 111) / 111), 2))
+                    : 0);
                 if (!node.isOnScreen)
                     return;
 
-                const scale = zoom * node.radius / SPRITE_TEXTURE_RADIUS;
-                node.sprite?.setTransform(viewportPos.x, viewportPos.y, scale, scale);
-                // handle dynamic effects
-                // node.blinkingGraphics.alpha = $simulation.frame % 150 < 50
-                //     ? 1 - ($simulation.frame % 50) / 50
-                //     : 0;
+                const scale = zoom * node.radius / NODE_SPRITE_RADIUS;
+                const timeAffectedScale = scale *
+                    (node.framesAlive <= NEW_NODE_INVISIBLE_FOR
+                        ? 0.01
+                        : Math.max(0, Math.min(1, (node.framesAlive - NEW_NODE_INVISIBLE_FOR) / NEW_NODE_FADE_IN_FRAMES)));
+                node.sprite?.setTransform(viewportPos.x, viewportPos.y, timeAffectedScale, timeAffectedScale);
+                node.sprite && node.sprite?.alpha
+    
 
-                if (zoom >= ZOOM_TEXT_INVISIBLE_THRESHOLD){
+                if (zoom >= ZOOM_TEXT_INVISIBLE_THRESHOLD) {
                     if (node.shape != NodeShape.TextBox)
                         node.renderedText?.setTransform(viewportPos.x, viewportPos.y + (node.radius * (1 + NODE_BORDER_THICKNESS * 2)) * zoom);
-                    else
+                    else {
                         node.renderedText?.setTransform(viewportPos.x, viewportPos.y + (node.radius * (NODE_BORDER_THICKNESS - 1)) * zoom, zoom, zoom);
-                    
+                    }
+                    node.renderedText && (node.renderedText.alpha = Math.max(0, Math.min(1, (node.framesAlive - NEW_NODE_INVISIBLE_FOR) / NEW_NODE_FADE_IN_FRAMES)));
                 }
             });
 
@@ -170,6 +178,13 @@ export const initGraphics = (app: Application, $states: GraphStoresContainer) =>
             const angle = Math.atan2(dy, dx);
 
             edge.sprite && edge.sprite.setTransform(srcViewportCoors.x, srcViewportCoors.y, scaleX, scaleY, angle);
+
+            const youngerNode = edge.source.framesAlive < edge.target.framesAlive
+                ? edge.source
+                : edge.target;
+            edge.sprite && (edge.sprite.alpha =
+                edge.alpha *
+                Math.max(0, Math.min(1, (youngerNode.framesAlive - NEW_NODE_INVISIBLE_FOR) / NEW_NODE_FADE_IN_FRAMES)));
             // (edge.sprite instanceof AnimatedSprite) && edge.sprite.update(1);
         })
     };

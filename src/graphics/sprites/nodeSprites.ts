@@ -3,7 +3,7 @@ import { NodeShape } from "../../api/dataTypes";
 import { NODE_BORDER_THICKNESS, TEXT_BOX_NODE_WIDTH_MULTIPLIER } from "../../core/defaultGraphOptions";
 import { RenderedNode } from "../../core/renderedNode";
 
-export const SPRITE_TEXTURE_RADIUS = 200;
+export const NODE_SPRITE_RADIUS = 200;
 export const TEXT_BOX_CORNER_RADIUS = 10;
 
 interface BaseTexturesContainer {
@@ -38,8 +38,8 @@ export function getNodeSprite(app: Application, node: RenderedNode): Sprite {
             if (!baseTextures.circle || baseTextures.circle.destroyed) {
                 const graphics = new Graphics();
                 graphics.beginFill("#ffffff");
-                graphics.lineStyle(SPRITE_TEXTURE_RADIUS * NODE_BORDER_THICKNESS, "#888888");
-                graphics.drawCircle(0, 0, SPRITE_TEXTURE_RADIUS);
+                graphics.lineStyle(NODE_SPRITE_RADIUS * NODE_BORDER_THICKNESS, "#888888");
+                graphics.drawCircle(0, 0, NODE_SPRITE_RADIUS);
                 baseTextures.circle = app.renderer.generateTexture(graphics,
                     {
                         scaleMode: SCALE_MODES.LINEAR,
@@ -54,10 +54,10 @@ export function getNodeSprite(app: Application, node: RenderedNode): Sprite {
             if (!baseTextures.square || baseTextures.square.destroyed) {
                 const graphics = new Graphics();
                 graphics.beginFill("#ffffff");
-                graphics.lineStyle(SPRITE_TEXTURE_RADIUS * NODE_BORDER_THICKNESS, "#888888");
+                graphics.lineStyle(NODE_SPRITE_RADIUS * NODE_BORDER_THICKNESS, "#888888");
                 graphics.drawRoundedRect(
-                    - SPRITE_TEXTURE_RADIUS / 3 * 2, - SPRITE_TEXTURE_RADIUS / 3 * 2,
-                    SPRITE_TEXTURE_RADIUS * 4 / 3, SPRITE_TEXTURE_RADIUS * 4 / 3, SPRITE_TEXTURE_RADIUS / 3
+                    - NODE_SPRITE_RADIUS / 3 * 2, - NODE_SPRITE_RADIUS / 3 * 2,
+                    NODE_SPRITE_RADIUS * 4 / 3, NODE_SPRITE_RADIUS * 4 / 3, NODE_SPRITE_RADIUS / 3
                 );
                 baseTextures.square = app.renderer.generateTexture(graphics,
                     {
@@ -71,14 +71,14 @@ export function getNodeSprite(app: Application, node: RenderedNode): Sprite {
         case NodeShape.Diamond:
             if (!baseTextures.diamond || baseTextures.diamond.destroyed) {
                 const graphics = new Graphics();
-                graphics.moveTo(0, 0 - SPRITE_TEXTURE_RADIUS);
-                graphics.arcTo(0 - SPRITE_TEXTURE_RADIUS, 0, 0, 0 + SPRITE_TEXTURE_RADIUS, SPRITE_TEXTURE_RADIUS / 3);
+                graphics.moveTo(0, 0 - NODE_SPRITE_RADIUS);
+                graphics.arcTo(0 - NODE_SPRITE_RADIUS, 0, 0, 0 + NODE_SPRITE_RADIUS, NODE_SPRITE_RADIUS / 3);
                 graphics.beginFill("#ffffff");
-                graphics.lineStyle(SPRITE_TEXTURE_RADIUS * NODE_BORDER_THICKNESS, "#888888");
-                graphics.arcTo(0, 0 + SPRITE_TEXTURE_RADIUS, 0 + SPRITE_TEXTURE_RADIUS, 0, SPRITE_TEXTURE_RADIUS / 3);
-                graphics.arcTo(0 + SPRITE_TEXTURE_RADIUS, 0, 0, 0 - SPRITE_TEXTURE_RADIUS, SPRITE_TEXTURE_RADIUS / 3);
-                graphics.arcTo(0, 0 - SPRITE_TEXTURE_RADIUS, 0 - SPRITE_TEXTURE_RADIUS, 0, SPRITE_TEXTURE_RADIUS / 3);
-                graphics.arcTo(0 - SPRITE_TEXTURE_RADIUS, 0, 0, 0 + SPRITE_TEXTURE_RADIUS, SPRITE_TEXTURE_RADIUS / 3);
+                graphics.lineStyle(NODE_SPRITE_RADIUS * NODE_BORDER_THICKNESS, "#888888");
+                graphics.arcTo(0, 0 + NODE_SPRITE_RADIUS, 0 + NODE_SPRITE_RADIUS, 0, NODE_SPRITE_RADIUS / 3);
+                graphics.arcTo(0 + NODE_SPRITE_RADIUS, 0, 0, 0 - NODE_SPRITE_RADIUS, NODE_SPRITE_RADIUS / 3);
+                graphics.arcTo(0, 0 - NODE_SPRITE_RADIUS, 0 - NODE_SPRITE_RADIUS, 0, NODE_SPRITE_RADIUS / 3);
+                graphics.arcTo(0 - NODE_SPRITE_RADIUS, 0, 0, 0 + NODE_SPRITE_RADIUS, NODE_SPRITE_RADIUS / 3);
                 baseTextures.diamond = app.renderer.generateTexture(graphics,
                     {
                         scaleMode: SCALE_MODES.LINEAR,
@@ -91,12 +91,12 @@ export function getNodeSprite(app: Application, node: RenderedNode): Sprite {
         case NodeShape.UpTriangle:
             if (!baseTextures.upTriangle || baseTextures.upTriangle.destroyed) {
                 const graphics = new Graphics();
-                graphics.moveTo(0, 0 - SPRITE_TEXTURE_RADIUS);
+                graphics.moveTo(0, 0 - NODE_SPRITE_RADIUS);
                 graphics.beginFill("#ffffff");
-                graphics.lineStyle(SPRITE_TEXTURE_RADIUS * NODE_BORDER_THICKNESS, "#888888");
-                graphics.lineTo(0 - SPRITE_TEXTURE_RADIUS * Math.sqrt(3) / 2, 0 + SPRITE_TEXTURE_RADIUS / 2);
-                graphics.lineTo(0 + SPRITE_TEXTURE_RADIUS * Math.sqrt(3) / 2, 0 + SPRITE_TEXTURE_RADIUS / 2);
-                graphics.lineTo(0, 0 - SPRITE_TEXTURE_RADIUS);
+                graphics.lineStyle(NODE_SPRITE_RADIUS * NODE_BORDER_THICKNESS, "#888888");
+                graphics.lineTo(0 - NODE_SPRITE_RADIUS * Math.sqrt(3) / 2, 0 + NODE_SPRITE_RADIUS / 2);
+                graphics.lineTo(0 + NODE_SPRITE_RADIUS * Math.sqrt(3) / 2, 0 + NODE_SPRITE_RADIUS / 2);
+                graphics.lineTo(0, 0 - NODE_SPRITE_RADIUS);
                 baseTextures.upTriangle = app.renderer.generateTexture(graphics,
                     {
                         scaleMode: SCALE_MODES.LINEAR,
@@ -109,12 +109,12 @@ export function getNodeSprite(app: Application, node: RenderedNode): Sprite {
         case NodeShape.DownTriangle:
             if (!baseTextures.downTriangle || baseTextures.downTriangle.destroyed) {
                 const graphics = new Graphics();
-                graphics.moveTo(0, SPRITE_TEXTURE_RADIUS);
+                graphics.moveTo(0, NODE_SPRITE_RADIUS);
                 graphics.beginFill("#ffffff");
-                graphics.lineStyle(SPRITE_TEXTURE_RADIUS * NODE_BORDER_THICKNESS, "#888888");
-                graphics.lineTo(-SPRITE_TEXTURE_RADIUS * Math.sqrt(3) / 2, -SPRITE_TEXTURE_RADIUS / 2);
-                graphics.lineTo(SPRITE_TEXTURE_RADIUS * Math.sqrt(3) / 2, -SPRITE_TEXTURE_RADIUS / 2);
-                graphics.lineTo(0, SPRITE_TEXTURE_RADIUS);
+                graphics.lineStyle(NODE_SPRITE_RADIUS * NODE_BORDER_THICKNESS, "#888888");
+                graphics.lineTo(-NODE_SPRITE_RADIUS * Math.sqrt(3) / 2, -NODE_SPRITE_RADIUS / 2);
+                graphics.lineTo(NODE_SPRITE_RADIUS * Math.sqrt(3) / 2, -NODE_SPRITE_RADIUS / 2);
+                graphics.lineTo(0, NODE_SPRITE_RADIUS);
                 baseTextures.downTriangle = app.renderer.generateTexture(graphics,
                     {
                         scaleMode: SCALE_MODES.LINEAR,
@@ -128,8 +128,8 @@ export function getNodeSprite(app: Application, node: RenderedNode): Sprite {
             if (!baseTextures.cross || baseTextures.cross.destroyed) {
                 const graphics = new Graphics();
                 graphics.beginFill("#ffffff");
-                graphics.lineStyle(SPRITE_TEXTURE_RADIUS * NODE_BORDER_THICKNESS, "#888888");
-                const gridSize = SPRITE_TEXTURE_RADIUS / 7 * 3;
+                graphics.lineStyle(NODE_SPRITE_RADIUS * NODE_BORDER_THICKNESS, "#888888");
+                const gridSize = NODE_SPRITE_RADIUS / 7 * 3;
 
                 graphics.moveTo(0, 0 - gridSize);
                 graphics.lineTo(0 - gridSize, 0 - gridSize * 2);
@@ -158,13 +158,13 @@ export function getNodeSprite(app: Application, node: RenderedNode): Sprite {
         case NodeShape.Heart:
             if (!baseTextures.heart || baseTextures.heart.destroyed) {
                 const graphics = new Graphics();
-                const yOffset = SPRITE_TEXTURE_RADIUS * 0.3;
+                const yOffset = NODE_SPRITE_RADIUS * 0.3;
                 graphics.beginFill("#ffffff");
-                graphics.lineStyle(SPRITE_TEXTURE_RADIUS * NODE_BORDER_THICKNESS, "#888888");
+                graphics.lineStyle(NODE_SPRITE_RADIUS * NODE_BORDER_THICKNESS, "#888888");
 
-                graphics.moveTo(0, SPRITE_TEXTURE_RADIUS * 0.6 + yOffset);
-                graphics.bezierCurveTo(-SPRITE_TEXTURE_RADIUS * 1.7, SPRITE_TEXTURE_RADIUS * -0.25 + yOffset, -SPRITE_TEXTURE_RADIUS * 0.93, -SPRITE_TEXTURE_RADIUS * 1.75 + yOffset, 0, -SPRITE_TEXTURE_RADIUS * 0.8 + yOffset);
-                graphics.bezierCurveTo(SPRITE_TEXTURE_RADIUS * 0.93, -SPRITE_TEXTURE_RADIUS * 1.75 + yOffset, SPRITE_TEXTURE_RADIUS * 1.7, SPRITE_TEXTURE_RADIUS * -0.25 + yOffset, 0, SPRITE_TEXTURE_RADIUS * 0.6 + yOffset);
+                graphics.moveTo(0, NODE_SPRITE_RADIUS * 0.6 + yOffset);
+                graphics.bezierCurveTo(-NODE_SPRITE_RADIUS * 1.7, NODE_SPRITE_RADIUS * -0.25 + yOffset, -NODE_SPRITE_RADIUS * 0.93, -NODE_SPRITE_RADIUS * 1.75 + yOffset, 0, -NODE_SPRITE_RADIUS * 0.8 + yOffset);
+                graphics.bezierCurveTo(NODE_SPRITE_RADIUS * 0.93, -NODE_SPRITE_RADIUS * 1.75 + yOffset, NODE_SPRITE_RADIUS * 1.7, NODE_SPRITE_RADIUS * -0.25 + yOffset, 0, NODE_SPRITE_RADIUS * 0.6 + yOffset);
 
                 graphics.endFill();
                 baseTextures.heart = app.renderer.generateTexture(graphics,
@@ -180,11 +180,11 @@ export function getNodeSprite(app: Application, node: RenderedNode): Sprite {
             if (!baseTextures.textBox || baseTextures.textBox.destroyed) {
                 const graphics = new Graphics();
                 graphics.beginFill("#222222");
-                graphics.lineStyle(SPRITE_TEXTURE_RADIUS * NODE_BORDER_THICKNESS / 2, "#ffffff");
+                graphics.lineStyle(NODE_SPRITE_RADIUS * NODE_BORDER_THICKNESS / 2, "#ffffff");
 
                 graphics.drawRoundedRect(
-                    - SPRITE_TEXTURE_RADIUS * TEXT_BOX_NODE_WIDTH_MULTIPLIER, - SPRITE_TEXTURE_RADIUS ,
-                    SPRITE_TEXTURE_RADIUS * TEXT_BOX_NODE_WIDTH_MULTIPLIER * 2, SPRITE_TEXTURE_RADIUS * 2, TEXT_BOX_CORNER_RADIUS
+                    - NODE_SPRITE_RADIUS * TEXT_BOX_NODE_WIDTH_MULTIPLIER, - NODE_SPRITE_RADIUS ,
+                    NODE_SPRITE_RADIUS * TEXT_BOX_NODE_WIDTH_MULTIPLIER * 2, NODE_SPRITE_RADIUS * 2, TEXT_BOX_CORNER_RADIUS
                 );
 
                 graphics.endFill();
@@ -199,6 +199,6 @@ export function getNodeSprite(app: Application, node: RenderedNode): Sprite {
             break;
     }
     // todo - polygon hitareas for others (especially triangles as they now have big areas of hitArea outside)
-    sprite.hitArea = new Circle(0, 0, SPRITE_TEXTURE_RADIUS + 10); // + 10 to make it slightly easier to grip on touchscreens
+    sprite.hitArea = new Circle(0, 0, NODE_SPRITE_RADIUS + 10); // + 10 to make it slightly easier to grip on touchscreens
     return sprite;
 }

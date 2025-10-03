@@ -17,7 +17,7 @@ export interface Node {
     glowEffect?: boolean;
     blinkEffect?: boolean;
 
-
+    
 }
 
 export enum NodeShape {

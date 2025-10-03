@@ -25,7 +25,7 @@ export interface RenderedNode {
     blinkEffect: boolean;
 
     sprite?: Sprite;
-    // blinkingGraphics: Graphics;
+    blinkingSprite?: Sprite;
     renderedText?: Text;
     radius: number;
 

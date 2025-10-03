@@ -38,7 +38,8 @@ export const GRAVITY_FREE_RADIUS = 40000;
 
 // When thoughts "appear" on screen they should not immediatelly start influencing other thoughts.
 // This parameter is the length of the "ease-in" period for influencing other thoughts
-export const INFLUENCE_FADE_IN = 250;
+// MINIMUM 1
+export const INFLUENCE_FADE_IN = 100;
 export const FRAMES_WITH_NO_INFLUENCE = 20;
 
 // Slows the simulation but makes it more stable
@@ -62,8 +63,8 @@ export const BASE_EDGE_WIDTH = 9;
 export const DEFAULT_EDGE_ALPHA = 0.3;
 
 // nodes appearing appearance
-export const NEW_NODE_INVISIBLE_FOR = 0;
-export const NEW_NODE_FADE_IN_FRAMES = 0;
+export const NEW_NODE_INVISIBLE_FOR = 20;
+export const NEW_NODE_FADE_IN_FRAMES = 20;
 
 // zoom
 export const MAX_ZOOM = 5;

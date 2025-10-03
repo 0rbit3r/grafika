@@ -70,7 +70,6 @@ export const simulate_one_frame_of_FDL = ($states: GraphStoresContainer) => {
     }
 
     renderedNodes.forEach(node => {
-        node.framesAlive += 1;
         // I'm gonna be honest, I don't really understand what's going on down from here...
         if (Math.abs(node.momentum.x) < Math.abs(node.forces.x)) {
             node.momentum.x = Math.abs(node.momentum.x) * Math.sign(node.forces.x);
