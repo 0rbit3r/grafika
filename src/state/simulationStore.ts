@@ -8,7 +8,7 @@ export interface SimulationStore {
     gravityEnabled: boolean;
 
     defaultEdgeLength: number;
-    upflowEnabled: boolean;
+    downflowEnabled: boolean;
 
     initialPositionsRadius: number;
     pushThreshold: number;
@@ -20,7 +20,7 @@ export function createSimulationStore(settings?: SimulationSettings): Simulation
         simulationEnabled: false,
         gravityEnabled: false,
         defaultEdgeLength: settings?.defaultEdgeLength ?? DEFAULT_EDGE_LENGTH, //TODO ADD TO SETTINGS?,
-        upflowEnabled: false,
+        downflowEnabled: false,
         initialPositionsRadius: settings?.initialPositionsRadius ?? INITIAL_POSITIONS_RADIUS,
         pushThreshold: settings?.pushThreshold ?? PUSH_THRESH
     };

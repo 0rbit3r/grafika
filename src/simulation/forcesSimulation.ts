@@ -13,7 +13,9 @@ import {
     MAX_MASS_DIFFERENCE_PUSH_FORCE_MULTIPLIER,
     MIN_MASS_DIFFERENCE_PUSH_FORCE_MULTIPLIER,
     pushForce,
-    TEXT_BOX_NODE_WIDTH_MULTIPLIER
+    TEXT_BOX_NODE_WIDTH_MULTIPLIER,
+    MAX_PULL_FORCE,
+    DOWNFLOW_FORCE
 } from "../core/defaultGraphOptions";
 import { RenderedEdge } from "../core/renderedEdge";
 import { RenderedNode } from "../core/renderedNode";
@@ -132,13 +134,13 @@ export const pull_or_push_connected_to_ideal_distance = (edge: RenderedEdge, $st
     edge.source.forces.x += (edge.source.held ? 0 : (dx / centerDistance) * force)
         * nodeMassMultiplier
         * sourceNodeTimeOnScreenMultiplier;
-    edge.source.forces.y += (edge.source.held ? 0 : (dy / centerDistance) * force - (simState.upflowEnabled ? 2 : 0))
+    edge.source.forces.y += (edge.source.held ? 0 : (dy / centerDistance) * force - (simState.downflowEnabled ? DOWNFLOW_FORCE : 0))
         * nodeMassMultiplier
         * sourceNodeTimeOnScreenMultiplier;
     edge.target.forces.x -= (edge.target.held ? 0 : (dx / centerDistance) * force)
         / nodeMassMultiplier
         * targetNodeTimeOnScreenMultiplier;
-    edge.target.forces.y -= (edge.target.held ? 0 : (dy / centerDistance) * force - (simState.upflowEnabled ? 2 : 0))
+    edge.target.forces.y -= (edge.target.held ? 0 : (dy / centerDistance) * force - (simState.downflowEnabled ? DOWNFLOW_FORCE : 0))
         / nodeMassMultiplier
         * targetNodeTimeOnScreenMultiplier;
 }
