@@ -154,7 +154,7 @@ export const initGraphics = (app: Application, $states: GraphStoresContainer) =>
                     if (node.shape != NodeShape.TextBox)
                         node.renderedText?.setTransform(viewportPos.x, viewportPos.y + (node.radius * (1 + NODE_BORDER_THICKNESS * 2)) * zoom);
                     else {
-                        node.renderedText?.setTransform(viewportPos.x, viewportPos.y + (node.radius * (NODE_BORDER_THICKNESS - 1)) * zoom, zoom, zoom);
+                        node.renderedText?.setTransform(viewportPos.x, viewportPos.y, zoom, zoom);
                     }
                     node.renderedText && (node.renderedText.alpha = Math.max(0, Math.min(1, (node.framesAlive - NEW_NODE_INVISIBLE_FOR) / NEW_NODE_FADE_IN_FRAMES)));
                 }

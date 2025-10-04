@@ -1,6 +1,6 @@
 import { TextStyle, Text, Sprite, MSAA_QUALITY, ColorMatrixFilter, Color } from "pixi.js";
 import { getNodeProxy } from "../api/proxyNode";
-import { DEFAULT_RADIUS, NODE_BORDER_THICKNESS, TEXT_BOX_NODE_WIDTH_MULTIPLIER, TEXT_WORD_WRAP_WIDTH, ZOOM_STEP_MULTIPLICATOR_WHEEL } from "../core/defaultGraphOptions";
+import { DEFAULT_RADIUS, NODE_BORDER_THICKNESS, TEXT_WORD_WRAP_WIDTH, ZOOM_STEP_MULTIPLICATOR_WHEEL } from "../core/defaultGraphOptions";
 import { RenderedNode } from "../core/renderedNode";
 import { GraphStoresContainer } from "../state/storesContainer";
 import { getBlinkSprite, getGlowSprite, getHollowHoleSprite, getHollowRimSprite } from "./sprites/effectSprites";
@@ -142,17 +142,17 @@ const getTextBoxText = (node: RenderedNode, colorfulText?: boolean) => {
     const style = new TextStyle({
         breakWords: false,
         wordWrap: true,
-        align: "left",
+        align: "center",
         fontFamily: 'Monospace',
         fontSize: 14,
         fill: 'white',
-        wordWrapWidth: node.radius * 2 * TEXT_BOX_NODE_WIDTH_MULTIPLIER - 2 * (NODE_BORDER_THICKNESS * node.radius + TEXT_BOX_MARGIN),
+        wordWrapWidth: node.radius * 4 / 3 - 2 * (NODE_BORDER_THICKNESS * node.radius + TEXT_BOX_MARGIN),
         stroke: "#000000",
     });
 
     const text = new Text(node.text, style);
     if (colorfulText) text.tint = new tinycolor(node.color).lighten(30).toString();
-    text.anchor.set(0.5, 0);
+    text.anchor.set(0.5);
     text.zIndex = TEXT_Z;
 
     return text;

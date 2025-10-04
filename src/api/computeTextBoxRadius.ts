@@ -4,7 +4,7 @@
 export const computeTextBoxRadius = (text: string) => {
     const textLength = text.length;
     const numberOfNewLines = text.split('\n').length - 1;
-    return Math.floor(Math.max(20, Math.sqrt(textLength * 0.85) * 3.8 + 10)) + numberOfNewLines * 5;
+    return Math.floor(Math.max(40, Math.sqrt(textLength) * 13 + 10)) + numberOfNewLines * 5;
 };
 
 // This is just a best human-effort at fitting curves through a bunch of datapoints:

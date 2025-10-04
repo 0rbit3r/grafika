@@ -1,6 +1,6 @@
 import { Application, Circle, Graphics, SCALE_MODES, Sprite, Texture, Text } from "pixi.js";
 import { NodeShape } from "../../api/dataTypes";
-import { NODE_BORDER_THICKNESS, TEXT_BOX_NODE_WIDTH_MULTIPLIER } from "../../core/defaultGraphOptions";
+import { NODE_BORDER_THICKNESS } from "../../core/defaultGraphOptions";
 import { RenderedNode } from "../../core/renderedNode";
 
 export const NODE_SPRITE_RADIUS = 200;
@@ -183,10 +183,8 @@ export function getNodeSprite(app: Application, node: RenderedNode): Sprite {
                 graphics.lineStyle(NODE_SPRITE_RADIUS * NODE_BORDER_THICKNESS / 2, "#ffffff");
 
                 graphics.drawRoundedRect(
-                    - NODE_SPRITE_RADIUS * TEXT_BOX_NODE_WIDTH_MULTIPLIER, - NODE_SPRITE_RADIUS ,
-                    NODE_SPRITE_RADIUS * TEXT_BOX_NODE_WIDTH_MULTIPLIER * 2, NODE_SPRITE_RADIUS * 2, TEXT_BOX_CORNER_RADIUS
-                );
-
+                    - NODE_SPRITE_RADIUS / 3 * 2, - NODE_SPRITE_RADIUS / 3 * 2,
+                    NODE_SPRITE_RADIUS * 4 / 3, NODE_SPRITE_RADIUS * 4 / 3, NODE_SPRITE_RADIUS / 3);
                 graphics.endFill();
                 baseTextures.textBox = app.renderer.generateTexture(graphics,
                     {
