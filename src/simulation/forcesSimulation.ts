@@ -1,8 +1,7 @@
-import { NodeShape } from "../api/dataTypes";
 import {
     MOMENTUM_DAMPENING_START_AT, MOMENTUM_DAMPENING_EASE_IN_FRAMES, MAX_MOMENTUM_DAMPENING,
     MAX_MOVEMENT_SPEED, GRAVITY_FREE_RADIUS, gravityForce,
-    inEdgesLengthForceDivisor,
+    edgesNumForceDivisor,
     FRAMES_WITH_NO_INFLUENCE,
     INFLUENCE_FADE_IN,
     MAX_MASS_DIFFERENCE_PULL_FORCE_MULTIPLIER,
@@ -13,8 +12,8 @@ import {
     MAX_MASS_DIFFERENCE_PUSH_FORCE_MULTIPLIER,
     MIN_MASS_DIFFERENCE_PUSH_FORCE_MULTIPLIER,
     pushForce,
-    MAX_PULL_FORCE,
-    DOWNFLOW_FORCE
+    DOWNFLOW_FORCE,
+    EDGE_COUNT_EDGE_LENGTH_INFLUENCE_FACTOR
 } from "../core/defaultGraphOptions";
 import { RenderedEdge } from "../core/renderedEdge";
 import { RenderedNode } from "../core/renderedNode";
@@ -103,9 +102,15 @@ export const pull_or_push_connected_to_ideal_distance = (edge: RenderedEdge, $st
     const centerDistance = get_center_distance(edge.source, edge.target);
     const borderDistance = get_border_distance(edge.source, edge.target);
 
-    const force = pullForce(borderDistance, edge.length)
+    const sizeAffectedLength = edge.length
+        * Math.max(1,
+            (edge.target.inEdges.size + edge.target.outEdges.size
+                + edge.source.inEdges.size + edge.source.outEdges.size)
+            * EDGE_COUNT_EDGE_LENGTH_INFLUENCE_FACTOR)
+
+    const force = pullForce(borderDistance, sizeAffectedLength)
         * edge.weight
-        / inEdgesLengthForceDivisor(edge.target.inEdges.size);
+        / edgesNumForceDivisor(edge.target.inEdges.size + edge.target.outEdges.size + edge.source.inEdges.size + edge.source.outEdges.size);
 
     const nodeMassMultiplier = NODE_MASS_ON
         ? Math.min(Math.max(edge.target.radius / edge.source.radius, MIN_MASS_DIFFERENCE_PULL_FORCE_MULTIPLIER), MAX_MASS_DIFFERENCE_PULL_FORCE_MULTIPLIER)
@@ -150,7 +155,7 @@ export const push_unconnected = (sourceNode: RenderedNode, targetNode: RenderedN
 
     //this might be a bit weird but hey... it works to eliminate the noncontinuity of the push force at the edge
     const forceAtPushThresh = pushForce($sim.pushThreshold);
-    const force = $sim.frame > FRAMES_WITH_OVERLAP
+    const force = sourceNode.framesAlive > FRAMES_WITH_OVERLAP && targetNode.framesAlive > FRAMES_WITH_OVERLAP
         ? pushForce(borderDistance) - forceAtPushThresh
         : 0;
 

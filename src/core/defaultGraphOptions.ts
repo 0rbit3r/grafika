@@ -30,8 +30,6 @@ export const EDGE_COUNT_EDGE_LENGTH_INFLUENCE_FACTOR = 0.1;
 // This number can only grow and starts having influence when reaching 1
 // sizeInfluencedEdgeforce = (f, E) => Max(1, f * E);
 
-//todo - implement this
-
 
 export const PUSH_THRESH = 5000;
 export const MAX_PUSH_FORCE = 50;
@@ -127,8 +125,8 @@ export const gravityForce = (centerDistance: number) => {
     }
 }
 
-// Makes bigger (ie. more referenced) thoughts less active and thus reduces jitter
-export const inEdgesLengthForceDivisor = (bl: number) => {
+// Makes highly connected nodes less active and thus reduces jitter
+export const edgesNumForceDivisor = (bl: number) => {
     if (bl < 3) {
         return 1;
     }
