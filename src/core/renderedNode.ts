@@ -10,7 +10,7 @@ import { handleNodeLoading } from "../graphics/dynamicLoader";
 import { computeTextBoxRadius } from "../api/computeTextBoxRadius";
 
 export interface RenderedNode {
-    id: number;
+    id: string;
     inEdges: Set<RenderedEdge>;
     outEdges: Set<RenderedEdge>;
 

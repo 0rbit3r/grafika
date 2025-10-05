@@ -8,7 +8,7 @@ import { initNodeGraphics } from "../graphics/initNodeGraphics";
 import { handleNodeLoading } from "../graphics/dynamicLoader";
 
 export interface ProxyNode {
-    id: number;
+    id: string;
 
     x: number;
     y: number;

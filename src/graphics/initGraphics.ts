@@ -43,19 +43,6 @@ export const initGraphics = (app: Application, $states: GraphStoresContainer) =>
     zSortedContainer.addChild(edgeContainer);
     zSortedContainer.addChild(debugContainer);
 
-    // Handle node dragging logic here as not to plague individual nodes with pointermove events...
-    // app.stage.on('pointermove', e => {
-    //     const heldNode = $states.context.heldNode;
-    //     if (app.ticker.started && heldNode !== undefined) {
-    //             if (!heldNode.held) return; 
-    //             const zoom = viewport.zoom;
-    //             heldNode.x += e.movementX / zoom;
-    //             heldNode.y += e.movementY / zoom;
-    //             $states.interactionEvents.emit("nodeDragged", getNodeProxy(heldNode, $states));
-    //             // console.log(renderedNode.x, renderedNode.graphics.x);
-    //     }
-    // });
-
     let $simulation = $states.simulation;
     let $debug = $states.debug;
     let $graphics = $states.graphics;

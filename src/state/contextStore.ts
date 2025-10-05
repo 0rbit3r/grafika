@@ -8,7 +8,7 @@ export interface ContextStore {
     renderedNodes: RenderedNode[];
     renderedEdges: RenderedEdge[];
 
-    edgesAdjacency: Map<number, Set<number>>;
+    edgesAdjacency: Map<string, Set<string>>;
 
     notRenderedEdges: GraphEdge[]; // edges that are defined, but missing either source or target node
 

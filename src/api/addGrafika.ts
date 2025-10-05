@@ -1,4 +1,4 @@
-import { Application } from "pixi.js";
+import { Application, Assets, TextStyle, Text } from "pixi.js";
 import { initGraphics } from "../graphics/initGraphics";
 import { GrafikaSettings } from "./settings";
 import { createGraphStores } from "../state/storesContainer";

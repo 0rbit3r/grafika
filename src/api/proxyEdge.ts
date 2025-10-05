@@ -10,15 +10,15 @@ import { initEdgeGraphics } from "../graphics/initEdgeGraphics";
 import { handleEdgeLoading } from "../graphics/dynamicLoader";
 
 export interface ProxyEdge {
+    // different than renderedEdge - require traps
+    source: ProxyNode;
+    target: ProxyNode;
+    sourceId: string;
+    targetId: string;
     // same as RenderedEdge - fall through
     color: string;
     type: EdgeType;
     
-    // different than renderedEdge - require traps
-    source: ProxyNode;
-    target: ProxyNode;
-    sourceId: number;
-    targetId: number;
     
     weight: number;
     alpha: number;

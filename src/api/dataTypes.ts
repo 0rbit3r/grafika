@@ -4,7 +4,7 @@ export interface Data {
 }
 
 export interface GraphNode {
-    id: number;
+    id: string;
 
     x?: number;
     y?: number;
@@ -36,8 +36,8 @@ export enum NodeShape {
 }
 
 export interface GraphEdge {
-    sourceId: number;
-    targetId: number;
+    sourceId: string;
+    targetId: string;
 
     color?: string;
     type?: EdgeType;

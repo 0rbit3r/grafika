@@ -25,8 +25,6 @@ export function addData($states: GraphStoresContainer, data: Data) {
         $context.proxyNodesList.push(getNodeProxy(newRenderedNode, $states));
     });
 
-    
-
     // handle finding notrenderedEdge that should be instantiated by the new data 
     const instantiatedNotRenderedEdges = new Set<GraphEdge>();
     $context.notRenderedEdges.forEach(notRenderedEdge => {
@@ -53,16 +51,17 @@ export function addData($states: GraphStoresContainer, data: Data) {
             $context.proxyEdgesList.push(getEdgeProxy(newRenderedEdge, $states));
             sourceRenderedNode.outEdges.add(newRenderedEdge);
             targetRenderedNode.inEdges.add(newRenderedEdge);
+
+            // update adjacency map
+            if ($context.edgesAdjacency.get(sourceRenderedNode.id) === undefined)
+                $context.edgesAdjacency.set(sourceRenderedNode.id, new Set());
+            $context.edgesAdjacency.get(sourceRenderedNode.id)?.add(targetRenderedNode?.id ?? -1);
+            if ($context.edgesAdjacency.get(targetRenderedNode.id) === undefined)
+                $context.edgesAdjacency.set(targetRenderedNode.id, new Set());
+            $context.edgesAdjacency.get(targetRenderedNode.id)?.add(sourceRenderedNode?.id ?? -1);
         }
         else {
             $context.notRenderedEdges.push(newEdge);
         }
-
-        if ($context.edgesAdjacency.get(sourceRenderedNode?.id ?? -1) === undefined)
-            $context.edgesAdjacency.set(sourceRenderedNode?.id ?? -1, new Set());
-        $context.edgesAdjacency.get(sourceRenderedNode?.id ?? -1)?.add(targetRenderedNode?.id ?? -1);
-        if ($context.edgesAdjacency.get(targetRenderedNode?.id ?? -1) === undefined)
-            $context.edgesAdjacency.set(targetRenderedNode?.id ?? -1, new Set());
-        $context.edgesAdjacency.get(targetRenderedNode?.id ?? -1)?.add(sourceRenderedNode?.id ?? -1);
     });
 }   

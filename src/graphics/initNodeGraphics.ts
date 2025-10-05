@@ -35,7 +35,7 @@ export const initNodeGraphics = (node: RenderedNode, $states: GraphStoresContain
         rim.tint = node.color;
         sprite.addChild(rim);
     }
-    if (node.blinkEffect ){
+    if (node.blinkEffect) {
         const blinkSprite = getBlinkSprite(app);
         sprite.addChild(blinkSprite);
         node.blinkingSprite = blinkSprite;
@@ -125,6 +125,7 @@ const getStandardNodeText = (node: RenderedNode, colorfulText?: boolean) => {
         fill: '#ffffff',
         wordWrapWidth: TEXT_WORD_WRAP_WIDTH,
         stroke: "#000000",
+        strokeThickness: 2
     });
 
     const text = new Text(node.text, style);
@@ -147,7 +148,6 @@ const getTextBoxText = (node: RenderedNode, colorfulText?: boolean) => {
         fontSize: 14,
         fill: 'white',
         wordWrapWidth: node.radius * 4 / 3 - 2 * (NODE_BORDER_THICKNESS * node.radius + TEXT_BOX_MARGIN),
-        stroke: "#000000",
     });
 
     const text = new Text(node.text, style);
