@@ -36,13 +36,15 @@ export function addGrafika(element: HTMLElement, settings: GrafikaSettings): Gra
     const renderGraph = initGraphics(app, $states);
 
     const resizeObserver = new ResizeObserver((entries => {
-        for (const entry of entries) {
-            if (entry.contentBoxSize) {
-                console.log("resizing grafika");
-                app.resize();
-                $states.graphics.viewport.resizeHitArea(app.screen.width, app.screen.height)
-            }
-        }
+
+        const entry = entries[0];
+        const width = entry.contentRect.width;
+        const height = entry.contentRect.height;
+
+        console.log("resizing grafika", width, height);
+
+        app.resize();
+        $states.graphics.viewport.resizeHitArea(app.screen.width, app.screen.height);
     }));
     resizeObserver.observe(element);
 
@@ -115,6 +117,18 @@ export function addGrafika(element: HTMLElement, settings: GrafikaSettings): Gra
             if (isDisposed) return;
             for (let i = 0; i <= frames; i++) handleTick();
             app.renderer.render(app.stage);
+        },
+        focusOn: (what) => {
+            if (what === null) {
+                $states.graphics.viewportFocus = null;
+                return;
+            }
+            if (what === "all") {
+                $states.graphics.viewportFocus = "all";
+                return;
+            }
+            $states.graphics.viewportFocus = $states.context.renderedNodes.find(n => n.id === what.id)
+                ?? null;
         }
     };
 }

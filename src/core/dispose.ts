@@ -2,6 +2,7 @@ import { Assets } from "pixi.js";
 import { GraphStoresContainer } from "../state/storesContainer"
 
 export const disposeState = async ($states: GraphStoresContainer) => {
+    $states.interactionEvents.all.clear();
     const $graphics = $states.graphics;
     const $context = $states.context;
 

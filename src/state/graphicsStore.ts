@@ -1,13 +1,17 @@
-import { addDraggableViewport, Viewport } from "../graphics/viewport";
+import {Viewport } from "../graphics/viewport/viewport";
+import { addDraggableViewport } from "../graphics/viewport/addViewport";
 import { BackdropSettings, GraphicsSettings, OverlaySettings } from "../api/settings";
 import { Container, Application, DisplayObject, ParticleContainer } from "pixi.js";
 import { EdgeType, NodeShape } from "../api/dataTypes";
 import { Emitter } from "mitt";
 import { InteractionEvents } from "../api/events";
 import { DEFAULT_EDGE_ALPHA } from "../core/defaultGraphOptions";
+import { RenderedNode } from "../core/renderedNode";
 
 export interface GraphicsStore {
   viewport: Viewport;
+  viewportFocus: "all" | RenderedNode | null; 
+
   app: Application;
   nodeContainer: Container<DisplayObject>;
   edgeContainer: Container<DisplayObject>;
@@ -33,6 +37,8 @@ export function createGraphicsStore
 
   return {
     app: app,
+    viewportFocus: null,
+
     nodeContainer: new Container(),
     textContainer: new Container(),
     debugContainer: new Container(),

@@ -1,5 +1,5 @@
 import { Emitter } from "mitt";
-import { Data, GraphEdge } from "./dataTypes";
+import { Data, GraphEdge, GraphNode } from "./dataTypes";
 import { ProxyEdge } from "./proxyEdge";
 import { ProxyNode } from "./proxyNode";
 import { InteractionEvents } from "./events";
@@ -27,6 +27,9 @@ export interface GrafikaInstance {
     // starts/stops the force simulation    
     simStart: () => void;
     simStop: () => void;
+
+    //will move the viewport to follow either a given node, all data on screen or nothing when null
+    focusOn: (what: GraphNode | ProxyNode | "all" | null) => void;
 }
 
 export interface DataProxy {

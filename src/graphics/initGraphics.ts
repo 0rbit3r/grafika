@@ -10,6 +10,7 @@ import { handleOverlay } from "./overlay/handleOverlay";
 import { handleNodeLoading, handleEdgeLoading } from "./dynamicLoader";
 import { initBackdrop } from "./backdrop/initBackdrop";
 import { handleBackdrop } from "./backdrop/handleBackdrop";
+import { handleViewportFocus } from "./viewport/handleViewportFocus";
 
 export const initGraphics = (app: Application, $states: GraphStoresContainer) => {
     app.stage.eventMode = 'static';
@@ -80,6 +81,8 @@ export const initGraphics = (app: Application, $states: GraphStoresContainer) =>
         $context = $states.context;
         zoom = $graphics.viewport.zoom;
 
+        handleViewportFocus($states);
+
         // FPS counter
         if ($debug.showFps) {
             const fps = $graphics.app.ticker.FPS;
@@ -112,7 +115,7 @@ export const initGraphics = (app: Application, $states: GraphStoresContainer) =>
 
                 handleNodeLoading(node, $graphics);
 
-                if ($graphics.floatingNodes) {
+                if ($graphics.floatingNodes && !node.held) {
                     const positionBasedAngle = (node.x / 100 + node.y / 100);
                     node.floatingDisplacement.x = Math.cos(positionBasedAngle + displacementAngleRotation) * 30;
                     node.floatingDisplacement.y = Math.sin(positionBasedAngle + displacementAngleRotation) * 30;
