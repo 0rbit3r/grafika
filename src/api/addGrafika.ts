@@ -13,7 +13,7 @@ import { disposeState } from "../core/dispose";
 
 export function addGrafika(element: HTMLElement, settings: GrafikaSettings): GrafikaInstance {
 
-    Object.assign(element.style, { width: "100%", height: "100%" });
+    // Object.assign(element.style, { width: "100%", height: "100%" });
 
     const app = new Application<HTMLCanvasElement>(
         {
