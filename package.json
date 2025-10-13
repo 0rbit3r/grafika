@@ -1,6 +1,6 @@
 {
   "name": "grafika",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "description": "Beautiful general purpose graph engine",
   "private": false,
   "repository": {
