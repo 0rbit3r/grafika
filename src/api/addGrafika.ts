@@ -37,14 +37,16 @@ export function addGrafika(element: HTMLElement, settings: GrafikaSettings): Gra
 
     const resizeObserver = new ResizeObserver((entries => {
 
-        const entry = entries[0];
-        const width = entry.contentRect.width;
-        const height = entry.contentRect.height;
+        entries.forEach(entry => {
 
-        console.log("resizing grafika", width, height);
+            const width = entry.contentRect.width;
+            const height = entry.contentRect.height;
 
-        app.resize();
-        $states.graphics.viewport.resizeHitArea(app.screen.width, app.screen.height);
+            console.log("resizing grafika", width, height);
+
+            app.resize();
+            $states.graphics.viewport.resizeHitArea(app.screen.width, app.screen.height);
+        });
     }));
     resizeObserver.observe(element);
 
