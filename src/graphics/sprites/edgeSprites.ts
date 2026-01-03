@@ -77,12 +77,12 @@ export function getEdgeSprite(app: Application, edge: RenderedEdge): Sprite | nu
                 const edgeGraphics = new Graphics();
                 const segments = 100;
 
-                edgeGraphics.lineStyle(0); // no outline
+                edgeGraphics.lineStyle(0);
 
                 const len = EDGE_SPRITE_LENGTH;
-                const ux = 1;  // unit vector along x-axis
+                const ux = 1;
                 const uy = 0;
-                const px = 0;  // perpendicular vector
+                const px = 0;
                 const py = 1;
 
                 for (let i = 0; i < segments; i++) {

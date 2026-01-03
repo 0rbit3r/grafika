@@ -16,6 +16,7 @@ export class Viewport {
     lockedOnNode: boolean;
     // onScreenSizeChange: () => void;
     interactionEvents: Emitter<InteractionEvents>;
+    lastPointerDownTimeStamp: number;
 
     dragContainer: Container;
 
@@ -28,6 +29,7 @@ export class Viewport {
         this.lockedOnNode = false;
         this.dragContainer = dragContainer;
         this.interactionEvents = interactionEvents;
+        this.lastPointerDownTimeStamp = 0;
     }
 
     public resizeHitArea = (width: number, height: number) => {
@@ -79,6 +81,7 @@ export class Viewport {
         }
     }
 
+    // used for user interactivity
     updateZoom = (newZoom: number, globalCoors: XAndY) => {
         newZoom = Math.min(MAX_ZOOM, Math.max(MIN_ZOOM, newZoom));
         // keep centerWorld stable on screen
@@ -87,5 +90,11 @@ export class Viewport {
         this.zoom = newZoom;
         this.interactionEvents.emit("viewportZoomed", this.zoom);
         this.interactionEvents.emit("viewportMoved", { x: this.position.x, y: this.position.y });
+    }
+
+    // used for automatic zoom
+    zoomBy = (factor: number) => {
+        const newZoom = this.zoom * factor;
+        this.zoom = Math.min(MAX_ZOOM, Math.max(MIN_ZOOM, newZoom));
     }
 }

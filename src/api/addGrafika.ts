@@ -14,7 +14,7 @@ import { disposeState } from "../core/dispose";
 export function addGrafika(element: HTMLElement, settings: GrafikaSettings): GrafikaInstance {
 
     // Object.assign(element.style, { width: "100%", height: "100%" });
-
+    // console.log(window.devicePixelRatio)
     const app = new Application<HTMLCanvasElement>(
         {
             background: settings.graphics?.backgroundColor ?? '#000000',
@@ -37,16 +37,16 @@ export function addGrafika(element: HTMLElement, settings: GrafikaSettings): Gra
 
     const resizeObserver = new ResizeObserver((entries => {
 
-        entries.forEach(entry => {
-
+        // entries.forEach(entry => {
+            const entry = entries[entries.length - 1];
             const width = entry.contentRect.width;
             const height = entry.contentRect.height;
 
-            console.log("resizing grafika", width, height);
+            // console.log("resizing grafika", width, height);
 
             app.resize();
             $states.graphics.viewport.resizeHitArea(app.screen.width, app.screen.height);
-        });
+        // });
     }));
     resizeObserver.observe(element);
 

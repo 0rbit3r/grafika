@@ -39,6 +39,7 @@ export const addDraggableViewport = (app: Application, interactionevents: Emitte
 
     dragContainer.on('pointerdown', (e) => {
         if (!app.ticker.started) return;
+        viewport.lastPointerDownTimeStamp = Date.now();
         activeTouches.set(e.pointerId, { x: e.global.x, y: e.global.y });
         if (activeTouches.size === 1) viewport.dragged = true;
     });
@@ -46,6 +47,13 @@ export const addDraggableViewport = (app: Application, interactionevents: Emitte
     const pointerUpEvents = ['pointerup', 'pointerupoutside'];
     pointerUpEvents.forEach(ev => {
         dragContainer.on(ev, (e) => clearPointer(e.pointerId));
+    });
+    dragContainer.on('pointertap', (e) => {
+        console.log(Date.now() - viewport.lastPointerDownTimeStamp)
+        if (Date.now() - viewport.lastPointerDownTimeStamp > 120) return;
+
+        const globalCoors = viewport.toGlobalCoordinates({x: e.globalX, y: e.globalY});
+        interactionevents.emit('backgroundClicked', globalCoors);
     });
 
 

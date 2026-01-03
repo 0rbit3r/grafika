@@ -81,23 +81,11 @@ export const TEXT_WORD_WRAP_WIDTH = 160;
 // FDL force functions
 export const pushForce = (borderDist: number) => {
 
-    // if (borderDist === 0) {
-    //     return -borderDist;
-    // }
-    // if (borderDist < 0) {
-    //     return -borderDist;
-    // }
-
     const computed = 30 / Math.sqrt(borderDist <= 0 ? 0.0001 : borderDist);
     return Math.min(MAX_PUSH_FORCE, computed);
 };
 
 export const pullForce = (borderDist: number, idealDistance: number) => {
-
-    // if (borderDist < 0) {
-    //     // console.log('negative borderDist ', borderDist);
-    //     return borderDist / 2;
-    // }
 
     const computed = 0.01 * (borderDist - idealDistance);
     const limited = computed > MAX_PULL_FORCE

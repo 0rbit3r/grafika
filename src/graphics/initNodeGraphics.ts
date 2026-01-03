@@ -11,6 +11,7 @@ import tinycolor from "tinycolor2";
 
 export const initNodeGraphics = (node: RenderedNode, $states: GraphStoresContainer) => {
     const app = $states.graphics.app;
+    if ($states.debug.logToConsole) console.log("initializing node " + node.id);
 
     node.sprite?.removeAllListeners();
     node.sprite?.destroy({ baseTexture: false, children: true, texture: false });
@@ -18,8 +19,6 @@ export const initNodeGraphics = (node: RenderedNode, $states: GraphStoresContain
 
     const sprite = getNodeSprite(app, node);
     sprite.tint = node.color;
-
-    // $states.graphics.nodeContainer.addChild(sprite); -> handled in loader
 
     node.sprite = sprite;
 

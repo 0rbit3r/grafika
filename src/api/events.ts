@@ -7,4 +7,5 @@ export type InteractionEvents = {
     viewportMoved: XAndY;
     viewportZoomed: number;
     framePassed: number;
+    backgroundClicked: {x: number, y: number};
 };
