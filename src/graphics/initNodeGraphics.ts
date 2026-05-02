@@ -1,6 +1,6 @@
-import { TextStyle, Text, Sprite, MSAA_QUALITY, ColorMatrixFilter, Color } from "pixi.js";
+import { TextStyle, Text } from "pixi.js";
 import { getNodeProxy } from "../api/proxyNode";
-import { DEFAULT_RADIUS, NODE_BORDER_THICKNESS, TEXT_WORD_WRAP_WIDTH, ZOOM_STEP_MULTIPLICATOR_WHEEL } from "../core/defaultGraphOptions";
+import { NODE_BORDER_THICKNESS, TEXT_WORD_WRAP_WIDTH, ZOOM_STEP_MULTIPLICATOR_WHEEL } from "../core/defaultGraphOptions";
 import { RenderedNode } from "../core/renderedNode";
 import { GraphStoresContainer } from "../state/storesContainer";
 import { getBlinkSprite, getGlowSprite, getHollowHoleSprite, getHollowRimSprite } from "./sprites/effectSprites";

@@ -5,7 +5,7 @@ import { createGraphStores } from "../state/storesContainer";
 import { addData } from "../core/contextManager/addData";
 import { removeDataByIds } from "../core/contextManager/removeData";
 import { simulate_one_frame_of_FDL } from "../simulation/forcesSimulation";
-import { GrafikaInstance } from "./controlTypes";
+import { GrafikaInstance } from "./grafikaInstance";
 import { Data } from "./dataTypes";
 import mitt from "mitt";
 import { type InteractionEvents } from "./events";
@@ -38,14 +38,14 @@ export function addGrafika(element: HTMLElement, settings: GrafikaSettings): Gra
     const resizeObserver = new ResizeObserver((entries => {
 
         // entries.forEach(entry => {
-            const entry = entries[entries.length - 1];
-            const width = entry.contentRect.width;
-            const height = entry.contentRect.height;
+        const entry = entries[entries.length - 1];
+        const width = entry.contentRect.width;
+        const height = entry.contentRect.height;
 
-            // console.log("resizing grafika", width, height);
+        // console.log("resizing grafika", width, height);
 
-            app.resize();
-            $states.graphics.viewport.resizeHitArea(app.screen.width, app.screen.height);
+        app.resize();
+        $states.graphics.viewport.resizeHitArea(app.screen.width, app.screen.height);
         // });
     }));
     resizeObserver.observe(element);
@@ -83,7 +83,7 @@ export function addGrafika(element: HTMLElement, settings: GrafikaSettings): Gra
         interactionEvents: interactionEvents,
 
         addData: (data: Data) => { if (!isDisposed) addData($states, data) },
-        removeData: (data: Data) => { if (!isDisposed) removeDataByIds($states, data) },
+        removeData: (data?: Data) => { if (!isDisposed) removeDataByIds($states, data) },
         getData: () => {
             if (isDisposed) return { edges: [], nodes: [], unusedEdges: [] };
             return {
@@ -92,6 +92,7 @@ export function addGrafika(element: HTMLElement, settings: GrafikaSettings): Gra
                 unusedEdges: $states.context.notRenderedEdges
             }
         },
+        getViewport: () => ({ position: $states.graphics.viewport.position, zoom: $states.graphics.viewport.zoom }),
 
         start: () => { if (!isDisposed) app.ticker.start() },
         stop: () => { if (!isDisposed) app.ticker.stop() },
