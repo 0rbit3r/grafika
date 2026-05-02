@@ -92,7 +92,7 @@ export const initGraphics = (app: Application, $states: GraphStoresContainer) =>
             if ($simulation.frame % updateFpsEveryNFrames === 0 && $simulation.frame >= 10) {
                 fpsCounter.text = Math.floor(fpsRollingHistory.reduce((a, b) => a + b) / fpsRollingHistory.length);
             }
-            fpsCounter.y = app.screen.height - 40;
+            fpsCounter.y = app.screen.height - 80;
         }
 
         $graphics.textContainer.alpha = zoom <= ZOOM_TEXT_INVISIBLE_THRESHOLD

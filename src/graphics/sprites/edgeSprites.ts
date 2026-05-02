@@ -5,7 +5,7 @@ import { RenderedEdge } from "../../core/renderedEdge";
 export const EDGE_SPRITE_LENGTH = 800;
 const ARROWHEAD_LENGTH = EDGE_SPRITE_LENGTH / 4;
 
-export const TAPERED_EDGE_WIDTH = EDGE_SPRITE_LENGTH / 10;
+export const TAPERED_EDGE_WIDTH = EDGE_SPRITE_LENGTH / 5;
 const ARROWHEAD_WIDTH = EDGE_SPRITE_LENGTH / 20;
 const LINE_EDGE_WIDTH = EDGE_SPRITE_LENGTH / 20;
 
@@ -75,7 +75,7 @@ export function getEdgeSprite(app: Application, edge: RenderedEdge): Sprite | nu
         case EdgeType.Tapered:
             if (!baseTextures.taperedEdge || baseTextures.taperedEdge.destroyed) {
                 const edgeGraphics = new Graphics();
-                const segments = 100;
+                const segments = 333;
 
                 edgeGraphics.lineStyle(0);
 
@@ -104,7 +104,7 @@ export function getEdgeSprite(app: Application, edge: RenderedEdge): Sprite | nu
                         endX + px * w1 / 2, endY + py * w1 / 2,
                     ];
 
-                    const segmentAlpha = t0;
+                    const segmentAlpha = t0 * t0;
 
                     edgeGraphics.beginFill("#ffffff", segmentAlpha);
                     edgeGraphics.drawPolygon(quad);

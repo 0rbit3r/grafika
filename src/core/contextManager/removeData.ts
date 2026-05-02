@@ -4,9 +4,14 @@ import { GraphStoresContainer } from "../../state/storesContainer";
 import { filterInPlace } from "../../util/filterInPlace";
 import { RenderedEdge } from "../renderedEdge";
 
-//todo - this might be made faster by using sets?
+export function removeDataByIds($states: GraphStoresContainer, dataToRemove?: Data) {
+    if (!dataToRemove)
+        dataToRemove = {
+            edges: $states.context.notRenderedEdges.map(e => ({ sourceId: e.sourceId, targetId: e.targetId }))
+                .concat($states.context.renderedEdges.map(e => ({ sourceId: e.source.id, targetId: e.target.id }))),
+            nodes: $states.context.renderedNodes
+        }
 
-export function removeDataByIds($states: GraphStoresContainer, dataToRemove: Data) {
     if (dataToRemove.nodes === undefined) dataToRemove.nodes = [];
     if (dataToRemove.edges === undefined) dataToRemove.edges = [];
 
@@ -30,8 +35,8 @@ export function removeDataByIds($states: GraphStoresContainer, dataToRemove: Dat
     const edgesToDestroy: Set<RenderedEdge> = new Set();
     nodesToDestroy.forEach(node => {
         node.sprite?.removeAllListeners();
-        node.sprite?.destroy({children: true});
-        node.renderedText?.destroy({children: true});
+        node.sprite?.destroy({ children: true });
+        node.renderedText?.destroy({ children: true });
         // remove deleted edges from nodes' references
         node.inEdges.forEach(e => edgesToDestroy.add(e));
         node.outEdges.forEach(e => edgesToDestroy.add(e));
@@ -50,7 +55,7 @@ export function removeDataByIds($states: GraphStoresContainer, dataToRemove: Dat
         $states.context.renderedEdges.filter(e => !edgesToDestroy.has(e));
 
     edgesToDestroy.forEach(e => {
-        e.sprite?.destroy({children: true});
+        e.sprite?.destroy({ children: true });
         e.target.inEdges.delete(e);
         e.source.outEdges.delete(e);
 
@@ -70,5 +75,4 @@ export function removeDataByIds($states: GraphStoresContainer, dataToRemove: Dat
 
     filterInPlace($states.context.proxyNodesList,
         rn => dataToRemove.nodes?.find(n => rn.id === n.id) === undefined);
-    
 }

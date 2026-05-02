@@ -49,19 +49,46 @@ export const addDraggableViewport = (app: Application, interactionevents: Emitte
         dragContainer.on(ev, (e) => clearPointer(e.pointerId));
     });
     dragContainer.on('pointertap', (e) => {
-        console.log(Date.now() - viewport.lastPointerDownTimeStamp)
         if (Date.now() - viewport.lastPointerDownTimeStamp > 120) return;
 
-        const globalCoors = viewport.toGlobalCoordinates({x: e.globalX, y: e.globalY});
+        const globalCoors = viewport.toGlobalCoordinates({ x: e.globalX, y: e.globalY });
         interactionevents.emit('backgroundClicked', globalCoors);
     });
+
+    // safety fallback to prevent hardlock of the zoom/pan on mobile devices
+    const handleGlobalPointerUp = (e: PointerEvent) => clearPointer(e.pointerId);
+    window.addEventListener('pointerup', handleGlobalPointerUp);
+    window.addEventListener('pointercancel', handleGlobalPointerUp);
+
+    dragContainer.on('pointertap', (e) => {
+        if (Date.now() - viewport.lastPointerDownTimeStamp > 120) return;
+        const globalCoors = viewport.toGlobalCoordinates({ x: e.globalX, y: e.globalY });
+        interactionevents.emit('backgroundClicked', globalCoors);
+    });
+
+
+
+
+
+    // TODO !!! - add removers of the event listeners to the viewport
+    // ie... dispose()
+
+
+
+
 
 
     app.stage.on('pointermove', (e) => {
         if (!app.ticker.started) return;
 
         if (activeTouches.size === 1 && viewport.dragged) {
-            viewport.moveByZoomed({ x: e.movementX, y: e.movementY });
+            const prev = activeTouches.get(e.pointerId);
+            if (prev) {
+                const dx = e.global.x - prev.x;
+                const dy = e.global.y - prev.y;
+                viewport.moveByZoomed({ x: dx, y: dy });
+            }
+            activeTouches.set(e.pointerId, { x: e.global.x, y: e.global.y });
             interactionevents.emit("viewportMoved", { x: viewport.position.x, y: viewport.position.y });
         }
 

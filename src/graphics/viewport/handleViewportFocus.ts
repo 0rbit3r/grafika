@@ -18,7 +18,7 @@ export const handleViewportFocus = ($states: GraphStoresContainer) => {
         }
         // zoom so that the node takes up N% of the screen
         const currentScreenSize = highlightedNode.radius * viewport.zoom * 2;
-        const targetScreenSize = 90;
+        const targetScreenSize = 30;
         const zoomRatio = targetScreenSize / currentScreenSize;
 
         if (Math.abs(zoomRatio - 1) > 0.01) {
@@ -31,6 +31,7 @@ export const handleViewportFocus = ($states: GraphStoresContainer) => {
 const handleZoomToAll = ($states: GraphStoresContainer) => {
     const viewport = $states.graphics.viewport;
 
+    //todo - this is just fucking awful man
     const minX = Math.min(...$states.context.renderedNodes.map(n => n.x));
     const maxX = Math.max(...$states.context.renderedNodes.map(n => n.x));
     const minY = Math.min(...$states.context.renderedNodes.map(n => n.y));
