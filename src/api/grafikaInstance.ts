@@ -30,7 +30,7 @@ export interface GrafikaInstance {
     simStop: () => void;
 
     //will move the viewport to follow either a given node, all data on screen or nothing when null
-    focusOn: (what: GraphNode | ProxyNode | "all" | null) => void;
+    focusOn: (what: GraphNode | ProxyNode | "all" | null, padding?: number) => void;
 }
 
 export interface DataProxy {

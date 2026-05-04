@@ -20,7 +20,7 @@ export const EDGE_COMPRESSIBILITY_FACTOR = 1;
 
 export const MAX_PULL_FORCE = 50;
 
-export const DOWNFLOW_FORCE = 2;
+export const DOWNFLOW_FORCE = 1;
 
 export const EDGE_COUNT_EDGE_LENGTH_INFLUENCE_FACTOR = 0.1;
 // That's a mouthful... 

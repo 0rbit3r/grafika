@@ -57,26 +57,8 @@ export const addDraggableViewport = (app: Application, interactionevents: Emitte
 
     // safety fallback to prevent hardlock of the zoom/pan on mobile devices
     const handleGlobalPointerUp = (e: PointerEvent) => clearPointer(e.pointerId);
-    window.addEventListener('pointerup', handleGlobalPointerUp);
-    window.addEventListener('pointercancel', handleGlobalPointerUp);
-
-    dragContainer.on('pointertap', (e) => {
-        if (Date.now() - viewport.lastPointerDownTimeStamp > 120) return;
-        const globalCoors = viewport.toGlobalCoordinates({ x: e.globalX, y: e.globalY });
-        interactionevents.emit('backgroundClicked', globalCoors);
-    });
-
-
-
-
-
-    // TODO !!! - add removers of the event listeners to the viewport
-    // ie... dispose()
-
-
-
-
-
+    viewport.registerWindowListener('pointerup', handleGlobalPointerUp);
+    viewport.registerWindowListener('pointercancel', handleGlobalPointerUp);
 
     app.stage.on('pointermove', (e) => {
         if (!app.ticker.started) return;

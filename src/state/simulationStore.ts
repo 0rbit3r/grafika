@@ -19,8 +19,8 @@ export function createSimulationStore(settings?: SimulationSettings): Simulation
         frame: 0,
         simulationEnabled: false,
         gravityEnabled: false,
-        defaultEdgeLength: settings?.defaultEdgeLength ?? DEFAULT_EDGE_LENGTH, //TODO ADD TO SETTINGS?,
-        downflowEnabled: false,
+        defaultEdgeLength: settings?.defaultEdgeLength ?? DEFAULT_EDGE_LENGTH,
+        downflowEnabled: settings?.downflowEnabled ?? false,
         initialPositionsRadius: settings?.initialPositionsRadius ?? INITIAL_POSITIONS_RADIUS,
         pushThreshold: settings?.pushThreshold ?? PUSH_THRESH
     };

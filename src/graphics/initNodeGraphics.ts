@@ -135,14 +135,14 @@ const getStandardNodeText = (node: RenderedNode, colorfulText?: boolean) => {
     return text;
 }
 
-const TEXT_BOX_MARGIN = 3;
+const TEXT_BOX_MARGIN = 2;
 
 const getTextBoxText = (node: RenderedNode, colorfulText?: boolean) => {
 
     const style = new TextStyle({
-        breakWords: false,
+        breakWords: true,
         wordWrap: true,
-        align: "center",
+        align: "left",
         fontFamily: 'Monospace',
         fontSize: 14,
         fill: 'white',
