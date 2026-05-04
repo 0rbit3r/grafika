@@ -23,8 +23,8 @@ export const disposeState = async ($states: GraphStoresContainer) => {
     $states.context.renderedNodes = [];
     $states.context.proxyEdgesMap = new Map();
     $states.context.proxyEdgesMap = new Map();
+    $graphics.viewport.dispose();
     $graphics.viewport = null!;
-
 
     $graphics.app.destroy(true, { children: true, texture: true, baseTexture: true });
     $states.context = null!;

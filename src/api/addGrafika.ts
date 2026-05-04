@@ -121,17 +121,17 @@ export function addGrafika(element: HTMLElement, settings: GrafikaSettings): Gra
             for (let i = 0; i <= frames; i++) handleTick();
             app.renderer.render(app.stage);
         },
-        focusOn: (what) => {
+        focusOn: (what, padding?) => {
             if (what === null) {
                 $states.graphics.viewportFocus = null;
                 return;
             }
             if (what === "all") {
-                $states.graphics.viewportFocus = "all";
+                $states.graphics.viewportFocus = { target: "all", padding };
                 return;
             }
-            $states.graphics.viewportFocus = $states.context.renderedNodes.find(n => n.id === what.id)
-                ?? null;
+            const node = $states.context.renderedNodes.find(n => n.id === what.id) ?? null;
+            $states.graphics.viewportFocus = node ? { target: node, padding } : null;
         }
     };
 }

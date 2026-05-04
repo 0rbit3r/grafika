@@ -10,7 +10,7 @@ import { RenderedNode } from "../core/renderedNode";
 
 export interface GraphicsStore {
   viewport: Viewport;
-  viewportFocus: "all" | RenderedNode | null; 
+  viewportFocus: { target: "all" | RenderedNode; padding?: number } | null;
 
   app: Application;
   nodeContainer: Container<DisplayObject>;

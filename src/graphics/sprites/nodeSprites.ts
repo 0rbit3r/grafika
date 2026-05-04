@@ -14,7 +14,6 @@ interface BaseTexturesContainer {
     downTriangle: Texture | undefined;
     cross: Texture | undefined;
     heart: Texture | undefined;
-
     textBox: Texture | undefined;
 }
 
@@ -180,11 +179,11 @@ export function getNodeSprite(app: Application, node: RenderedNode): Sprite {
             if (!baseTextures.textBox || baseTextures.textBox.destroyed) {
                 const graphics = new Graphics();
                 graphics.beginFill("#222222");
-                graphics.lineStyle(NODE_SPRITE_RADIUS * NODE_BORDER_THICKNESS / 2, "#ffffff");
+                graphics.lineStyle(NODE_SPRITE_RADIUS * NODE_BORDER_THICKNESS / 4, "#ffffff");
 
                 graphics.drawRoundedRect(
                     - NODE_SPRITE_RADIUS / 3 * 2, - NODE_SPRITE_RADIUS / 3 * 2,
-                    NODE_SPRITE_RADIUS * 4 / 3, NODE_SPRITE_RADIUS * 4 / 3, NODE_SPRITE_RADIUS / 3);
+                    NODE_SPRITE_RADIUS * 4 / 3, NODE_SPRITE_RADIUS * 4 / 3, NODE_SPRITE_RADIUS / 6);
                 graphics.endFill();
                 baseTextures.textBox = app.renderer.generateTexture(graphics,
                     {

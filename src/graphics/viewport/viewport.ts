@@ -19,6 +19,7 @@ export class Viewport {
     lastPointerDownTimeStamp: number;
 
     dragContainer: Container;
+    private windowListeners: Array<[string, EventListener]> = [];
 
     constructor(width: number, height: number, dragContainer: Container, interactionEvents: Emitter<InteractionEvents>, initialZoom?: number) {
         this.width = width;
@@ -30,6 +31,17 @@ export class Viewport {
         this.dragContainer = dragContainer;
         this.interactionEvents = interactionEvents;
         this.lastPointerDownTimeStamp = 0;
+    }
+
+    public registerWindowListener = (event: string, handler: (e: PointerEvent) => void) => {
+        const listener = handler as EventListener;
+        window.addEventListener(event, listener);
+        this.windowListeners.push([event, listener]);
+    }
+
+    public dispose = () => {
+        this.windowListeners.forEach(([event, handler]) => window.removeEventListener(event, handler));
+        this.windowListeners = [];
     }
 
     public resizeHitArea = (width: number, height: number) => {
@@ -92,9 +104,13 @@ export class Viewport {
         this.interactionEvents.emit("viewportMoved", { x: this.position.x, y: this.position.y });
     }
 
-    // used for automatic zoom
-    zoomBy = (factor: number) => {
-        const newZoom = this.zoom * factor;
-        this.zoom = Math.min(MAX_ZOOM, Math.max(MIN_ZOOM, newZoom));
+    // used for automatic zoom, optionally anchored at a world coordinate
+    zoomBy = (factor: number, anchor?: XAndY) => {
+        const newZoom = Math.min(MAX_ZOOM, Math.max(MIN_ZOOM, this.zoom * factor));
+        if (anchor) {
+            this.position.x = anchor.x - (anchor.x - this.position.x) * (this.zoom / newZoom);
+            this.position.y = anchor.y - (anchor.y - this.position.y) * (this.zoom / newZoom);
+        }
+        this.zoom = newZoom;
     }
 }

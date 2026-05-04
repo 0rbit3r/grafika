@@ -14,6 +14,7 @@ export interface SimulationSettings {
 
     initialPositionsRadius?: number;
     pushThreshold?: number;
+    downflowEnabled?: boolean;
 }
 
 // DEBUG
