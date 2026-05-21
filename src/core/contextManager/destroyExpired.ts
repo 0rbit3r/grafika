@@ -1,0 +1,26 @@
+import { RenderedNode } from "../renderedNode";
+import { GraphStoresContainer } from "../../state/storesContainer";
+
+export function destroyExpired($states: GraphStoresContainer) {
+    const expiredNodes = new Set<RenderedNode>();
+    $states.context.renderedNodes = $states.context.renderedNodes.filter(n => {
+        if (n.timeToLiveTo !== undefined && n.framesAlive >= n.timeToLiveTo) {
+            n.sprite?.destroy({ children: true });
+            n.renderedText?.destroy({ children: true });
+            expiredNodes.add(n);
+            return false;
+        }
+        return true;
+    });
+    if (expiredNodes.size > 0) {
+        $states.context.renderedEdges = $states.context.renderedEdges.filter(e => {
+            if (expiredNodes.has(e.source) || expiredNodes.has(e.target)) {
+                e.sprite?.destroy({ children: true });
+                if (!expiredNodes.has(e.target)) e.target.inEdges.delete(e);
+                if (!expiredNodes.has(e.source)) e.source.outEdges.delete(e);
+                return false;
+            }
+            return true;
+        });
+    }
+}

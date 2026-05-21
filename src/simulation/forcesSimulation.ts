@@ -45,18 +45,17 @@ export const simulate_one_frame_of_FDL = ($states: GraphStoresContainer) => {
 
     $states.context.renderedEdges.forEach(e => {
         if (e.source.framesAlive < 0 || e.target.framesAlive < 0
-            || (e.source.timeToLiveTo !== undefined && e.source.framesAlive >= e.source.timeToLiveTo)
-            || (e.target.timeToLiveTo !== undefined && e.target.framesAlive >= e.target.timeToLiveTo))
+            || e.source.timeToLiveTo !== undefined || e.target.timeToLiveTo !== undefined)
             return;
         pull_or_push_connected_to_ideal_distance(e, $states);
     });
 
     renderedNodes.forEach((n1, i1) => {
-        if (n1.framesAlive < 0 || n1.framesAlive >= (n1.timeToLiveTo ?? Number.MAX_VALUE)) return;
+        if (n1.framesAlive < 0 || n1.timeToLiveTo !== undefined) return;
         handleOutOfBounds(n1);
         renderedNodes.forEach((n2, i2) => {
             if (i1 <= i2) return;
-            if (n2.framesAlive < 0 || n2.framesAlive >= (n2.timeToLiveTo ?? Number.MAX_VALUE)) return;
+            if (n2.framesAlive < 0 || n2.timeToLiveTo !== undefined) return;
             const borderDistance = get_border_distance(n1, n2);
             if (borderDistance < $simulationState.pushThreshold
                 && !$context.edgesAdjacency.get(n1.id)?.has(n2.id)) {

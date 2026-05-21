@@ -10,6 +10,7 @@ import { Data } from "./dataTypes";
 import mitt from "mitt";
 import { type InteractionEvents } from "./events";
 import { disposeState } from "../core/dispose";
+import { destroyExpired } from "../core/contextManager/destroyExpired";
 
 export function addGrafika(element: HTMLElement, settings: GrafikaSettings): GrafikaInstance {
 
@@ -67,6 +68,7 @@ export function addGrafika(element: HTMLElement, settings: GrafikaSettings): Gra
         // render the graph
         interactionEvents.emit("framePassed", $states.simulation.frame);
         renderGraph();
+        destroyExpired($states);
     }
 
     // main application loop

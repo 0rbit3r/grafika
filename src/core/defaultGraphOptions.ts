@@ -65,6 +65,7 @@ export const DEFAULT_EDGE_ALPHA = 0.3;
 // nodes appearing appearance
 export const NEW_NODE_INVISIBLE_FOR = 20;
 export const NEW_NODE_FADE_IN_FRAMES = 20;
+export const NEW_NODE_FADE_OUT_FRAMES = 20;
 
 // zoom
 export const MAX_ZOOM = 5;
