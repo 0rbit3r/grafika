@@ -2,7 +2,7 @@ import { Application, Container, TextStyle, Text, Sprite, Assets } from "pixi.js
 import { DRAG_Z, EDGES_Z, NODES_Z, TEXT_Z } from "./zIndexes";
 import { GraphStoresContainer } from "../state/storesContainer";
 import { EdgeType, NodeShape } from "../api/dataTypes";
-import { NEW_NODE_FADE_IN_FRAMES, NEW_NODE_INVISIBLE_FOR, NODE_BORDER_THICKNESS, ZOOM_TEXT_INVISIBLE_THRESHOLD, ZOOM_TEXT_VISIBLE_THRESHOLD } from "../core/defaultGraphOptions";
+import { NEW_NODE_FADE_IN_FRAMES, NEW_NODE_FADE_OUT_FRAMES, NEW_NODE_INVISIBLE_FOR, NODE_BORDER_THICKNESS, ZOOM_TEXT_INVISIBLE_THRESHOLD, ZOOM_TEXT_VISIBLE_THRESHOLD } from "../core/defaultGraphOptions";
 import { initOverlay } from "./overlay/initOverlay";
 import { NODE_SPRITE_RADIUS } from "./sprites/nodeSprites";
 import { EDGE_SPRITE_LENGTH, TAPERED_EDGE_WIDTH } from "./sprites/edgeSprites";
@@ -132,12 +132,13 @@ export const initGraphics = (app: Application, $states: GraphStoresContainer) =>
 
                 // handle scale and alpha based on time (fade effect) and zoom.
                 const scale = zoom * node.radius / NODE_SPRITE_RADIUS;
+                const fadeInFactor = Math.max(0, Math.min(1, (node.framesAlive - NEW_NODE_INVISIBLE_FOR) / NEW_NODE_FADE_IN_FRAMES));
+                const fadeOutFactor = node.timeToLiveTo !== undefined
+                    ? Math.max(0, Math.min(1, (node.timeToLiveTo - node.framesAlive) / NEW_NODE_FADE_OUT_FRAMES))
+                    : 1;
                 const timeAffectedScale = scale *
-                    (node.framesAlive <= NEW_NODE_INVISIBLE_FOR
-                        ? 0.01
-                        : Math.max(0, Math.min(1, (node.framesAlive - NEW_NODE_INVISIBLE_FOR) / NEW_NODE_FADE_IN_FRAMES)));
+                    (node.framesAlive <= NEW_NODE_INVISIBLE_FOR ? 0.01 : fadeInFactor) * fadeOutFactor;
                 node.sprite?.setTransform(viewportPos.x, viewportPos.y, timeAffectedScale, timeAffectedScale);
-                node.sprite && node.sprite?.alpha
 
                 // handle text
                 if (zoom >= ZOOM_TEXT_INVISIBLE_THRESHOLD) {
@@ -146,7 +147,7 @@ export const initGraphics = (app: Application, $states: GraphStoresContainer) =>
                     else {
                         node.renderedText?.setTransform(viewportPos.x, viewportPos.y, zoom, zoom);
                     }
-                    node.renderedText && (node.renderedText.alpha = Math.max(0, Math.min(1, (node.framesAlive - NEW_NODE_INVISIBLE_FOR) / NEW_NODE_FADE_IN_FRAMES)));
+                    node.renderedText && (node.renderedText.alpha = fadeInFactor * fadeOutFactor);
                 }
             });
 
@@ -174,9 +175,13 @@ export const initGraphics = (app: Application, $states: GraphStoresContainer) =>
             const youngerNode = edge.source.framesAlive < edge.target.framesAlive
                 ? edge.source
                 : edge.target;
-            edge.sprite && (edge.sprite.alpha =
-                edge.alpha *
-                Math.max(0, Math.min(1, (youngerNode.framesAlive - NEW_NODE_INVISIBLE_FOR) / NEW_NODE_FADE_IN_FRAMES)));
+            const edgeFadeInFactor = Math.max(0, Math.min(1, (youngerNode.framesAlive - NEW_NODE_INVISIBLE_FOR) / NEW_NODE_FADE_IN_FRAMES));
+            let edgeFadeOutFactor = 1;
+            if (edge.source.timeToLiveTo !== undefined)
+                edgeFadeOutFactor = Math.min(edgeFadeOutFactor, Math.max(0, Math.min(1, (edge.source.timeToLiveTo - edge.source.framesAlive) / NEW_NODE_FADE_OUT_FRAMES)));
+            if (edge.target.timeToLiveTo !== undefined)
+                edgeFadeOutFactor = Math.min(edgeFadeOutFactor, Math.max(0, Math.min(1, (edge.target.timeToLiveTo - edge.target.framesAlive) / NEW_NODE_FADE_OUT_FRAMES)));
+            edge.sprite && (edge.sprite.alpha = edge.alpha * edgeFadeInFactor * edgeFadeOutFactor);
         })
     };
 
