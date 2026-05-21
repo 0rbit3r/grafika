@@ -74,6 +74,6 @@ const handleZoomToAll = ($states: GraphStoresContainer, padding?: number) => {
 
     if (Math.abs(zoomRatio - 1) > 0.01) {
         const smoothZoom = 1 + (zoomRatio - 1) / 50;
-        $states.graphics.viewport.zoomBy(smoothZoom, { x: desiredCenterX, y: desiredCenterY });
+        $states.graphics.viewport.zoomBy(smoothZoom);
     }
 }

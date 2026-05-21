@@ -1,3 +1,5 @@
+// Note: diverges from BE (FdlLayoutService.cs) — ideal edge length is scaled by total edge count here
+// vs target node size on BE; pull force divisor uses total edge count here vs backlink count on BE.
 import {
     MOMENTUM_DAMPENING_START_AT, MOMENTUM_DAMPENING_EASE_IN_FRAMES, MAX_MOMENTUM_DAMPENING,
     MAX_MOVEMENT_SPEED, GRAVITY_FREE_RADIUS, gravityForce,
@@ -86,8 +88,15 @@ export const simulate_one_frame_of_FDL = ($states: GraphStoresContainer) => {
         node.momentum.x /= frameAdjustedDampeningRate;
         node.momentum.y /= frameAdjustedDampeningRate;
 
-        node.x += Math.max(Math.min(node.momentum.x, MAX_MOVEMENT_SPEED), -MAX_MOVEMENT_SPEED); // not taking angle into account...
-        node.y += Math.max(Math.min(node.momentum.y, MAX_MOVEMENT_SPEED), -MAX_MOVEMENT_SPEED); // not taking angle into account...
+        // to spare cpu the sqrt unless in the square of allowed movement speed
+        const momentumSq = node.momentum.x ** 2 + node.momentum.y ** 2;
+        if (momentumSq > MAX_MOVEMENT_SPEED ** 2) {
+            const totalMomentum = Math.sqrt(momentumSq);
+            node.momentum.x = MAX_MOVEMENT_SPEED * (node.momentum.x / totalMomentum);
+            node.momentum.y = MAX_MOVEMENT_SPEED * (node.momentum.y / totalMomentum);
+        }
+        node.x += node.momentum.x;
+        node.y += node.momentum.y;
 
         node.forces.x /= frameAdjustedDampeningRate;
         node.forces.y /= frameAdjustedDampeningRate;
