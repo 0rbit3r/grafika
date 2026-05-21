@@ -3,6 +3,7 @@ import { initGraphics } from "../graphics/initGraphics";
 import { GrafikaSettings } from "./settings";
 import { createGraphStores } from "../state/storesContainer";
 import { addData } from "../core/contextManager/addData";
+import { processPendingData } from "../core/contextManager/processPendingData";
 import { removeDataByIds } from "../core/contextManager/removeData";
 import { simulate_one_frame_of_FDL } from "../simulation/forcesSimulation";
 import { GrafikaInstance } from "./grafikaInstance";
@@ -60,6 +61,7 @@ export function addGrafika(element: HTMLElement, settings: GrafikaSettings): Gra
 
     const handleTick = () => {
         $states.simulation.frame = $states.simulation.frame + 1;
+        processPendingData($states, 5);
         // force simulation
         if ($states.simulation.simulationEnabled) {
             simulate_one_frame_of_FDL($states);

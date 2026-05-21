@@ -1,4 +1,4 @@
-import { Data, GraphEdge } from "../api/dataTypes";
+import { Data, GraphEdge, GraphNode } from "../api/dataTypes";
 import { RenderedNode } from "../core/renderedNode";
 import { RenderedEdge } from "../core/renderedEdge";
 import { ProxyNode } from "../api/proxyNode";
@@ -11,6 +11,10 @@ export interface ContextStore {
     edgesAdjacency: Map<string, Set<string>>;
 
     notRenderedEdges: GraphEdge[]; // edges that are defined, but missing either source or target node
+
+    pendingNodes: GraphNode[];
+    pendingEdges: GraphEdge[];
+    pendingAngle: number; // running angle for spiral initial placement
 
     proxyNodesList: ProxyNode[];
     proxyEdgesList: ProxyEdge[];
@@ -26,6 +30,10 @@ export function createContextStore(): ContextStore {
         edgesAdjacency: new Map(),
 
         notRenderedEdges: [],
+
+        pendingNodes: [],
+        pendingEdges: [],
+        pendingAngle: 0,
 
         proxyNodesList: [],
         proxyEdgesList: [],
