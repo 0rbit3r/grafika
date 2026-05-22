@@ -1,6 +1,7 @@
 import { initializeRenderedEdge } from "../renderedEdge";
 import { initializeRenderedNode } from "../renderedNode";
 import { GraphStoresContainer } from "../../state/storesContainer";
+import { ContextStore } from "../../state/contextStore";
 import { GraphEdge } from "../../api/dataTypes";
 import { getNodeProxy } from "../../api/proxyNode";
 import { getEdgeProxy } from "../../api/proxyEdge";
@@ -8,14 +9,19 @@ import { filterInPlace } from "../../util/filterInPlace";
 
 const GOLDEN_ANGLE = 2.39996; // radians — distributes nodes in a spiral
 
+const findNode = ($context: ContextStore, id: string) =>
+    $context.renderedNodes.find(n => n.id === id && n.timeToLiveTo === undefined);
+
 export function processPendingData($states: GraphStoresContainer, batchSize: number) {
     const $context = $states.context;
     const $simulation = $states.simulation;
 
-    if ($context.pendingNodes.length === 0 && $context.pendingEdges.length === 0) return;
+    if ($context.pendingNodes.length === 0 && $context.pendingEdges.length === 0 && $context.notRenderedEdges.length === 0) return;
 
     const nodeBatch = $context.pendingNodes.splice(0, batchSize);
     nodeBatch.forEach(newNode => {
+        if (findNode($context, newNode.id)) return;
+
         if (newNode.x === undefined) newNode.x = Math.cos($context.pendingAngle) * $simulation.initialPositionsRadius;
         if (newNode.y === undefined) newNode.y = Math.sin($context.pendingAngle) * $simulation.initialPositionsRadius;
         $context.pendingAngle += GOLDEN_ANGLE;
@@ -29,8 +35,8 @@ export function processPendingData($states: GraphStoresContainer, batchSize: num
     const instantiatedNotRenderedEdges = new Set<GraphEdge>();
     const instantiatedEdgePairs = new Set<string>();
     $context.notRenderedEdges.forEach(notRenderedEdge => {
-        const sourceRenderedNode = $context.renderedNodes.find(n => n.id === notRenderedEdge.sourceId);
-        const targetRenderedNode = $context.renderedNodes.find(n => n.id === notRenderedEdge.targetId);
+        const sourceRenderedNode = findNode($context, notRenderedEdge.sourceId);
+        const targetRenderedNode = findNode($context, notRenderedEdge.targetId);
         if (sourceRenderedNode && targetRenderedNode
             && !$context.renderedEdges.some(e => e.source === sourceRenderedNode && e.target === targetRenderedNode)) {
             const newRenderedEdge = initializeRenderedEdge(notRenderedEdge, sourceRenderedNode, targetRenderedNode, $states);
@@ -55,8 +61,8 @@ export function processPendingData($states: GraphStoresContainer, batchSize: num
     const edgeBatch = $context.pendingEdges.splice(0, batchSize);
     edgeBatch.forEach(newEdge => {
         if (instantiatedEdgePairs.has(`${newEdge.sourceId}->${newEdge.targetId}`)) return;
-        const sourceRenderedNode = $context.renderedNodes.find(n => n.id === newEdge.sourceId);
-        const targetRenderedNode = $context.renderedNodes.find(n => n.id === newEdge.targetId);
+        const sourceRenderedNode = findNode($context, newEdge.sourceId);
+        const targetRenderedNode = findNode($context, newEdge.targetId);
         if (sourceRenderedNode && targetRenderedNode
             && !$context.renderedEdges.some(e => e.source === sourceRenderedNode && e.target === targetRenderedNode)) {
             const newRenderedEdge = initializeRenderedEdge(newEdge, sourceRenderedNode, targetRenderedNode, $states);

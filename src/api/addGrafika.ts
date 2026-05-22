@@ -61,7 +61,7 @@ export function addGrafika(element: HTMLElement, settings: GrafikaSettings): Gra
 
     const handleTick = () => {
         $states.simulation.frame = $states.simulation.frame + 1;
-        processPendingData($states, 5);
+        processPendingData($states, 20);
         // force simulation
         if ($states.simulation.simulationEnabled) {
             simulate_one_frame_of_FDL($states);

@@ -17,6 +17,8 @@ export function removeDataByIds($states: GraphStoresContainer, dataToRemove?: Da
     if (dataToRemove.edges === undefined) dataToRemove.edges = [];
 
     // Schedule fade-out for deleted nodes; stagger TTLs so at most 10 expire per frame
+    filterInPlace($states.context.pendingNodes, n => !dataToRemove.nodes?.find(r => r.id === n.id));
+
     const nodesToFade = $states.context.renderedNodes.filter(existingNode =>
         (dataToRemove.nodes?.find(n => n.id === existingNode.id)));
 
