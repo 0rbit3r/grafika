@@ -29,6 +29,7 @@ export function processPendingData($states: GraphStoresContainer, batchSize: num
         const newRenderedNode = initializeRenderedNode(newNode, $states);
         $context.renderedNodes.push(newRenderedNode);
         $context.proxyNodesList.push(getNodeProxy(newRenderedNode, $states));
+        $states.interactionEvents.emit("nodeAdded", $context.proxyNodesList[$context.proxyNodesList.length - 1]);
     });
 
     // resolve notRenderedEdges unblocked by newly added nodes
