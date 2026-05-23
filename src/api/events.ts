@@ -8,4 +8,5 @@ export type InteractionEvents = {
     viewportZoomed: number;
     framePassed: number;
     backgroundClicked: {x: number, y: number};
+    nodeAdded: ProxyNode;
 };
