@@ -18,7 +18,13 @@ export const initNodeGraphics = (node: RenderedNode, $states: GraphStoresContain
     node.isLoadedOnScreen = false;
 
     const sprite = getNodeSprite(app, node);
-    sprite.tint = node.color;
+    if (node.shape === NodeShape.TextOnly) {
+        sprite.alpha = 0;
+    } else if (node.shape === NodeShape.TextCard) {
+        sprite.alpha = 0.5;
+    } else {
+        sprite.tint = node.color;
+    }
 
     node.sprite = sprite;
 
@@ -104,7 +110,7 @@ export const initNodeGraphics = (node: RenderedNode, $states: GraphStoresContain
     // text
     node.renderedText && node.renderedText.destroy({ children: true });
 
-    node.renderedText = node.shape === NodeShape.TextBox
+    node.renderedText = (node.shape === NodeShape.TextBox || node.shape === NodeShape.TextOnly || node.shape === NodeShape.TextCard)
         ? getTextBoxText(node, $states.graphics.colorfulText)
         : getStandardNodeText(node, $states.graphics.colorfulText);
 

@@ -15,6 +15,7 @@ interface BaseTexturesContainer {
     cross: Texture | undefined;
     heart: Texture | undefined;
     textBox: Texture | undefined;
+    textCard: Texture | undefined;
 }
 
 const baseTextures: BaseTexturesContainer = {
@@ -26,7 +27,8 @@ const baseTextures: BaseTexturesContainer = {
     cross: undefined,
     heart: undefined,
 
-    textBox: undefined
+    textBox: undefined,
+    textCard: undefined,
 }
 
 export function getNodeSprite(app: Application, node: RenderedNode): Sprite {
@@ -192,6 +194,27 @@ export function getNodeSprite(app: Application, node: RenderedNode): Sprite {
                     });
             }
             sprite = Sprite.from(baseTextures.textBox);
+            sprite.anchor.set(0.5);
+            break;
+        case NodeShape.TextOnly:
+            sprite = Sprite.from(Texture.EMPTY);
+            sprite.anchor.set(0.5);
+            break;
+        case NodeShape.TextCard:
+            if (!baseTextures.textCard || baseTextures.textCard.destroyed) {
+                const graphics = new Graphics();
+                graphics.beginFill(0x000000);
+                graphics.drawRoundedRect(
+                    - NODE_SPRITE_RADIUS / 3 * 2, - NODE_SPRITE_RADIUS / 3 * 2,
+                    NODE_SPRITE_RADIUS * 4 / 3, NODE_SPRITE_RADIUS * 4 / 3, NODE_SPRITE_RADIUS / 6);
+                graphics.endFill();
+                baseTextures.textCard = app.renderer.generateTexture(graphics,
+                    {
+                        scaleMode: SCALE_MODES.LINEAR,
+                        resolution: 1
+                    });
+            }
+            sprite = Sprite.from(baseTextures.textCard);
             sprite.anchor.set(0.5);
             break;
     }
