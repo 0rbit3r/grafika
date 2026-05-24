@@ -1,4 +1,4 @@
-import { Application, Graphics, SCALE_MODES, Sprite, Texture } from "pixi.js";
+import { Application, Graphics, Sprite, Texture } from "pixi.js";
 import { EdgeType } from "../../api/dataTypes";
 import { RenderedEdge } from "../../core/renderedEdge";
 
@@ -35,40 +35,26 @@ export function getEdgeSprite(app: Application, edge: RenderedEdge): Sprite | nu
         default:
             if (!baseTextures.lineEdge || baseTextures.lineEdge.destroyed) {
                 const edgeGraphics = new Graphics();
-                edgeGraphics.lineStyle({ width: LINE_EDGE_WIDTH, color: "#ffffff" });
                 edgeGraphics.moveTo(0, 0);
                 edgeGraphics.lineTo(EDGE_SPRITE_LENGTH, 0);
-                baseTextures.lineEdge = app.renderer.generateTexture(edgeGraphics,
-                    {
-                        scaleMode: SCALE_MODES.LINEAR,
-                        resolution: 1
-                    }
-                );
+                edgeGraphics.stroke({ width: LINE_EDGE_WIDTH, color: "#ffffff" });
+                baseTextures.lineEdge = app.renderer.generateTexture(edgeGraphics);
             }
             sprite = Sprite.from(baseTextures.lineEdge);
             break;
         case EdgeType.Arrow:
             if (!baseTextures.arrowEdge || baseTextures.arrowEdge.destroyed) {
                 const edgeGraphics = new Graphics();
-                edgeGraphics.lineStyle();
-                edgeGraphics.lineTo(0, -LINE_EDGE_WIDTH / 2);
-                edgeGraphics.beginFill("#ffffff");
+                edgeGraphics.moveTo(0, -LINE_EDGE_WIDTH / 2);
                 edgeGraphics.lineTo(EDGE_SPRITE_LENGTH - ARROWHEAD_LENGTH, -LINE_EDGE_WIDTH / 3);
                 edgeGraphics.lineTo(EDGE_SPRITE_LENGTH - ARROWHEAD_LENGTH, -ARROWHEAD_WIDTH);
                 edgeGraphics.lineTo(EDGE_SPRITE_LENGTH, 0);
                 edgeGraphics.lineTo(EDGE_SPRITE_LENGTH - ARROWHEAD_LENGTH, ARROWHEAD_WIDTH);
                 edgeGraphics.lineTo(EDGE_SPRITE_LENGTH - ARROWHEAD_LENGTH, LINE_EDGE_WIDTH / 3);
                 edgeGraphics.lineTo(0, LINE_EDGE_WIDTH / 2);
-                edgeGraphics.lineTo(0, -LINE_EDGE_WIDTH / 2);
-
-
-                edgeGraphics.endFill();
-                baseTextures.arrowEdge = app.renderer.generateTexture(edgeGraphics,
-                    {
-                        scaleMode: SCALE_MODES.LINEAR,
-                        resolution: 1,
-                    }
-                );
+                edgeGraphics.closePath();
+                edgeGraphics.fill("#ffffff");
+                baseTextures.arrowEdge = app.renderer.generateTexture(edgeGraphics);
             }
             sprite = Sprite.from(baseTextures.arrowEdge);
             break;
@@ -76,8 +62,6 @@ export function getEdgeSprite(app: Application, edge: RenderedEdge): Sprite | nu
             if (!baseTextures.taperedEdge || baseTextures.taperedEdge.destroyed) {
                 const edgeGraphics = new Graphics();
                 const segments = 333;
-
-                edgeGraphics.lineStyle(0);
 
                 const len = EDGE_SPRITE_LENGTH;
                 const ux = 1;
@@ -105,17 +89,9 @@ export function getEdgeSprite(app: Application, edge: RenderedEdge): Sprite | nu
                     ];
 
                     const segmentAlpha = t0 * t0;
-
-                    edgeGraphics.beginFill("#ffffff", segmentAlpha);
-                    edgeGraphics.drawPolygon(quad);
-                    edgeGraphics.endFill();
+                    edgeGraphics.poly(quad).fill({ color: '#ffffff', alpha: segmentAlpha });
                 }
-                baseTextures.taperedEdge = app.renderer.generateTexture(edgeGraphics,
-                    {
-                        scaleMode: SCALE_MODES.LINEAR,
-                        resolution: 1,
-                    }
-                );
+                baseTextures.taperedEdge = app.renderer.generateTexture(edgeGraphics);
             }
             sprite = Sprite.from(baseTextures.taperedEdge);
             break;
@@ -123,62 +99,17 @@ export function getEdgeSprite(app: Application, edge: RenderedEdge): Sprite | nu
             if (!baseTextures.curvedEdge || baseTextures.curvedEdge.destroyed) {
                 const edgeGraphics = new Graphics();
                 edgeGraphics.moveTo(0, 0);
-                edgeGraphics.lineStyle({ width: 30, color: "#ffffff" });
                 edgeGraphics.quadraticCurveTo(
                     EDGE_SPRITE_LENGTH / 2,
                     -EDGE_SPRITE_LENGTH / 2,
                     EDGE_SPRITE_LENGTH,
                     0
                 );
-                baseTextures.curvedEdge = app.renderer.generateTexture(edgeGraphics,
-                    {
-                        scaleMode: SCALE_MODES.LINEAR,
-                        resolution: 1,
-                    }
-                );
+                edgeGraphics.stroke({ width: 30, color: "#ffffff" });
+                baseTextures.curvedEdge = app.renderer.generateTexture(edgeGraphics);
             }
             sprite = Sprite.from(baseTextures.curvedEdge);
             break;
-        // case EdgeType.Animated:
-        //     const SEGMENTS = 10;
-        //     const FRAMES = 16;
-        //     if (!baseTextures.animated || baseTextures.animated.some(t => t.destroyed)) {
-        //         const frames: Texture[] = [];
-
-        //         for (let frame = 0; frame < FRAMES; frame++) {
-        //             const g = new Graphics();
-        //             g.lineStyle({ width: LINE_EDGE_WIDTH, color: 0xffffff});
-        //             g.moveTo(0, 0);
-        //             g.lineTo(EDGE_SPRITE_LENGTH, 0);
-
-        //             for (let segment = 0; segment < SEGMENTS; segment++) {
-
-        //                 // draw a small dot shifting to the right each frame
-        //                 const dotX = EDGE_SPRITE_LENGTH / SEGMENTS * segment + (EDGE_SPRITE_LENGTH / SEGMENTS / FRAMES) * frame;
-        //                 console.log(`f: ${frame} s: ${segment} x: ${dotX}`);
-        //                 g.beginFill(0xffffff);
-        //                 g.drawCircle(dotX, 0, 5);
-        //                 g.endFill();
-        //             }
-
-        //             frames.push(
-        //                 app.renderer.generateTexture(g, {
-        //                     scaleMode: SCALE_MODES.LINEAR,
-        //                     resolution: 1
-        //                 })
-        //             );
-        //         }
-        //         baseTextures.animated = frames;
-        //     }
-
-        //     const animatedSprite = new AnimatedSprite(baseTextures.animated);
-        //     animatedSprite.animationSpeed = 1;
-        //     animatedSprite.autoUpdate = false;
-        //     animatedSprite.play();
-        //     animatedSprite.anchor.set(0, 0.5);
-        //     animatedSprite.loop = true;
-        //     return animatedSprite;
-        //     break;
     }
 
     edge.type === EdgeType.CurvedLine

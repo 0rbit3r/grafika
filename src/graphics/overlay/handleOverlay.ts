@@ -9,9 +9,8 @@ export const handleOverlay = (overlaySprite: Sprite, $graphics: GraphicsStore) =
         { x: 0, y: 0 }
     );
     
-    overlaySprite.setTransform(
-        onScreenCoors.x, onScreenCoors.y,
-        sizeOnScreen, sizeOnScreen);
+    overlaySprite.position.set(onScreenCoors.x, onScreenCoors.y);
+    overlaySprite.scale.set(sizeOnScreen, sizeOnScreen);
     const overlayOpacity =
         1 - Math.min(1, Math.max(0, $graphics.viewport.zoom - $graphics.overlaySettings.startDisappearingAt)
             / ($graphics.overlaySettings.disappearCompletelyAt - $graphics.overlaySettings.startDisappearingAt));

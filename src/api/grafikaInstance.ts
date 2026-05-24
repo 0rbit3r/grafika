@@ -22,7 +22,7 @@ export interface GrafikaInstance {
     // starts/stops the internal ticker (needed for panning, zooming, dragging etc.)
     start: () => void;
     stop: () => void;
-    dispose: () => void;
+    dispose: () => Promise<void>;
     isDisposed: () => boolean;
 
     // starts/stops the force simulation    

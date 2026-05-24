@@ -26,7 +26,7 @@ export const disposeState = async ($states: GraphStoresContainer) => {
     $graphics.viewport.dispose();
     $graphics.viewport = null!;
 
-    $graphics.app.destroy(true, { children: true, texture: true, baseTexture: true });
+    $graphics.app.destroy(true, { children: true, texture: true });
     $states.context = null!;
     $states.debug = null!;
     $states.graphics = null!;

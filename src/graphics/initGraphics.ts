@@ -1,4 +1,4 @@
-import { Application, Container, TextStyle, Text, Sprite, Assets } from "pixi.js";
+import { Application, Container, TextStyle, Text, Sprite } from "pixi.js";
 import { DRAG_Z, EDGES_Z, NODES_Z, TEXT_Z } from "./zIndexes";
 import { GraphStoresContainer } from "../state/storesContainer";
 import { EdgeType, NodeShape } from "../api/dataTypes";
@@ -12,7 +12,7 @@ import { initBackdrop } from "./backdrop/initBackdrop";
 import { handleBackdrop } from "./backdrop/handleBackdrop";
 import { handleViewportFocus } from "./viewport/handleViewportFocus";
 
-export const initGraphics = (app: Application, $states: GraphStoresContainer) => {
+export const initGraphics = async (app: Application, $states: GraphStoresContainer) => {
     app.stage.eventMode = 'static';
     const zSortedContainer = new Container();
     zSortedContainer.sortableChildren = true;
@@ -53,20 +53,20 @@ export const initGraphics = (app: Application, $states: GraphStoresContainer) =>
 
     let overlaySprite: Sprite;
     if ($graphics.overlaySettings !== undefined) {
-        overlaySprite = initOverlay($graphics.overlaySettings.url);
+        overlaySprite = await initOverlay($graphics.overlaySettings.url);
         zSortedContainer.addChild(overlaySprite);
     }
 
     let backdropSprite: Sprite;
     if ($graphics.backdropSettings !== undefined) {
-        backdropSprite = initBackdrop($graphics.backdropSettings.url);
+        backdropSprite = await initBackdrop($graphics.backdropSettings.url);
         zSortedContainer.addChild(backdropSprite);
     }
 
 
     zSortedContainer.sortChildren();
 
-    const fpsCounter: Text = new Text('0', new TextStyle({ fontSize: 20, fill: "#ffffff" }));
+    const fpsCounter: Text = new Text({ text: '0', style: new TextStyle({ fontSize: 20, fill: "#ffffff" }) });
     fpsCounter.x = 20;
     const updateFpsEveryNFrames = 10;
     const fpsRollingHistory: number[] = [];
@@ -90,12 +90,12 @@ export const initGraphics = (app: Application, $states: GraphStoresContainer) =>
             if (fpsRollingHistory.length > updateFpsEveryNFrames)
                 fpsRollingHistory.shift();
             if ($simulation.frame % updateFpsEveryNFrames === 0 && $simulation.frame >= 10) {
-                fpsCounter.text = Math.floor(fpsRollingHistory.reduce((a, b) => a + b) / fpsRollingHistory.length);
+                fpsCounter.text = String(Math.floor(fpsRollingHistory.reduce((a, b) => a + b) / fpsRollingHistory.length));
             }
             fpsCounter.y = app.screen.height - 80;
         }
 
-        $graphics.textContainer.alpha = 
+        $graphics.textContainer.alpha =
             zoom <= ZOOM_TEXT_INVISIBLE_THRESHOLD
             ? 0
             : zoom >= ZOOM_TEXT_VISIBLE_THRESHOLD
@@ -139,14 +139,20 @@ export const initGraphics = (app: Application, $states: GraphStoresContainer) =>
                     : 1;
                 const timeAffectedScale = scale *
                     (node.framesAlive <= NEW_NODE_INVISIBLE_FOR ? 0.01 : fadeInFactor) * fadeOutFactor;
-                node.sprite?.setTransform(viewportPos.x, viewportPos.y, timeAffectedScale, timeAffectedScale);
+                if (node.sprite) {
+                    node.sprite.position.set(viewportPos.x, viewportPos.y);
+                    node.sprite.scale.set(timeAffectedScale, timeAffectedScale);
+                }
 
                 // handle text
                 if (zoom >= ZOOM_TEXT_INVISIBLE_THRESHOLD) {
-                    if (node.shape !== NodeShape.TextOnly && node.shape !== NodeShape.TextOnlyHighlighted)
-                        node.renderedText?.setTransform(viewportPos.x, viewportPos.y + (node.radius * (1 + NODE_BORDER_THICKNESS * 2)) * zoom);
-                    else {
-                        node.renderedText?.setTransform(viewportPos.x, viewportPos.y, zoom, zoom);
+                    if (node.shape !== NodeShape.TextOnly && node.shape !== NodeShape.TextOnlyHighlighted) {
+                        if (node.renderedText) node.renderedText.position.set(viewportPos.x, viewportPos.y + (node.radius * (1 + NODE_BORDER_THICKNESS * 2)) * zoom);
+                    } else {
+                        if (node.renderedText) {
+                            node.renderedText.position.set(viewportPos.x, viewportPos.y);
+                            node.renderedText.scale.set(zoom, zoom);
+                        }
                     }
                     node.renderedText && (node.renderedText.alpha = fadeInFactor * fadeOutFactor);
                 }
@@ -171,7 +177,11 @@ export const initGraphics = (app: Application, $states: GraphStoresContainer) =>
                 : zoom;
             const angle = Math.atan2(dy, dx);
 
-            edge.sprite && edge.sprite.setTransform(srcViewportCoors.x, srcViewportCoors.y, scaleX, scaleY, angle);
+            if (edge.sprite) {
+                edge.sprite.position.set(srcViewportCoors.x, srcViewportCoors.y);
+                edge.sprite.scale.set(scaleX, scaleY);
+                edge.sprite.rotation = angle;
+            }
 
             const youngerNode = edge.source.framesAlive < edge.target.framesAlive
                 ? edge.source
