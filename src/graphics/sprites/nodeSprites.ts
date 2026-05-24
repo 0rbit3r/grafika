@@ -196,7 +196,7 @@ export function getNodeSprite(app: Application, node: RenderedNode): Sprite {
             sprite = Sprite.from(baseTextures.textBox);
             sprite.anchor.set(0.5);
             break;
-        case NodeShape.TextOnly:
+        case NodeShape.TextOnly || NodeShape.TextOnlyHighlighted:
             sprite = Sprite.from(Texture.EMPTY);
             sprite.anchor.set(0.5);
             break;
