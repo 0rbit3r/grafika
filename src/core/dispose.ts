@@ -26,6 +26,10 @@ export const disposeState = async ($states: GraphStoresContainer) => {
     $graphics.viewport.dispose();
     $graphics.viewport = null!;
 
+    // Assets.load() textures must be unloaded via Assets — not app.destroy — or the cache entry survives pointing at a dead texture
+    if ($graphics.overlaySettings?.url) await Assets.unload($graphics.overlaySettings.url);
+    if ($graphics.backdropSettings?.url) await Assets.unload($graphics.backdropSettings.url);
+
     $graphics.app.destroy(true, { children: true, texture: true });
     $states.context = null!;
     $states.debug = null!;
