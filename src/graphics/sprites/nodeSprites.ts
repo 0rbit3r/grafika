@@ -219,6 +219,8 @@ export function getNodeSprite(app: Application, node: RenderedNode): Sprite {
             break;
     }
     // todo - polygon hitareas for others (especially triangles as they now have big areas of hitArea outside)
-    sprite.hitArea = new Circle(0, 0, NODE_SPRITE_RADIUS * 1.2); // + 10 to make it slightly easier to grip on touchscreens
+    sprite.hitArea = node.shape === NodeShape.TextOnly || node.shape === NodeShape.TextOnlyHighlighted
+        ? new Circle(0, 0, NODE_SPRITE_RADIUS * 0.4)
+        : new Circle(0, 0, NODE_SPRITE_RADIUS * 1.2); // + 10 to make it slightly easier to grip on touchscreens
     return sprite;
 }
