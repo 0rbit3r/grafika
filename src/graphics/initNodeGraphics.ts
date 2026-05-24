@@ -18,7 +18,7 @@ export const initNodeGraphics = (node: RenderedNode, $states: GraphStoresContain
     node.isLoadedOnScreen = false;
 
     const sprite = getNodeSprite(app, node);
-    if (node.shape === NodeShape.TextOnly) {
+    if (node.shape === NodeShape.TextOnly || node.shape === NodeShape.TextOnlyHighlighted) {
         sprite.alpha = 0;
     } else if (node.shape === NodeShape.TextCard) {
         sprite.alpha = 0.5;
@@ -110,8 +110,9 @@ export const initNodeGraphics = (node: RenderedNode, $states: GraphStoresContain
     // text
     node.renderedText && node.renderedText.destroy({ children: true });
 
-    node.renderedText = (node.shape === NodeShape.TextBox || node.shape === NodeShape.TextOnly || node.shape === NodeShape.TextCard)
-        ? getTextBoxText(node, $states.graphics.colorfulText)
+    node.renderedText = (node.shape === NodeShape.TextBox || node.shape === NodeShape.TextOnly
+        || node.shape === NodeShape.TextCard || node.shape === NodeShape.TextOnlyHighlighted)
+        ? getTextBoxText(node, $states.graphics.colorfulText, node.shape  === NodeShape.TextOnlyHighlighted)
         : getStandardNodeText(node, $states.graphics.colorfulText);
 
     // $states.graphics.textContainer.addChild(text); -> handled in loader
@@ -143,7 +144,7 @@ const getStandardNodeText = (node: RenderedNode, colorfulText?: boolean) => {
 
 const TEXT_BOX_MARGIN = 2;
 
-const getTextBoxText = (node: RenderedNode, colorfulText?: boolean) => {
+const getTextBoxText = (node: RenderedNode, colorfulText?: boolean, highlighted?: boolean) => {
 
     const style = new TextStyle({
         breakWords: true,
@@ -152,6 +153,10 @@ const getTextBoxText = (node: RenderedNode, colorfulText?: boolean) => {
         fontFamily: 'Monospace',
         fontSize: 14,
         fill: 'white',
+        dropShadow: highlighted,
+        dropShadowBlur: 4,
+        dropShadowColor: 'white',
+        dropShadowDistance: 0,
         wordWrapWidth: node.radius * 4 / 3 - 2 * (NODE_BORDER_THICKNESS * node.radius + TEXT_BOX_MARGIN),
     });
 

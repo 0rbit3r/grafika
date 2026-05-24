@@ -35,8 +35,9 @@ export enum NodeShape {
     TextBox = 100,
     // Text with no background sprite — just floating text.
     TextOnly = 101,
+    TextOnlyHighlighted = 102,
     // Text with a semi-transparent black rounded rect background.
-    TextCard = 102,
+    TextCard = 103,
 }
 
 export interface GraphEdge {
