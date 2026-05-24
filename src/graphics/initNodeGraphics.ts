@@ -1,4 +1,4 @@
-import { TextStyle, Text } from "pixi.js";
+import { TextStyle, Text, Container } from "pixi.js";
 import { getNodeProxy } from "../api/proxyNode";
 import { NODE_BORDER_THICKNESS, TEXT_WORD_WRAP_WIDTH, ZOOM_STEP_MULTIPLICATOR_WHEEL } from "../core/defaultGraphOptions";
 import { RenderedNode } from "../core/renderedNode";
@@ -14,70 +14,72 @@ export const initNodeGraphics = (node: RenderedNode, $states: GraphStoresContain
     if ($states.debug.logToConsole) console.log("initializing node " + node.id);
 
     node.sprite?.removeAllListeners();
-    node.sprite?.destroy({ baseTexture: false, children: true, texture: false });
+    node.sprite?.destroy({ children: true });
     node.isLoadedOnScreen = false;
 
-    const sprite = getNodeSprite(app, node);
+    // baseSprite is purely visual — the container handles interaction
+    const baseSprite = getNodeSprite(app, node);
+    baseSprite.eventMode = 'none';
     if (node.shape === NodeShape.TextOnly || node.shape === NodeShape.TextOnlyHighlighted) {
-        sprite.alpha = 0;
+        baseSprite.alpha = 0;
     } else {
-        sprite.tint = node.color;
+        baseSprite.tint = node.color;
     }
 
-    node.sprite = sprite;
+    // Container owns the transform each frame and is the interactive element
+    const container = new Container();
+    container.hitArea = baseSprite.hitArea;
+    container.eventMode = 'static';
+    container.cursor = 'pointer';
+    container.addChild(baseSprite);
 
     if (node.glowEffect) {
         const glow = getGlowSprite(app);
         glow.tint = node.color;
-        sprite.addChild(glow);
+        container.addChild(glow);
     }
     if (node.hollowEffect) {
         const hole = getHollowHoleSprite(app);
-        sprite.addChild(hole);
+        container.addChild(hole);
         const rim = getHollowRimSprite(app);
         rim.tint = node.color;
-        sprite.addChild(rim);
+        container.addChild(rim);
     }
     if (node.blinkEffect) {
         const blinkSprite = getBlinkSprite(app);
-        sprite.addChild(blinkSprite);
+        container.addChild(blinkSprite);
         node.blinkingSprite = blinkSprite;
     }
 
-    //interactivity
-    sprite.eventMode = 'static';
-    sprite.cursor = 'pointer';
-    // sprite.cacheAsBitmap = true; 
+    node.sprite = container;
 
     let holdStartTime = 0;
 
-    sprite.on('globalpointermove', e => {
+    container.on('globalpointermove', e => {
         const $graphics = $states.graphics;
         if (node.held && $graphics.app.ticker.started) {
             const zoom = $states.graphics.viewport.zoom;
             node.x += e.movementX / zoom;
             node.y += e.movementY / zoom;
             $states.interactionEvents.emit("nodeDragged", getNodeProxy(node, $states));
-            // console.log(renderedNode.x, renderedNode.graphics.x);
         }
     });
 
-    sprite.on('pointerdown', () => {
+    container.on('pointerdown', () => {
         if (!app.ticker.started) return;
         $states.simulation.frame = 0;
         node.held = true;
         holdStartTime = performance.now();
     });
 
-    sprite.on('pointerover', () => {
+    container.on('pointerover', () => {
         if (!app.ticker.started) return;
         node.hovered = true;
     });
-    sprite.on('pointerout', () => {
-        // if (!app.ticker.started) return; //I think leaving this condition here is reasonable
+    container.on('pointerout', () => {
         node.hovered = false;
     });
-    sprite.on('wheel', (e) => {
+    container.on('wheel', (e) => {
         const $graphics = $states.graphics;
         if (!$graphics.app.ticker.started) return;
         e.preventDefault();
@@ -86,8 +88,6 @@ export const initNodeGraphics = (node: RenderedNode, $states: GraphStoresContain
         const factor = e.deltaY < 0 ? ZOOM_STEP_MULTIPLICATOR_WHEEL : 1 / ZOOM_STEP_MULTIPLICATOR_WHEEL;
         $graphics.viewport.updateZoom($graphics.viewport.zoom * factor, worldCenter);
     });
-
-    // opens the node if the click was short
 
     const handlePointerUp = () => {
         const DRAG_TIME_THRESHOLD = 200;
@@ -102,14 +102,14 @@ export const initNodeGraphics = (node: RenderedNode, $states: GraphStoresContain
         }
         node.held = false;
     }
-    sprite.on('pointerup', handlePointerUp);
-    sprite.on("pointerupoutside", handlePointerUp);
-    // sprite.on("pointercancel", handlePointerUp);
+    container.on('pointerup', handlePointerUp);
+    container.on("pointerupoutside", handlePointerUp);
+
     // text
     node.renderedText && node.renderedText.destroy({ children: true });
 
     node.renderedText = (node.shape === NodeShape.TextOnly || node.shape === NodeShape.TextOnlyHighlighted)
-        ? getTextBoxText(node, $states.graphics.colorfulText, node.shape  === NodeShape.TextOnlyHighlighted)
+        ? getTextBoxText(node, $states.graphics.colorfulText, node.shape === NodeShape.TextOnlyHighlighted)
         : getStandardNodeText(node, $states.graphics.colorfulText);
 
     // $states.graphics.textContainer.addChild(text); -> handled in loader
@@ -127,11 +127,10 @@ const getStandardNodeText = (node: RenderedNode, colorfulText?: boolean) => {
         fontWeight: "bold",
         fill: '#ffffff',
         wordWrapWidth: TEXT_WORD_WRAP_WIDTH,
-        stroke: "#000000",
-        strokeThickness: 2
+        stroke: { color: "#000000", width: 2 }
     });
 
-    const text = new Text(node.text, style);
+    const text = new Text({ text: node.text, style });
     if (colorfulText) text.tint = new tinycolor(node.color).lighten(30).toString();
     text.anchor.set(0.5, 0);
     text.zIndex = TEXT_Z;
@@ -148,14 +147,11 @@ const getTextBoxText = (node: RenderedNode, colorfulText?: boolean, highlighted?
         fontFamily: 'Monospace',
         fontSize: 30,
         fill: 'white',
-        dropShadow: highlighted,
-        dropShadowBlur: 4,
-        dropShadowColor: 'white',
-        dropShadowDistance: 0,
+        dropShadow: highlighted ? { blur: 4, color: 'white', distance: 0 } : undefined,
         wordWrapWidth: node.radius * 3
     });
 
-    const text = new Text(node.text, style);
+    const text = new Text({ text: node.text, style });
     if (colorfulText) text.tint = new tinycolor(node.color).lighten(30).toString();
     text.anchor.set(0.5);
     text.zIndex = TEXT_Z;

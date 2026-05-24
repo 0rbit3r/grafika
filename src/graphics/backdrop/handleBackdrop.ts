@@ -20,9 +20,8 @@ export const handleBackdrop = (backdropSprite: Sprite, $graphics: GraphicsStore)
         y: $graphics.viewport.position.y * $graphics.backdropSettings.parallax,
     });
 
-    backdropSprite.setTransform(
-        onScreenCoors.x, onScreenCoors.y,
-        sizeOnScreen, sizeOnScreen);
+    backdropSprite.position.set(onScreenCoors.x, onScreenCoors.y);
+    backdropSprite.scale.set(sizeOnScreen, sizeOnScreen);
 
     const backdropOpacity =
         Math.min(1, Math.max(0, $graphics.viewport.zoom - $graphics.backdropSettings.startAppearingAt)

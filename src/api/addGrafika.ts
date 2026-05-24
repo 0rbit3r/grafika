@@ -1,4 +1,4 @@
-import { Application, Assets, TextStyle, Text } from "pixi.js";
+import { Application } from "pixi.js";
 import { initGraphics } from "../graphics/initGraphics";
 import { GrafikaSettings } from "./settings";
 import { createGraphStores } from "../state/storesContainer";
@@ -13,29 +13,26 @@ import { type InteractionEvents } from "./events";
 import { disposeState } from "../core/dispose";
 import { destroyExpired } from "../core/contextManager/destroyExpired";
 
-export function addGrafika(element: HTMLElement, settings: GrafikaSettings): GrafikaInstance {
+export async function addGrafika(element: HTMLElement, settings: GrafikaSettings): Promise<GrafikaInstance> {
 
-    // Object.assign(element.style, { width: "100%", height: "100%" });
-    // console.log(window.devicePixelRatio)
-    const app = new Application<HTMLCanvasElement>(
-        {
-            background: settings.graphics?.backgroundColor ?? '#000000',
-            resizeTo: element,
-            antialias: settings.graphics?.antialiasing ?? false,
+    const app = new Application();
+    await app.init({
+        background: settings.graphics?.backgroundColor ?? '#000000',
+        resizeTo: element,
+        antialias: settings.graphics?.antialiasing ?? false,
 
-            autoDensity: true, // todo: i have a hunch this might mess up drag containers relative size to viewport or other things,
-            resolution: window.devicePixelRatio // this and the above are needed for the canvas not to look like shit on mobile
-        }
-    );
+        autoDensity: true, // todo: i have a hunch this might mess up drag containers relative size to viewport or other things,
+        resolution: window.devicePixelRatio // this and the above are needed for the canvas not to look like shit on mobile
+    });
 
-    app.view.addEventListener("wheel", preventPageScrollOnWheel);
-    element.appendChild(app.view as HTMLCanvasElement);
+    app.canvas.addEventListener("wheel", preventPageScrollOnWheel, { passive: false });
+    element.appendChild(app.canvas);
 
     const interactionEvents = mitt<InteractionEvents>();
 
     const $states = createGraphStores(app, settings, interactionEvents);
 
-    const renderGraph = initGraphics(app, $states);
+    const renderGraph = await initGraphics(app, $states);
 
     const resizeObserver = new ResizeObserver((entries => {
 
@@ -61,7 +58,7 @@ export function addGrafika(element: HTMLElement, settings: GrafikaSettings): Gra
 
     const handleTick = () => {
         $states.simulation.frame = $states.simulation.frame + 1;
-        processPendingData($states, 20);
+        processPendingData($states, 40);
         // force simulation
         if ($states.simulation.simulationEnabled) {
             simulate_one_frame_of_FDL($states);
@@ -101,14 +98,14 @@ export function addGrafika(element: HTMLElement, settings: GrafikaSettings): Gra
         start: () => { if (!isDisposed) app.ticker.start() },
         stop: () => { if (!isDisposed) app.ticker.stop() },
         dispose: () => {
-            if (isDisposed) return;
+            if (isDisposed) return Promise.resolve();
             isDisposed = true;
             console.log(`disposing grafika instance ${id}`);
-            app.view.removeEventListener("wheel", preventPageScrollOnWheel)
+            app.canvas.removeEventListener("wheel", preventPageScrollOnWheel)
             resizeObserver.disconnect();
             app.ticker.stop();
 
-            disposeState($states);
+            return disposeState($states);
         },
         isDisposed: () => isDisposed,
 

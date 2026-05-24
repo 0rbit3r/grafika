@@ -1,6 +1,6 @@
 import { RenderedEdge } from "../core/renderedEdge";
 import { NodeShape, GraphNode } from "../api/dataTypes";
-import { Text, Sprite } from "pixi.js";
+import { Text, Sprite, Container } from "pixi.js";
 import { DEFAULT_RADIUS } from "../core/defaultGraphOptions";
 import { GraphStoresContainer } from "../state/storesContainer";
 // import { drawNode } from "../graphics/drawNode";
@@ -24,7 +24,7 @@ export interface RenderedNode {
     glowEffect: boolean;
     blinkEffect: boolean;
 
-    sprite?: Sprite;
+    sprite?: Container;
     blinkingSprite?: Sprite;
     renderedText?: Text;
     radius: number;

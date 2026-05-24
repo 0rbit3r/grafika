@@ -4,7 +4,6 @@ import { GraphStoresContainer } from "../state/storesContainer";
 // import { drawNode } from "../graphics/drawNode";
 import { RenderedEdge } from "../core/renderedEdge";
 // import { drawEdge } from "../graphics/drawEdge";
-import { Graphics } from "pixi.js";
 import { getNodeProxy, ProxyNode } from "./proxyNode";
 import { initEdgeGraphics } from "../graphics/initEdgeGraphics";
 import { handleEdgeLoading } from "../graphics/dynamicLoader";

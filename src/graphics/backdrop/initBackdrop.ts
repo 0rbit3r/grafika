@@ -1,12 +1,11 @@
-import { Sprite, Assets, Texture } from "pixi.js";
+import { Sprite, Assets } from "pixi.js";
 import { BACKDROP_Z } from "../zIndexes";
 
-export const initBackdrop = (url: string) => {
-        const backdropSprite = Sprite.from(url);
-        backdropSprite.anchor.set(0.5)
-
-        backdropSprite.eventMode = "none";
-        backdropSprite.zIndex = BACKDROP_Z;
-        
-        return backdropSprite;
+export const initBackdrop = async (url: string) => {
+    const texture = await Assets.load(url);
+    const backdropSprite = new Sprite(texture);
+    backdropSprite.anchor.set(0.5);
+    backdropSprite.eventMode = "none";
+    backdropSprite.zIndex = BACKDROP_Z;
+    return backdropSprite;
 }

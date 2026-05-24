@@ -1,4 +1,3 @@
-import { checkMaxIfStatementsInShader } from "pixi.js";
 import { Data } from "../../api/dataTypes";
 import { GraphStoresContainer } from "../../state/storesContainer";
 import { filterInPlace } from "../../util/filterInPlace";
