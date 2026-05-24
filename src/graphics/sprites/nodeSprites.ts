@@ -177,50 +177,14 @@ export function getNodeSprite(app: Application, node: RenderedNode): Sprite {
             sprite = Sprite.from(baseTextures.heart);
             sprite.anchor.set(0.5);
             break;
-        case NodeShape.TextBox:
-            if (!baseTextures.textBox || baseTextures.textBox.destroyed) {
-                const graphics = new Graphics();
-                graphics.beginFill("#222222");
-                graphics.lineStyle(NODE_SPRITE_RADIUS * NODE_BORDER_THICKNESS / 4, "#ffffff");
-
-                graphics.drawRoundedRect(
-                    - NODE_SPRITE_RADIUS / 3 * 2, - NODE_SPRITE_RADIUS / 3 * 2,
-                    NODE_SPRITE_RADIUS * 4 / 3, NODE_SPRITE_RADIUS * 4 / 3, NODE_SPRITE_RADIUS / 6);
-                graphics.endFill();
-                baseTextures.textBox = app.renderer.generateTexture(graphics,
-                    {
-                        scaleMode: SCALE_MODES.LINEAR,
-                        resolution: 1
-                    });
-            }
-            sprite = Sprite.from(baseTextures.textBox);
-            sprite.anchor.set(0.5);
-            break;
         case NodeShape.TextOnly || NodeShape.TextOnlyHighlighted:
             sprite = Sprite.from(Texture.EMPTY);
-            sprite.anchor.set(0.5);
-            break;
-        case NodeShape.TextCard:
-            if (!baseTextures.textCard || baseTextures.textCard.destroyed) {
-                const graphics = new Graphics();
-                graphics.beginFill(0x000000);
-                graphics.drawRoundedRect(
-                    - NODE_SPRITE_RADIUS / 3 * 2, - NODE_SPRITE_RADIUS / 3 * 2,
-                    NODE_SPRITE_RADIUS * 4 / 3, NODE_SPRITE_RADIUS * 4 / 3, NODE_SPRITE_RADIUS / 6);
-                graphics.endFill();
-                baseTextures.textCard = app.renderer.generateTexture(graphics,
-                    {
-                        scaleMode: SCALE_MODES.LINEAR,
-                        resolution: 1
-                    });
-            }
-            sprite = Sprite.from(baseTextures.textCard);
             sprite.anchor.set(0.5);
             break;
     }
     // todo - polygon hitareas for others (especially triangles as they now have big areas of hitArea outside)
     sprite.hitArea = node.shape === NodeShape.TextOnly || node.shape === NodeShape.TextOnlyHighlighted
-        ? new Circle(0, 0, NODE_SPRITE_RADIUS * 0.4)
+        ? new Circle(0, 0, NODE_SPRITE_RADIUS * 0.8)
         : new Circle(0, 0, NODE_SPRITE_RADIUS * 1.2); // + 10 to make it slightly easier to grip on touchscreens
     return sprite;
 }
