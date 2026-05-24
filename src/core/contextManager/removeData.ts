@@ -7,7 +7,7 @@ import { NEW_NODE_FADE_OUT_FRAMES } from "../defaultGraphOptions";
 export function removeDataByIds($states: GraphStoresContainer, dataToRemove?: Data) {
     if (!dataToRemove)
         dataToRemove = {
-            edges: $states.context.notRenderedEdges.map(e => ({ sourceId: e.sourceId, targetId: e.targetId }))
+            edges: Array.from($states.context.notRenderedEdgesById.values()).map(e => ({ sourceId: e.sourceId, targetId: e.targetId }))
                 .concat($states.context.renderedEdges.map(e => ({ sourceId: e.source.id, targetId: e.target.id }))),
             nodes: $states.context.renderedNodes
         }
@@ -32,9 +32,9 @@ export function removeDataByIds($states: GraphStoresContainer, dataToRemove?: Da
 
     // Clear adjacency for dying nodes so they stop influencing force calculations
     nodesToFade.forEach(node => {
-        $states.context.edgesAdjacency.delete(node.id);
-        node.inEdges.forEach(e => $states.context.edgesAdjacency.get(e.source.id)?.delete(node.id));
-        node.outEdges.forEach(e => $states.context.edgesAdjacency.get(e.target.id)?.delete(node.id));
+        node.adjacentNodeIds.clear();
+        node.inEdges.forEach(e => e.source.adjacentNodeIds.delete(node.id));
+        node.outEdges.forEach(e => e.target.adjacentNodeIds.delete(node.id));
     });
 
     // Edges on dying nodes stay in renderedEdges to fade; collect them to exclude from immediate destruction
@@ -47,9 +47,7 @@ export function removeDataByIds($states: GraphStoresContainer, dataToRemove?: Da
     // Destroy explicitly requested edges not connected to any dying node immediately
     const edgesToDestroyNow = new Set<RenderedEdge>();
     dataToRemove.edges?.forEach(e => {
-        const renderedEdge = $states.context.renderedEdges.find(
-            re => re.source.id === e.sourceId && re.target.id === e.targetId
-        );
+        const renderedEdge = $states.context.edgesById.get(`${e.sourceId}->${e.targetId}`);
         if (renderedEdge && !edgesOnDyingNodes.has(renderedEdge))
             edgesToDestroyNow.add(renderedEdge);
     });
@@ -57,21 +55,16 @@ export function removeDataByIds($states: GraphStoresContainer, dataToRemove?: Da
     $states.context.renderedEdges = $states.context.renderedEdges.filter(e => !edgesToDestroyNow.has(e));
     edgesToDestroyNow.forEach(e => {
         e.sprite?.destroy({ children: true });
+        $states.context.edgesById.delete(`${e.source.id}->${e.target.id}`);
         e.target.inEdges.delete(e);
         e.source.outEdges.delete(e);
-        $states.context.edgesAdjacency.get(e.source.id)?.delete(e.target.id);
-        $states.context.edgesAdjacency.get(e.target.id)?.delete(e.source.id);
+        e.source.adjacentNodeIds.delete(e.target.id);
+        e.target.adjacentNodeIds.delete(e.source.id);
     });
 
-    // Remove dying nodes and their edges from consumer-facing lists immediately
-    filterInPlace($states.context.proxyNodesList,
-        rn => !dyingNodeIds.has(rn.id));
-
-    filterInPlace($states.context.proxyEdgesList,
-        re => !dyingNodeIds.has(re.sourceId) && !dyingNodeIds.has(re.targetId)
-            && dataToRemove.edges?.find(e => e.sourceId === re.sourceId && e.targetId === re.targetId) === undefined);
-
-    filterInPlace($states.context.notRenderedEdges,
-        ne => !dyingNodeIds.has(ne.sourceId) && !dyingNodeIds.has(ne.targetId)
-            && dataToRemove.edges?.find(e => e.sourceId === ne.sourceId && e.targetId === ne.targetId) === undefined);
+    for (const [key, ne] of $states.context.notRenderedEdgesById) {
+        if (dyingNodeIds.has(ne.sourceId) || dyingNodeIds.has(ne.targetId)
+            || dataToRemove.edges?.find(e => e.sourceId === ne.sourceId && e.targetId === ne.targetId) !== undefined)
+            $states.context.notRenderedEdgesById.delete(key);
+    }
 }

@@ -12,6 +12,8 @@ import mitt from "mitt";
 import { type InteractionEvents } from "./events";
 import { disposeState } from "../core/dispose";
 import { destroyExpired } from "../core/contextManager/destroyExpired";
+import { getNodeProxy } from "./proxyNode";
+import { getEdgeProxy } from "./proxyEdge";
 
 export async function addGrafika(element: HTMLElement, settings: GrafikaSettings): Promise<GrafikaInstance> {
 
@@ -88,9 +90,9 @@ export async function addGrafika(element: HTMLElement, settings: GrafikaSettings
         getData: () => {
             if (isDisposed) return { edges: [], nodes: [], unusedEdges: [] };
             return {
-                nodes: $states.context.proxyNodesList,
-                edges: $states.context.proxyEdgesList,
-                unusedEdges: $states.context.notRenderedEdges
+                nodes: $states.context.renderedNodes.map(n => getNodeProxy(n, $states)),
+                edges: $states.context.renderedEdges.map(e => getEdgeProxy(e, $states)),
+                unusedEdges: Array.from($states.context.notRenderedEdgesById.values())
             }
         },
         getViewport: () => ({ position: $states.graphics.viewport.position, zoom: $states.graphics.viewport.zoom }),

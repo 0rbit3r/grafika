@@ -58,7 +58,7 @@ export const simulate_one_frame_of_FDL = ($states: GraphStoresContainer) => {
             if (n2.framesAlive < 0 || n2.timeToLiveTo !== undefined) return;
             const borderDistance = get_border_distance(n1, n2);
             if (borderDistance < $simulationState.pushThreshold
-                && !$context.edgesAdjacency.get(n1.id)?.has(n2.id)) {
+                && !n1.adjacentNodeIds.has(n2.id)) {
                 push_unconnected(n1, n2, $states);
             }
         });
