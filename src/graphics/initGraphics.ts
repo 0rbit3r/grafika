@@ -95,7 +95,8 @@ export const initGraphics = (app: Application, $states: GraphStoresContainer) =>
             fpsCounter.y = app.screen.height - 80;
         }
 
-        $graphics.textContainer.alpha = zoom <= ZOOM_TEXT_INVISIBLE_THRESHOLD
+        $graphics.textContainer.alpha = 
+            zoom <= ZOOM_TEXT_INVISIBLE_THRESHOLD
             ? 0
             : zoom >= ZOOM_TEXT_VISIBLE_THRESHOLD
                 ? 1
@@ -142,7 +143,7 @@ export const initGraphics = (app: Application, $states: GraphStoresContainer) =>
 
                 // handle text
                 if (zoom >= ZOOM_TEXT_INVISIBLE_THRESHOLD) {
-                    if (node.shape !== NodeShape.TextBox && node.shape !== NodeShape.TextOnly && node.shape !== NodeShape.TextCard && node.shape !== NodeShape.TextOnlyHighlighted)
+                    if (node.shape !== NodeShape.TextOnly && node.shape !== NodeShape.TextOnlyHighlighted)
                         node.renderedText?.setTransform(viewportPos.x, viewportPos.y + (node.radius * (1 + NODE_BORDER_THICKNESS * 2)) * zoom);
                     else {
                         node.renderedText?.setTransform(viewportPos.x, viewportPos.y, zoom, zoom);

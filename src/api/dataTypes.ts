@@ -31,13 +31,8 @@ export enum NodeShape {
     Heart = 6,
     // todo: exclamation mark, question mark, dash, checked and unchecked "checkbox-like",  
 
-    // Text box renderes a box with text inside of it.
-    TextBox = 100,
-    // Text with no background sprite — just floating text.
-    TextOnly = 101,
-    TextOnlyHighlighted = 102,
-    // Text with a semi-transparent black rounded rect background.
-    TextCard = 103,
+    TextOnly = 100,
+    TextOnlyHighlighted = 101,
 }
 
 export interface GraphEdge {

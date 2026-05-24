@@ -67,8 +67,8 @@ export const initializeRenderedNode = (node: GraphNode, $states: GraphStoresCont
         sprite: undefined,
         // blinkingGraphics: new Graphics(),
         radius: node.radius ??
-        ((node.shape === NodeShape.TextBox || node.shape === NodeShape.TextOnly || node.shape === NodeShape.TextCard ||node.shape === NodeShape.TextOnlyHighlighted
-            || (!node.shape && ($graphics.defaultNodeShape === NodeShape.TextBox || $graphics.defaultNodeShape === NodeShape.TextOnly || $graphics.defaultNodeShape === NodeShape.TextCard, $graphics.defaultNodeShape === NodeShape.TextOnlyHighlighted)))
+        (( node.shape === NodeShape.TextOnly  ||node.shape === NodeShape.TextOnlyHighlighted
+            || (!node.shape && ( $graphics.defaultNodeShape === NodeShape.TextOnly || $graphics.defaultNodeShape === NodeShape.TextOnlyHighlighted)))
         ? computeTextBoxRadius(node.text ?? node.id.toString())
         : DEFAULT_RADIUS),
         renderedText: undefined,
