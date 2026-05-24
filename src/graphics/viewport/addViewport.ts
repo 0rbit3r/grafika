@@ -96,7 +96,6 @@ export const addDraggableViewport = (app: Application, interactionevents: Emitte
     // Mouse wheel zoom toward mouse position
     dragContainer.on('wheel', (event) => {
         if (!app.ticker.started) return;
-        event.preventDefault();
         event.stopPropagation();
         const worldCenter = viewport.toGlobalCoordinates({ x: event.globalX, y: event.globalY });
         const factor = event.deltaY < 0 ? ZOOM_STEP_MULTIPLICATOR_WHEEL : 1 / ZOOM_STEP_MULTIPLICATOR_WHEEL;

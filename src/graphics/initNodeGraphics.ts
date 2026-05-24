@@ -82,7 +82,6 @@ export const initNodeGraphics = (node: RenderedNode, $states: GraphStoresContain
     container.on('wheel', (e) => {
         const $graphics = $states.graphics;
         if (!$graphics.app.ticker.started) return;
-        e.preventDefault();
         e.stopPropagation();
         const worldCenter = $graphics.viewport.toGlobalCoordinates({ x: e.globalX, y: e.globalY });
         const factor = e.deltaY < 0 ? ZOOM_STEP_MULTIPLICATOR_WHEEL : 1 / ZOOM_STEP_MULTIPLICATOR_WHEEL;
