@@ -8,16 +8,14 @@ export interface ContextStore {
     renderedNodes: RenderedNode[];
     renderedEdges: RenderedEdge[];
 
-    edgesAdjacency: Map<string, Set<string>>;
+    nodesById: Map<string, RenderedNode>;
+    edgesById: Map<string, RenderedEdge>;
 
-    notRenderedEdges: GraphEdge[]; // edges that are defined, but missing either source or target node
+    notRenderedEdgesById: Map<string, GraphEdge>; // edges that are defined, but missing either source or target node
 
     pendingNodes: GraphNode[];
     pendingEdges: GraphEdge[];
     pendingAngle: number; // running angle for spiral initial placement
-
-    proxyNodesList: ProxyNode[];
-    proxyEdgesList: ProxyEdge[];
 
     proxyNodesMap: WeakMap<RenderedNode, ProxyNode>;
     proxyEdgesMap: WeakMap<RenderedEdge, ProxyEdge>;
@@ -27,16 +25,15 @@ export function createContextStore(): ContextStore {
     return {
         renderedNodes: [],
         renderedEdges: [],
-        edgesAdjacency: new Map(),
 
-        notRenderedEdges: [],
+        nodesById: new Map(),
+        edgesById: new Map(),
+
+        notRenderedEdgesById: new Map(),
 
         pendingNodes: [],
         pendingEdges: [],
         pendingAngle: 0,
-
-        proxyNodesList: [],
-        proxyEdgesList: [],
 
         proxyEdgesMap: new WeakMap(),
         proxyNodesMap: new WeakMap(),

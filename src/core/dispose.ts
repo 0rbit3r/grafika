@@ -15,12 +15,14 @@ export const disposeState = async ($states: GraphStoresContainer) => {
         n.sprite?.destroy(true);
         n.inEdges = new Set();
         n.outEdges = new Set();
+        n.adjacentNodeIds = new Set();
     });
 
-    $states.context.edgesAdjacency = new Map();
-    $states.context.notRenderedEdges = [];
+    $states.context.notRenderedEdgesById = new Map();
     $states.context.renderedEdges = [];
     $states.context.renderedNodes = [];
+    $states.context.nodesById = new Map();
+    $states.context.edgesById = new Map();
     $states.context.proxyEdgesMap = new Map();
     $states.context.proxyEdgesMap = new Map();
     $graphics.viewport.dispose();

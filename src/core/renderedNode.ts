@@ -13,6 +13,7 @@ export interface RenderedNode {
     id: string;
     inEdges: Set<RenderedEdge>;
     outEdges: Set<RenderedEdge>;
+    adjacentNodeIds: Set<string>;
 
     x: number;
     y: number;
@@ -59,6 +60,7 @@ export const initializeRenderedNode = (node: GraphNode, $states: GraphStoresCont
         color: node.color ?? "#dddddd",
         inEdges: new Set(),
         outEdges: new Set(),
+        adjacentNodeIds: new Set(),
         
         hollowEffect: node.hollowEffect ?? false,
         blinkEffect: node.blinkEffect ?? false,

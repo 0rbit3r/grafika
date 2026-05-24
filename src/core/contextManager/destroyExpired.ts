@@ -7,6 +7,7 @@ export function destroyExpired($states: GraphStoresContainer) {
         if (n.timeToLiveTo !== undefined && n.framesAlive >= n.timeToLiveTo) {
             n.sprite?.destroy({ children: true });
             n.renderedText?.destroy({ children: true });
+            $states.context.nodesById.delete(n.id);
             expiredNodes.add(n);
             return false;
         }
@@ -16,6 +17,7 @@ export function destroyExpired($states: GraphStoresContainer) {
         $states.context.renderedEdges = $states.context.renderedEdges.filter(e => {
             if (expiredNodes.has(e.source) || expiredNodes.has(e.target)) {
                 e.sprite?.destroy({ children: true });
+                $states.context.edgesById.delete(`${e.source.id}->${e.target.id}`);
                 if (!expiredNodes.has(e.target)) e.target.inEdges.delete(e);
                 if (!expiredNodes.has(e.source)) e.source.outEdges.delete(e);
                 return false;
