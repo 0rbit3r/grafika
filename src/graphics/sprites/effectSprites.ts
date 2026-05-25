@@ -69,7 +69,7 @@ export const getBlinkSprite = (app: Application) => {
     let sprite: Sprite = null!;
     if (!baseTextures.blink || baseTextures.blink.destroyed) {
         const graphics = new Graphics();
-        const circles = 15;
+        const circles = 10;
         for (let i = 0; i <= circles; i++) {
             graphics.circle(0, 0, NODE_SPRITE_RADIUS * Math.pow(1.15, i))
                 .fill({ color: '#ffffff', alpha: Math.max(0.001, (1 - i / circles) * 0.1) });
