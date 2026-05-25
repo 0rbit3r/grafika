@@ -4,7 +4,7 @@ import { filterInPlace } from "../../util/filterInPlace";
 import { RenderedEdge } from "../renderedEdge";
 import { NEW_NODE_FADE_OUT_FRAMES } from "../defaultGraphOptions";
 
-export function removeDataByIds($states: GraphStoresContainer, dataToRemove?: Data) {
+export function removeDataByIds($states: GraphStoresContainer, dataToRemove?: Data, onFinished?: () => void) {
     if (!dataToRemove)
         dataToRemove = {
             edges: Array.from($states.context.notRenderedEdgesById.values()).map(e => ({ sourceId: e.sourceId, targetId: e.targetId }))
@@ -66,5 +66,24 @@ export function removeDataByIds($states: GraphStoresContainer, dataToRemove?: Da
         if (dyingNodeIds.has(ne.sourceId) || dyingNodeIds.has(ne.targetId)
             || dataToRemove.edges?.find(e => e.sourceId === ne.sourceId && e.targetId === ne.targetId) !== undefined)
             $states.context.notRenderedEdgesById.delete(key);
+    }
+
+    // Drain any addTrackers that were waiting on nodes that are now being removed
+    // (covers both pendingNodes that were filtered out and renderedNodes being faded)
+    const allRemovedIds = new Set(dataToRemove.nodes?.map(n => n.id) ?? []);
+    if (allRemovedIds.size > 0) {
+        filterInPlace($states.context.addTrackers, tracker => {
+            allRemovedIds.forEach(id => tracker.pendingIds.delete(id));
+            if (tracker.pendingIds.size === 0) { tracker.callback(); return false; }
+            return true;
+        });
+    }
+
+    if (onFinished) {
+        if (nodesToFade.length === 0) {
+            onFinished();
+        } else {
+            $states.context.removeTrackers.push({ pendingIds: new Set(nodesToFade.map(n => n.id)), callback: onFinished });
+        }
     }
 }

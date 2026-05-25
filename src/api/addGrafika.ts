@@ -60,7 +60,7 @@ export async function addGrafika(element: HTMLElement, settings: GrafikaSettings
 
     const handleTick = () => {
         $states.simulation.frame = $states.simulation.frame + 1;
-        processPendingData($states, 40);
+        processPendingData($states, 10);
         // force simulation
         if ($states.simulation.simulationEnabled) {
             simulate_one_frame_of_FDL($states);
@@ -85,8 +85,8 @@ export async function addGrafika(element: HTMLElement, settings: GrafikaSettings
         id: id.toString(),
         interactionEvents: interactionEvents,
 
-        addData: (data: Data) => { if (!isDisposed) addData($states, data) },
-        removeData: (data?: Data) => { if (!isDisposed) removeDataByIds($states, data) },
+        addData: (data: Data, onFinished?: () => void) => { if (!isDisposed) addData($states, data, onFinished) },
+        removeData: (data?: Data, onFinished?: () => void) => { if (!isDisposed) removeDataByIds($states, data, onFinished) },
         getData: () => {
             if (isDisposed) return { edges: [], nodes: [], unusedEdges: [] };
             return {

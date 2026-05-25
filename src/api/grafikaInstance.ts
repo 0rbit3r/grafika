@@ -9,8 +9,8 @@ export interface GrafikaInstance {
     interactionEvents: Emitter<InteractionEvents>;
 
     // data management
-    addData: (data: Data) => void;
-    removeData: (data?: Data) => void;
+    addData: (data: Data, onFinished?: () => void) => void;
+    removeData: (data?: Data, onFinished?: () => void) => void;
     getData: () => DataProxy;
     getViewport: () => { position: XAndY, zoom: number };
 
