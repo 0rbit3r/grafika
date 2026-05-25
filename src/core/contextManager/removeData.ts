@@ -68,22 +68,19 @@ export function removeDataByIds($states: GraphStoresContainer, dataToRemove?: Da
             $states.context.notRenderedEdgesById.delete(key);
     }
 
-    // Drain any addTrackers that were waiting on nodes that are now being removed
-    // (covers both pendingNodes that were filtered out and renderedNodes being faded)
+    // Drain any addTrackers waiting on nodes that are now being removed.
+    // Does NOT fire callbacks here — processPendingData fires them on the next tick,
+    // preventing synchronous re-entrancy if a callback calls back into removeData.
     const allRemovedIds = new Set(dataToRemove.nodes?.map(n => n.id) ?? []);
     if (allRemovedIds.size > 0) {
-        filterInPlace($states.context.addTrackers, tracker => {
-            allRemovedIds.forEach(id => tracker.pendingIds.delete(id));
-            if (tracker.pendingIds.size === 0) { tracker.callback(); return false; }
-            return true;
-        });
+        $states.context.addTrackers.forEach(tracker =>
+            allRemovedIds.forEach(id => tracker.pendingIds.delete(id))
+        );
     }
 
     if (onFinished) {
-        if (nodesToFade.length === 0) {
-            onFinished();
-        } else {
-            $states.context.removeTrackers.push({ pendingIds: new Set(nodesToFade.map(n => n.id)), callback: onFinished });
-        }
+        // Always push — even if nodesToFade is empty (pendingIds will be an empty Set),
+        // processPendingData fires it on the next tick rather than synchronously here.
+        $states.context.removeTrackers.push({ pendingIds: new Set(nodesToFade.map(n => n.id)), callback: onFinished });
     }
 }

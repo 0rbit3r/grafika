@@ -16,15 +16,32 @@ export function processPendingData($states: GraphStoresContainer, batchSize: num
     const $context = $states.context;
     const $simulation = $states.simulation;
 
+    // Fire any trackers that have been fully drained — always runs, even when queues are empty.
+    // All callback firing is intentionally deferred to here so it never happens synchronously
+    // inside removeDataByIds or addData (which would risk re-entrancy / infinite recursion).
+    // Snapshot lengths first: if a callback pushes a new tracker, filterInPlace's
+    // `while (i < array.length)` would otherwise extend into it in the same pass.
+    const addTrackerLen = $context.addTrackers.length;
+    const removeTrackerLen = $context.removeTrackers.length;
+    filterInPlace($context.addTrackers, (t, i) => {
+        if (i! >= addTrackerLen) return true;
+        if (t.pendingIds.size === 0) { t.callback(); return false; }
+        return true;
+    });
+    filterInPlace($context.removeTrackers, (t, i) => {
+        if (i! >= removeTrackerLen) return true;
+        if (t.pendingIds.size === 0) { t.callback(); return false; }
+        return true;
+    });
+
     if ($context.pendingNodes.length === 0 && $context.pendingEdges.length === 0 && $context.notRenderedEdgesById.size === 0) return;
 
     const nodeBatch = $context.pendingNodes.splice(0, batchSize);
     nodeBatch.forEach(newNode => {
-        if (findNode($context, newNode.id)) {
-            // Node already exists (not dying) — still counts as processed for addTrackers
-            $context.addTrackers.forEach(t => t.pendingIds.delete(newNode.id));
-            return;
-        }
+        // Drain this ID from all addTrackers regardless of whether the node is actually added
+        $context.addTrackers.forEach(t => t.pendingIds.delete(newNode.id));
+
+        if (findNode($context, newNode.id)) return; // already exists (not dying), skip
 
         if (newNode.x === undefined) newNode.x = Math.cos($context.pendingAngle) * $simulation.initialPositionsRadius;
         if (newNode.y === undefined) newNode.y = Math.sin($context.pendingAngle) * $simulation.initialPositionsRadius;
@@ -33,13 +50,7 @@ export function processPendingData($states: GraphStoresContainer, batchSize: num
         const newRenderedNode = initializeRenderedNode(newNode, $states);
         $context.renderedNodes.push(newRenderedNode);
         $context.nodesById.set(newRenderedNode.id, newRenderedNode);
-        $context.addTrackers.forEach(t => t.pendingIds.delete(newNode.id));
         $states.interactionEvents.emit("nodeAdded", getNodeProxy(newRenderedNode, $states));
-    });
-
-    filterInPlace($context.addTrackers, tracker => {
-        if (tracker.pendingIds.size === 0) { tracker.callback(); return false; }
-        return true;
     });
 
     // resolve notRenderedEdgesById unblocked by newly added nodes

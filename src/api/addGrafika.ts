@@ -15,7 +15,7 @@ import { destroyExpired } from "../core/contextManager/destroyExpired";
 import { getNodeProxy } from "./proxyNode";
 import { getEdgeProxy } from "./proxyEdge";
 
-export async function addGrafika(element: HTMLElement, settings: GrafikaSettings): Promise<GrafikaInstance> {
+export async function addGrafika(element: HTMLElement, settings: GrafikaSettings, onFinished?: () => void): Promise<GrafikaInstance> {
 
     const app = new Application();
     await app.init({
@@ -52,7 +52,7 @@ export async function addGrafika(element: HTMLElement, settings: GrafikaSettings
     resizeObserver.observe(element);
 
 
-    addData($states, settings.data ?? { edges: [], nodes: [] });
+    addData($states, settings.data ?? { edges: [], nodes: [] }, onFinished);
 
     app.ticker.autoStart = false;
 
