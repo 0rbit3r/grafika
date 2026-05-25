@@ -1,6 +1,5 @@
 import { RenderedNode } from "../renderedNode";
 import { GraphStoresContainer } from "../../state/storesContainer";
-import { filterInPlace } from "../../util/filterInPlace";
 
 export function destroyExpired($states: GraphStoresContainer) {
     const expiredNodes = new Set<RenderedNode>();
@@ -29,10 +28,9 @@ export function destroyExpired($states: GraphStoresContainer) {
             return true;
         });
 
-        filterInPlace($states.context.removeTrackers, tracker => {
-            expiredNodes.forEach(n => tracker.pendingIds.delete(n.id));
-            if (tracker.pendingIds.size === 0) { tracker.callback(); return false; }
-            return true;
-        });
+        // Drain removeTracker IDs; processPendingData will fire callbacks on the next tick
+        $states.context.removeTrackers.forEach(tracker =>
+            expiredNodes.forEach(n => tracker.pendingIds.delete(n.id))
+        );
     }
 }

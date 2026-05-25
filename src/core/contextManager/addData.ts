@@ -6,11 +6,9 @@ export function addData($states: GraphStoresContainer, data: Data, onFinished?: 
     if (data.edges) $states.context.pendingEdges.push(...data.edges);
 
     if (onFinished) {
+        // Always push — even for empty node lists (pendingIds will be an empty Set),
+        // processPendingData fires it on the next tick rather than synchronously here.
         const ids = data.nodes?.map(n => n.id) ?? [];
-        if (ids.length === 0) {
-            onFinished();
-        } else {
-            $states.context.addTrackers.push({ pendingIds: new Set(ids), callback: onFinished });
-        }
+        $states.context.addTrackers.push({ pendingIds: new Set(ids), callback: onFinished });
     }
 }
