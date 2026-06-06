@@ -5,13 +5,11 @@ import { ProxyNode } from "../api/proxyNode";
 import { ProxyEdge } from "../api/proxyEdge";
 
 export interface ContextStore {
-    renderedNodes: RenderedNode[];
-    renderedEdges: RenderedEdge[];
-
-    nodesById: Map<string, RenderedNode>;
-    edgesById: Map<string, RenderedEdge>;
+    renderedNodes: Map<string, RenderedNode>;
+    renderedEdges: Map<string, RenderedEdge>;
 
     notRenderedEdgesById: Map<string, GraphEdge>; // edges that are defined, but missing either source or target node
+    notRenderedEdgesByNodeId: Map<string, Set<GraphEdge>>; // reverse index: nodeId → pending edges referencing that node
 
     pendingNodes: GraphNode[];
     pendingEdges: GraphEdge[];
@@ -26,13 +24,11 @@ export interface ContextStore {
 
 export function createContextStore(): ContextStore {
     return {
-        renderedNodes: [],
-        renderedEdges: [],
-
-        nodesById: new Map(),
-        edgesById: new Map(),
+        renderedNodes: new Map(),
+        renderedEdges: new Map(),
 
         notRenderedEdgesById: new Map(),
+        notRenderedEdgesByNodeId: new Map(),
 
         pendingNodes: [],
         pendingEdges: [],

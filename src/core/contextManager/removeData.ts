@@ -8,8 +8,8 @@ export function removeDataByIds($states: GraphStoresContainer, dataToRemove?: Da
     if (!dataToRemove)
         dataToRemove = {
             edges: Array.from($states.context.notRenderedEdgesById.values()).map(e => ({ sourceId: e.sourceId, targetId: e.targetId }))
-                .concat($states.context.renderedEdges.map(e => ({ sourceId: e.source.id, targetId: e.target.id }))),
-            nodes: $states.context.renderedNodes
+                .concat([...$states.context.renderedEdges.values()].map(e => ({ sourceId: e.source.id, targetId: e.target.id }))),
+            nodes: [...$states.context.renderedNodes.values()]
         }
 
     if (dataToRemove.nodes === undefined) dataToRemove.nodes = [];
@@ -18,7 +18,7 @@ export function removeDataByIds($states: GraphStoresContainer, dataToRemove?: Da
     // Schedule fade-out for deleted nodes; stagger TTLs so at most 10 expire per frame
     filterInPlace($states.context.pendingNodes, n => !dataToRemove.nodes?.find(r => r.id === n.id));
 
-    const nodesToFade = $states.context.renderedNodes.filter(existingNode =>
+    const nodesToFade = [...$states.context.renderedNodes.values()].filter(existingNode =>
         (dataToRemove.nodes?.find(n => n.id === existingNode.id)));
 
     nodesToFade.forEach((node, i) => {
@@ -47,15 +47,14 @@ export function removeDataByIds($states: GraphStoresContainer, dataToRemove?: Da
     // Destroy explicitly requested edges not connected to any dying node immediately
     const edgesToDestroyNow = new Set<RenderedEdge>();
     dataToRemove.edges?.forEach(e => {
-        const renderedEdge = $states.context.edgesById.get(`${e.sourceId}->${e.targetId}`);
+        const renderedEdge = $states.context.renderedEdges.get(`${e.sourceId}->${e.targetId}`);
         if (renderedEdge && !edgesOnDyingNodes.has(renderedEdge))
             edgesToDestroyNow.add(renderedEdge);
     });
 
-    $states.context.renderedEdges = $states.context.renderedEdges.filter(e => !edgesToDestroyNow.has(e));
     edgesToDestroyNow.forEach(e => {
         e.sprite?.destroy({ children: true });
-        $states.context.edgesById.delete(`${e.source.id}->${e.target.id}`);
+        $states.context.renderedEdges.delete(`${e.source.id}->${e.target.id}`);
         e.target.inEdges.delete(e);
         e.source.outEdges.delete(e);
         e.source.adjacentNodeIds.delete(e.target.id);
@@ -64,8 +63,11 @@ export function removeDataByIds($states: GraphStoresContainer, dataToRemove?: Da
 
     for (const [key, ne] of $states.context.notRenderedEdgesById) {
         if (dyingNodeIds.has(ne.sourceId) || dyingNodeIds.has(ne.targetId)
-            || dataToRemove.edges?.find(e => e.sourceId === ne.sourceId && e.targetId === ne.targetId) !== undefined)
+            || dataToRemove.edges?.find(e => e.sourceId === ne.sourceId && e.targetId === ne.targetId) !== undefined) {
             $states.context.notRenderedEdgesById.delete(key);
+            $states.context.notRenderedEdgesByNodeId.get(ne.sourceId)?.delete(ne);
+            $states.context.notRenderedEdgesByNodeId.get(ne.targetId)?.delete(ne);
+        }
     }
 
     // Drain any addTrackers waiting on nodes that are now being removed.

@@ -19,10 +19,9 @@ export const disposeState = async ($states: GraphStoresContainer) => {
     });
 
     $states.context.notRenderedEdgesById = new Map();
-    $states.context.renderedEdges = [];
-    $states.context.renderedNodes = [];
-    $states.context.nodesById = new Map();
-    $states.context.edgesById = new Map();
+    $states.context.notRenderedEdgesByNodeId = new Map();
+    $states.context.renderedEdges.clear();
+    $states.context.renderedNodes.clear();
     $states.context.proxyEdgesMap = new Map();
     $states.context.proxyEdgesMap = new Map();
     $graphics.viewport.dispose();

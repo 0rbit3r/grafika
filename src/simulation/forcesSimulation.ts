@@ -20,6 +20,7 @@ import {
 import { RenderedEdge } from "../core/renderedEdge";
 import { RenderedNode } from "../core/renderedNode";
 import { GraphStoresContainer } from "../state/storesContainer";
+import { buildQuadTree, cellMinDist, QuadCell } from "./quadtree";
 
 export const get_border_distance = (node1: RenderedNode, node2: RenderedNode) => {
     const dx = node1.x - node2.x;
@@ -39,7 +40,7 @@ const get_center_distance = (node1: RenderedNode, node2: RenderedNode) => {
 
 export const simulate_one_frame_of_FDL = ($states: GraphStoresContainer) => {
     const $simulationState = $states.simulation;
-    const renderedNodes = $states.context.renderedNodes;
+    const renderedNodes = [...$states.context.renderedNodes.values()];
     const frame = $simulationState.frame;
     const $context = $states.context;
 
@@ -50,18 +51,13 @@ export const simulate_one_frame_of_FDL = ($states: GraphStoresContainer) => {
         pull_or_push_connected_to_ideal_distance(e, $states);
     });
 
-    renderedNodes.forEach((n1, i1) => {
+    const activeNodes = renderedNodes.filter(n => n.framesAlive >= 0 && n.timeToLiveTo === undefined);
+    const root = buildQuadTree(activeNodes);
+
+    renderedNodes.forEach(n1 => {
         if (n1.framesAlive < 0 || n1.timeToLiveTo !== undefined) return;
         handleOutOfBounds(n1);
-        renderedNodes.forEach((n2, i2) => {
-            if (i1 <= i2) return;
-            if (n2.framesAlive < 0 || n2.timeToLiveTo !== undefined) return;
-            const borderDistance = get_border_distance(n1, n2);
-            if (borderDistance < $simulationState.pushThreshold
-                && !n1.adjacentNodeIds.has(n2.id)) {
-                push_unconnected(n1, n2, $states);
-            }
-        });
+        if (root) queryPush(root, n1, $simulationState.pushThreshold, $states);
         if ($simulationState.gravityEnabled) {
             gravity_pull(n1);
         }
@@ -191,6 +187,51 @@ export const push_unconnected = (sourceNode: RenderedNode, targetNode: RenderedN
     targetNode.forces.y += (targetNode.held ? 0 : (dy / centerDistance) * force)
         / nodeMassMultiplier
         * targetNodeTimeOnScreenMultiplier;
+}
+
+// One-sided push: applies force only to `node` (not `other`).
+// The full loop calls this for every (node, other) pair from node's perspective,
+// so each node accumulates its correct total push force without double-counting.
+const push_force_on_node = (node: RenderedNode, other: RenderedNode, $states: GraphStoresContainer) => {
+    const $sim = $states.simulation;
+    const dx = other.x - node.x;
+    const dy = other.y - node.y;
+    const centerDistance = get_center_distance(node, other);
+    const borderDistance = get_border_distance(node, other);
+
+    const forceAtPushThresh = pushForce($sim.pushThreshold);
+    const force = node.framesAlive > FRAMES_WITH_OVERLAP && other.framesAlive > FRAMES_WITH_OVERLAP
+        ? pushForce(borderDistance) - forceAtPushThresh
+        : 0;
+
+    const nodeMassMultiplier = NODE_MASS_ON
+        ? Math.min(Math.max(other.radius / node.radius, MIN_MASS_DIFFERENCE_PUSH_FORCE_MULTIPLIER), MAX_MASS_DIFFERENCE_PUSH_FORCE_MULTIPLIER)
+        : 1;
+
+    const timeMultiplier = other.framesAlive < FRAMES_WITH_NO_INFLUENCE
+        ? 0
+        : Math.min(1, (other.framesAlive - FRAMES_WITH_NO_INFLUENCE) / INFLUENCE_FADE_IN);
+
+    node.forces.x -= (node.held ? 0 : (dx / centerDistance) * force) * nodeMassMultiplier * timeMultiplier;
+    node.forces.y -= (node.held ? 0 : (dy / centerDistance) * force) * nodeMassMultiplier * timeMultiplier;
+};
+
+function queryPush(cell: QuadCell, node: RenderedNode, pushThreshold: number, $states: GraphStoresContainer): void {
+    if (cellMinDist(cell, node.x, node.y) - node.radius > pushThreshold) return;
+
+    if (cell.nw === null) {
+        if (cell.node === null || cell.node === node) return;
+        const other = cell.node;
+        if (node.adjacentNodeIds.has(other.id)) return;
+        if (get_border_distance(node, other) < pushThreshold) {
+            push_force_on_node(node, other, $states);
+        }
+        return;
+    }
+    queryPush(cell.nw, node, pushThreshold, $states);
+    queryPush(cell.ne!, node, pushThreshold, $states);
+    queryPush(cell.sw!, node, pushThreshold, $states);
+    queryPush(cell.se!, node, pushThreshold, $states);
 }
 
 // Adds force pulling the node towards the center of the graph
