@@ -1,92 +1,79 @@
-import { XAndY } from "../api/dataTypes";
-import { SIM_WIDTH } from "../core/defaultGraphOptions";
 import { RenderedNode } from "../core/renderedNode";
 
-export interface QuadTree {
-    position: XAndY;
-    size: number;
-    centerOfMass?: XAndY;
-    mass?: number;
-
-
-    children?: QuadTree[];
-    parent?: QuadTree;
-
-    node?: RenderedNode;
+export interface QuadCell {
+    x: number;      // left edge
+    y: number;      // top edge
+    half: number;   // half of side length; full cell covers [x, x+half*2] × [y, y+half*2]
+    node: RenderedNode | null;
+    nw: QuadCell | null;
+    ne: QuadCell | null;
+    sw: QuadCell | null;
+    se: QuadCell | null;
 }
 
-export const createQuadTree = (position: XAndY, size: number) => {
-    const quadTree: QuadTree = {
-        position: { x: -position.x / 2, y: -position.x / 2 },
-        size
+const MAX_DEPTH = 24;
+
+function makeCell(x: number, y: number, half: number): QuadCell {
+    return { x, y, half, node: null, nw: null, ne: null, sw: null, se: null };
+}
+
+function insertIntoChild(cell: QuadCell, node: RenderedNode, depth: number): void {
+    const cx = cell.x + cell.half;
+    const cy = cell.y + cell.half;
+    if (node.x < cx) {
+        if (node.y < cy) insert(cell.nw!, node, depth + 1);
+        else             insert(cell.sw!, node, depth + 1);
+    } else {
+        if (node.y < cy) insert(cell.ne!, node, depth + 1);
+        else             insert(cell.se!, node, depth + 1);
     }
-    return quadTree;
 }
 
-export const insertIntoQuadTree = (tree: QuadTree, node: RenderedNode) => {
-    const nodeMass = node.radius * node.radius;// give or take... 
-    if (!tree.node && !tree.children) {
-        tree.node = node;
-        tree.centerOfMass = { x: node.x, y: node.y }
-        tree.mass = nodeMass
+function insert(cell: QuadCell, node: RenderedNode, depth: number): void {
+    if (cell.nw === null && cell.node === null) {
+        cell.node = node;
         return;
     }
-    if (tree.node && !tree.children) {
-        const existingNode = tree.node;
-        tree.node = undefined;
-
-        tree.children = [
-            createQuadTree(tree.position, tree.size / 2),
-            createQuadTree({ x: tree.position.x + tree.size / 2, y: tree.position.y }, tree.size / 2),
-            createQuadTree({ x: tree.position.x + tree.size / 2, y: tree.position.y + tree.size / 2 }, tree.size / 2),
-            createQuadTree({ x: tree.position.x, y: tree.position.y + tree.size / 2 }, tree.size / 2)
-        ];
-
-        switch (hitCheck(tree, existingNode)) {
-            case "I":
-                insertIntoQuadTree(tree.children[0], existingNode); break;
-            case "II":
-                insertIntoQuadTree(tree.children[1], existingNode); break;
-            case "III":
-                insertIntoQuadTree(tree.children[2], existingNode); break;
-            case "IV":
-                insertIntoQuadTree(tree.children[3], existingNode); break;
-        }
+    if (depth >= MAX_DEPTH) return; // co-located nodes; skip to prevent infinite recursion
+    if (cell.nw === null) {
+        const existing = cell.node!;
+        cell.node = null;
+        const h = cell.half / 2;
+        cell.nw = makeCell(cell.x,            cell.y,            h);
+        cell.ne = makeCell(cell.x + cell.half, cell.y,            h);
+        cell.sw = makeCell(cell.x,            cell.y + cell.half, h);
+        cell.se = makeCell(cell.x + cell.half, cell.y + cell.half, h);
+        insertIntoChild(cell, existing, depth);
     }
-    if (tree.children) {
-        tree.centerOfMass = { x: (tree.centerOfMass!.x * tree.mass! + node.x * nodeMass)/(tree.mass! + nodeMass), y: tree.centerOfMass!.y};
-        switch (hitCheck(tree, node)) {
-            case "I":
-                insertIntoQuadTree(tree.children[0], node); break;
-            case "II":
-                insertIntoQuadTree(tree.children[1], node); break;
-            case "III":
-                insertIntoQuadTree(tree.children[2], node); break;
-            case "IV":
-                insertIntoQuadTree(tree.children[3], node); break;
-        }
-    }
+    insertIntoChild(cell, node, depth);
 }
 
-type hitCheckResult = "I" | "II" | "III" | "IV" | "OUTSIDE";
+export function buildQuadTree(nodes: RenderedNode[]): QuadCell | null {
+    if (nodes.length === 0) return null;
 
-function hitCheck(tree: QuadTree, node: RenderedNode): hitCheckResult {
+    let minX = Infinity, maxX = -Infinity, minY = Infinity, maxY = -Infinity;
+    for (const n of nodes) {
+        if (n.x < minX) minX = n.x;
+        if (n.x > maxX) maxX = n.x;
+        if (n.y < minY) minY = n.y;
+        if (n.y > maxY) maxY = n.y;
+    }
 
-    if (node.x > tree.position.x && node.x < tree.position.x + tree.size / 2
-        && node.y > tree.position.y && node.y < tree.position.y + tree.size / 2)
-        return "I";
+    const span = Math.max(maxX - minX, maxY - minY, 1);
+    const half = span / 2 + 1; // +1 so boundary nodes fall strictly inside
+    const cx = (minX + maxX) / 2;
+    const cy = (minY + maxY) / 2;
 
-    if (node.x > tree.position.x + tree.size / 2 && node.x < tree.position.x + tree.size
-        && node.y > tree.position.y && node.y < tree.position.y + tree.size / 2)
-        return "II";
+    const root = makeCell(cx - half, cy - half, half);
+    for (const n of nodes) insert(root, n, 0);
+    return root;
+}
 
-    if (node.x > tree.position.x + tree.size / 2 && node.x < tree.position.x + tree.size
-        && node.y > tree.position.y + tree.size / 2 && node.y < tree.position.y + tree.size)
-        return "III";
-
-    if (node.x > tree.position.x && node.x < tree.position.x + tree.size / 2
-        && node.y > tree.position.y + tree.size / 2 && node.y < tree.position.y + tree.size)
-        return "IV";
-
-    return "OUTSIDE";
+// Minimum distance from point (px, py) to any point on/inside the cell's bounding box.
+export function cellMinDist(cell: QuadCell, px: number, py: number): number {
+    const clampedX = Math.max(cell.x, Math.min(px, cell.x + cell.half * 2));
+    const clampedY = Math.max(cell.y, Math.min(py, cell.y + cell.half * 2));
+    const dx = px - clampedX;
+    const dy = py - clampedY;
+    return Math.sqrt(dx * dx + dy * dy);
 }

@@ -30,20 +30,20 @@ export const handleViewportFocus = ($states: GraphStoresContainer) => {
 
 const handleZoomToAll = ($states: GraphStoresContainer, padding?: number) => {
     const nodes = $states.context.renderedNodes;
-    if (nodes.length === 0) return;
+    if (nodes.size === 0) return;
 
     const viewport = $states.graphics.viewport;
 
     let minX: number, maxX: number, minY: number, maxY: number;
-    if (nodes.length === 1) {
-        const n = nodes[0];
+    if (nodes.size === 1) {
+        const n = nodes.values().next().value!;
         minX = n.x - n.radius;
         maxX = n.x + n.radius;
         minY = n.y - n.radius;
         maxY = n.y + n.radius;
     } else {
         minX = Infinity; maxX = -Infinity; minY = Infinity; maxY = -Infinity;
-        for (const n of nodes) {
+        for (const n of nodes.values()) {
             if (n.x < minX) minX = n.x;
             if (n.x > maxX) maxX = n.x;
             if (n.y < minY) minY = n.y;
@@ -65,7 +65,7 @@ const handleZoomToAll = ($states: GraphStoresContainer, padding?: number) => {
 
     const fill = padding !== undefined
         ? (1 - padding)
-        : $states.context.renderedNodes.length > 3
+        : nodes.size > 3
             ? 0.95
             : 0.5;
     const currentScreenSize = largerDimension * viewport.zoom;

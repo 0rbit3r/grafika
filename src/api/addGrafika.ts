@@ -90,8 +90,8 @@ export async function addGrafika(element: HTMLElement, settings: GrafikaSettings
         getData: () => {
             if (isDisposed) return { edges: [], nodes: [], unusedEdges: [] };
             return {
-                nodes: $states.context.renderedNodes.map(n => getNodeProxy(n, $states)),
-                edges: $states.context.renderedEdges.map(e => getEdgeProxy(e, $states)),
+                nodes: [...$states.context.renderedNodes.values()].map(n => getNodeProxy(n, $states)),
+                edges: [...$states.context.renderedEdges.values()].map(e => getEdgeProxy(e, $states)),
                 unusedEdges: Array.from($states.context.notRenderedEdgesById.values())
             }
         },
@@ -133,7 +133,7 @@ export async function addGrafika(element: HTMLElement, settings: GrafikaSettings
                 $states.graphics.viewportFocus = { target: "all", padding };
                 return;
             }
-            const node = $states.context.renderedNodes.find(n => n.id === what.id) ?? null;
+            const node = $states.context.renderedNodes.get(what.id) ?? null;
             $states.graphics.viewportFocus = node ? { target: node, padding } : null;
         }
     };

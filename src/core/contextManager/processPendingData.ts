@@ -4,11 +4,22 @@ import { GraphStoresContainer } from "../../state/storesContainer";
 import { ContextStore } from "../../state/contextStore";
 import { getNodeProxy } from "../../api/proxyNode";
 import { filterInPlace } from "../../util/filterInPlace";
+import { GraphEdge } from "../../api/dataTypes";
 
 const GOLDEN_ANGLE = 2.39996; // radians — distributes nodes in a spiral
 
+function addToNreIndex(index: Map<string, Set<GraphEdge>>, nodeId: string, edge: GraphEdge) {
+    let set = index.get(nodeId);
+    if (!set) { set = new Set(); index.set(nodeId, set); }
+    set.add(edge);
+}
+
+function removeFromNreIndex(index: Map<string, Set<GraphEdge>>, nodeId: string, edge: GraphEdge) {
+    index.get(nodeId)?.delete(edge);
+}
+
 const findNode = ($context: ContextStore, id: string) => {
-    const n = $context.nodesById.get(id);
+    const n = $context.renderedNodes.get(id);
     return n?.timeToLiveTo === undefined ? n : undefined;
 };
 
@@ -37,6 +48,7 @@ export function processPendingData($states: GraphStoresContainer, batchSize: num
     if ($context.pendingNodes.length === 0 && $context.pendingEdges.length === 0 && $context.notRenderedEdgesById.size === 0) return;
 
     const nodeBatch = $context.pendingNodes.splice(0, batchSize);
+    const addedNodeIds: string[] = [];
     nodeBatch.forEach(newNode => {
         // Drain this ID from all addTrackers regardless of whether the node is actually added
         $context.addTrackers.forEach(t => t.pendingIds.delete(newNode.id));
@@ -48,26 +60,31 @@ export function processPendingData($states: GraphStoresContainer, batchSize: num
         $context.pendingAngle += GOLDEN_ANGLE;
 
         const newRenderedNode = initializeRenderedNode(newNode, $states);
-        $context.renderedNodes.push(newRenderedNode);
-        $context.nodesById.set(newRenderedNode.id, newRenderedNode);
+        $context.renderedNodes.set(newRenderedNode.id, newRenderedNode);
         $states.interactionEvents.emit("nodeAdded", getNodeProxy(newRenderedNode, $states));
+        addedNodeIds.push(newRenderedNode.id);
     });
 
-    // resolve notRenderedEdgesById unblocked by newly added nodes
-    for (const [nreKey, notRenderedEdge] of $context.notRenderedEdgesById) {
-        const sourceRenderedNode = findNode($context, notRenderedEdge.sourceId);
-        const targetRenderedNode = findNode($context, notRenderedEdge.targetId);
-        if (sourceRenderedNode && targetRenderedNode
-            && !$context.edgesById.has(nreKey)) {
-            const newRenderedEdge = initializeRenderedEdge(notRenderedEdge, sourceRenderedNode, targetRenderedNode, $states);
-            $context.renderedEdges.push(newRenderedEdge);
-            $context.edgesById.set(nreKey, newRenderedEdge);
-            sourceRenderedNode.outEdges.add(newRenderedEdge);
-            targetRenderedNode.inEdges.add(newRenderedEdge);
-            $context.notRenderedEdgesById.delete(nreKey);
-
-            sourceRenderedNode.adjacentNodeIds.add(targetRenderedNode.id);
-            targetRenderedNode.adjacentNodeIds.add(sourceRenderedNode.id);
+    // resolve only the notRenderedEdges that reference a newly added node
+    for (const addedNodeId of addedNodeIds) {
+        const candidates = $context.notRenderedEdgesByNodeId.get(addedNodeId);
+        if (!candidates) continue;
+        for (const notRenderedEdge of Array.from(candidates)) {
+            const edgeKey = `${notRenderedEdge.sourceId}->${notRenderedEdge.targetId}`;
+            if (!$context.notRenderedEdgesById.has(edgeKey)) continue; // already resolved earlier in this batch
+            const sourceRenderedNode = findNode($context, notRenderedEdge.sourceId);
+            const targetRenderedNode = findNode($context, notRenderedEdge.targetId);
+            if (sourceRenderedNode && targetRenderedNode && !$context.renderedEdges.has(edgeKey)) {
+                const newRenderedEdge = initializeRenderedEdge(notRenderedEdge, sourceRenderedNode, targetRenderedNode, $states);
+                $context.renderedEdges.set(edgeKey, newRenderedEdge);
+                sourceRenderedNode.outEdges.add(newRenderedEdge);
+                targetRenderedNode.inEdges.add(newRenderedEdge);
+                $context.notRenderedEdgesById.delete(edgeKey);
+                removeFromNreIndex($context.notRenderedEdgesByNodeId, notRenderedEdge.sourceId, notRenderedEdge);
+                removeFromNreIndex($context.notRenderedEdgesByNodeId, notRenderedEdge.targetId, notRenderedEdge);
+                sourceRenderedNode.adjacentNodeIds.add(targetRenderedNode.id);
+                targetRenderedNode.adjacentNodeIds.add(sourceRenderedNode.id);
+            }
         }
     }
 
@@ -78,18 +95,20 @@ export function processPendingData($states: GraphStoresContainer, batchSize: num
         const sourceRenderedNode = findNode($context, newEdge.sourceId);
         const targetRenderedNode = findNode($context, newEdge.targetId);
         if (sourceRenderedNode && targetRenderedNode
-            && !$context.edgesById.has(edgeKey)) {
+            && !$context.renderedEdges.has(edgeKey)) {
             const newRenderedEdge = initializeRenderedEdge(newEdge, sourceRenderedNode, targetRenderedNode, $states);
-            $context.renderedEdges.push(newRenderedEdge);
-            $context.edgesById.set(edgeKey, newRenderedEdge);
+            $context.renderedEdges.set(edgeKey, newRenderedEdge);
             sourceRenderedNode.outEdges.add(newRenderedEdge);
             targetRenderedNode.inEdges.add(newRenderedEdge);
 
             sourceRenderedNode.adjacentNodeIds.add(targetRenderedNode.id);
             targetRenderedNode.adjacentNodeIds.add(sourceRenderedNode.id);
         } else if (!sourceRenderedNode || !targetRenderedNode) {
-            if (!$context.notRenderedEdgesById.has(edgeKey))
+            if (!$context.notRenderedEdgesById.has(edgeKey)) {
                 $context.notRenderedEdgesById.set(edgeKey, newEdge);
+                addToNreIndex($context.notRenderedEdgesByNodeId, newEdge.sourceId, newEdge);
+                addToNreIndex($context.notRenderedEdgesByNodeId, newEdge.targetId, newEdge);
+            }
         }
     });
 }
