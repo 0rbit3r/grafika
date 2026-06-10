@@ -104,16 +104,19 @@ export const initNodeGraphics = (node: RenderedNode, $states: GraphStoresContain
     container.on('pointerup', handlePointerUp);
     container.on("pointerupoutside", handlePointerUp);
 
-    // text
+    // text — created lazily in handleNodeLoading, not here
     node.renderedText && node.renderedText.destroy({ children: true });
-
-    node.renderedText = (node.shape === NodeShape.TextOnly || node.shape === NodeShape.TextOnlyHighlighted)
-        ? getTextBoxText(node, $states.graphics.colorfulText, node.shape === NodeShape.TextOnlyHighlighted)
-        : getStandardNodeText(node, $states.graphics.colorfulText);
+    node.renderedText = undefined;
+    node.isTextLoadedOnScreen = false;
 
     // $states.graphics.textContainer.addChild(text); -> handled in loader
 }
 
+
+export const createRenderedText = (node: RenderedNode, colorfulText: boolean): Text =>
+    (node.shape === NodeShape.TextOnly || node.shape === NodeShape.TextOnlyHighlighted)
+        ? getTextBoxText(node, colorfulText, node.shape === NodeShape.TextOnlyHighlighted)
+        : getStandardNodeText(node, colorfulText);
 
 const getStandardNodeText = (node: RenderedNode, colorfulText?: boolean) => {
 

@@ -2,16 +2,16 @@ import { XAndY } from "../api/dataTypes";
 import { RenderedEdge } from "../core/renderedEdge";
 import { RenderedNode } from "../core/renderedNode";
 import { GraphicsStore } from "../state/graphicsStore";
+import { createRenderedText } from "./initNodeGraphics";
+import { ZOOM_TEXT_INVISIBLE_THRESHOLD } from "../core/defaultGraphOptions";
 
 const loadNode = (node: RenderedNode, $graphics: GraphicsStore) => {
     node.isLoadedOnScreen = true;
     node.sprite && $graphics.nodeContainer.addChild(node.sprite);
-    node.renderedText && $graphics.textContainer.addChild(node.renderedText);
 }
 const unloadNode = (node: RenderedNode, $graphics: GraphicsStore) => {
     node.isLoadedOnScreen = false;
     node.sprite && $graphics.nodeContainer.removeChild(node.sprite);
-    node.renderedText && $graphics.textContainer.removeChild(node.renderedText);
 };
 
 export const handleNodeLoading = (node: RenderedNode, $graphics: GraphicsStore) => {
@@ -36,6 +36,16 @@ export const handleNodeLoading = (node: RenderedNode, $graphics: GraphicsStore) 
         }
     } else if (!isInsideViewport && !node.held) {
         unloadNode(node, $graphics);
+    }
+
+    const textShouldLoad = isInsideViewport && $graphics.viewport.zoom >= ZOOM_TEXT_INVISIBLE_THRESHOLD;
+    if (!node.isTextLoadedOnScreen && textShouldLoad) {
+        if (!node.renderedText) node.renderedText = createRenderedText(node, $graphics.colorfulText);
+        $graphics.textContainer.addChild(node.renderedText);
+        node.isTextLoadedOnScreen = true;
+    } else if (node.isTextLoadedOnScreen && !textShouldLoad) {
+        node.renderedText && $graphics.textContainer.removeChild(node.renderedText);
+        node.isTextLoadedOnScreen = false;
     }
 
     // if (isInside && $graphics.viewport.zoom < 0.25)

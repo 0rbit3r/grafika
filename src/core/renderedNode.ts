@@ -42,6 +42,7 @@ export interface RenderedNode {
     momentum: XAndY;
 
     isLoadedOnScreen: boolean;
+    isTextLoadedOnScreen: boolean;
 
     floatingDisplacement: XAndY;
 }
@@ -83,6 +84,7 @@ export const initializeRenderedNode = (node: GraphNode, $states: GraphStoresCont
         forces: { x: 0, y: 0 },
         momentum: { x: 0, y: 0 },
         isLoadedOnScreen: false,
+        isTextLoadedOnScreen: false,
         floatingDisplacement: { x: 0, y: 0 },
     };
     initNodeGraphics(renderedNode, $states);
