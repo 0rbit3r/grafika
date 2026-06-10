@@ -25,6 +25,10 @@ const baseTextures: BaseTexturesContainer = {
     animated: undefined
 }
 
+export const invalidateEdgeSpriteTextureCache = () => {
+    (Object.keys(baseTextures) as (keyof typeof baseTextures)[]).forEach(key => baseTextures[key] = undefined);
+};
+
 export function getEdgeSprite(app: Application, edge: RenderedEdge): Sprite | null {
     let sprite: Sprite = null!;
 

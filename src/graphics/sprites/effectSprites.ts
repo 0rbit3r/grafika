@@ -15,6 +15,13 @@ const baseTextures: BaseTexturesContainer = {
     blink: undefined
 }
 
+export const invalidateEffectTextureCache = () => {
+    baseTextures.hollowRim = undefined;
+    baseTextures.hollowHole = undefined;
+    baseTextures.glow = undefined;
+    baseTextures.blink = undefined;
+};
+
 export const getGlowSprite = (app: Application) => {
     let sprite: Sprite = null!;
     if (!baseTextures.glow || baseTextures.glow.destroyed) {

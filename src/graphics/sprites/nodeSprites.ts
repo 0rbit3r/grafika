@@ -31,6 +31,10 @@ const baseTextures: BaseTexturesContainer = {
     textCard: undefined,
 }
 
+export const invalidateNodeSpriteTextureCache = () => {
+    (Object.keys(baseTextures) as (keyof typeof baseTextures)[]).forEach(key => baseTextures[key] = undefined);
+};
+
 export function getNodeSprite(app: Application, node: RenderedNode): Sprite {
     let sprite: Sprite = null!;
     switch (node.shape) {

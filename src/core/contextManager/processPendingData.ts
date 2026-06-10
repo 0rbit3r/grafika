@@ -60,6 +60,11 @@ export function processPendingData($states: GraphStoresContainer, batchSize: num
         $context.pendingAngle += GOLDEN_ANGLE;
 
         const newRenderedNode = initializeRenderedNode(newNode, $states);
+        const dyingNode = $context.renderedNodes.get(newNode.id);
+        if (dyingNode) {
+            dyingNode.sprite?.destroy({ children: true });
+            dyingNode.renderedText?.destroy({ children: true });
+        }
         $context.renderedNodes.set(newRenderedNode.id, newRenderedNode);
         $states.interactionEvents.emit("nodeAdded", getNodeProxy(newRenderedNode, $states));
         addedNodeIds.push(newRenderedNode.id);
