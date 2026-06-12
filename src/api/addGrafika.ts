@@ -125,15 +125,23 @@ export async function addGrafika(element: HTMLElement, settings: GrafikaSettings
             app.renderer.render(app.stage);
         },
         focusOn: (what, padding?) => {
+            const current = $states.graphics.viewportFocus;
             if (what === null) {
                 $states.graphics.viewportFocus = null;
                 return;
             }
             if (what === "all") {
+                // Already focusing "all" — leave the running journey alone so
+                // re-applying doesn't reset it (jitter). An omitted padding means
+                // "don't care", so only a changed explicit padding re-triggers.
+                if (current?.target === "all" && (padding === undefined || current.padding === padding)) return;
                 $states.graphics.viewportFocus = { target: "all", padding };
                 return;
             }
             const node = $states.context.renderedNodes.get(what.id) ?? null;
+            // Already focusing this same node — no-op. Omitted padding = "don't
+            // care", so only a changed explicit padding re-triggers.
+            if (node && current?.target === node && (padding === undefined || current.padding === padding)) return;
             $states.graphics.viewportFocus = node ? { target: node, padding } : null;
         }
     };
