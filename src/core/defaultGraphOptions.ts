@@ -82,7 +82,7 @@ export const TEXT_WORD_WRAP_WIDTH = 160;
 // FDL force functions
 export const pushForce = (borderDist: number) => {
 
-    const computed = 30 / Math.sqrt(borderDist <= 0 ? 0.0001 : borderDist);
+    const computed = 20 / Math.sqrt(borderDist <= 0 ? 0.0001 : borderDist);
     return Math.min(MAX_PUSH_FORCE, computed);
 };
 

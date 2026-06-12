@@ -7,8 +7,6 @@ import { initOverlay } from "./overlay/initOverlay";
 import { NODE_SPRITE_RADIUS, invalidateNodeSpriteTextureCache } from "./sprites/nodeSprites";
 import { EDGE_SPRITE_LENGTH, TAPERED_EDGE_WIDTH, invalidateEdgeSpriteTextureCache } from "./sprites/edgeSprites";
 import { invalidateEffectTextureCache } from "./sprites/effectSprites";
-import { initNodeGraphics } from "./initNodeGraphics";
-import { initEdgeGraphics } from "./initEdgeGraphics";
 import { handleOverlay } from "./overlay/handleOverlay";
 import { handleNodeLoading, handleEdgeLoading } from "./dynamicLoader";
 import { initBackdrop } from "./backdrop/initBackdrop";
@@ -47,17 +45,9 @@ export const initGraphics = async (app: Application, $states: GraphStoresContain
     zSortedContainer.addChild(edgeContainer);
     zSortedContainer.addChild(debugContainer);
 
-    (app.view as HTMLCanvasElement).addEventListener('webglcontextrestored', () => {
-        invalidateNodeSpriteTextureCache();
-        invalidateEffectTextureCache();
-        invalidateEdgeSpriteTextureCache();
-        for (const node of $states.context.renderedNodes.values()) {
-            initNodeGraphics(node, $states);
-        }
-        for (const edge of $states.context.renderedEdges.values()) {
-            initEdgeGraphics(edge, $states);
-        }
-    });
+    invalidateNodeSpriteTextureCache();
+    invalidateEffectTextureCache();
+    invalidateEdgeSpriteTextureCache();
 
     let $simulation = $states.simulation;
     let $debug = $states.debug;
