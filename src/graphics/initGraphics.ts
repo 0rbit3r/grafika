@@ -159,7 +159,11 @@ export const initGraphics = async (app: Application, $states: GraphStoresContain
                             node.renderedText.scale.set(zoom, zoom);
                         }
                     }
-                    node.renderedText && (node.renderedText.alpha = fadeInFactor * fadeOutFactor);
+                    if (node.renderedText) {
+                        node.renderedText.alpha = (node.shape === NodeShape.TextOnly || node.shape === NodeShape.TextOnlyHighlighted)
+                            ? 1
+                            : fadeInFactor * fadeOutFactor;
+                    }
                 }
             });
 
