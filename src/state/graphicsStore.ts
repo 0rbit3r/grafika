@@ -20,6 +20,11 @@ export interface GraphicsStore {
     startW?: number;
     progress?: number;
     phase?: "flight" | "settle";
+    // low-passed copy of the live resolved target pose. The raw target is
+    // re-resolved from the live bbox every frame and is noisy (nodes
+    // appearing/leaving swing it); flight/settle read this smoothed pose
+    // instead so bbox churn can't pass straight through to the camera.
+    smoothedTarget?: { pos: XAndY; w: number };
   } | null;
 
   app: Application;

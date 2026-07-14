@@ -14,7 +14,7 @@ There is no test suite.
 
 ## Architecture
 
-Grafika is a TypeScript library for force-directed graph rendering built on **PixiJS v7**. The single public entry point is `addGrafika(element, settings)` (`src/api/addGrafika.ts`), which returns a `GrafikaInstance`.
+Grafika is a TypeScript library for force-directed graph rendering built on **PixiJS v8**. The single public entry point is `addGrafika(element, settings)` (`src/api/addGrafika.ts`), which returns a `GrafikaInstance`.
 
 ### Data flow
 
@@ -22,11 +22,15 @@ Grafika is a TypeScript library for force-directed graph rendering built on **Pi
 addGrafika()
   ├── creates GraphStoresContainer  (src/state/storesContainer.ts)
   ├── calls initGraphics()          (src/graphics/initGraphics.ts)  → returns renderGraph()
-  └── starts app.ticker loop:
-        1. simulate_one_frame_of_FDL()   (updates x/y on RenderedNodes)
-        2. interactionEvents.emit("framePassed")
-        3. renderGraph()                 (positions PixiJS sprites)
+  └── starts app.ticker loop (handleTick):
+        1. processPendingData()          (drains queued adds/removes, batch-capped per frame)
+        2. simulate_one_frame_of_FDL()   (updates x/y on RenderedNodes; gated by simulationEnabled)
+        3. interactionEvents.emit("framePassed", frame)
+        4. renderGraph()                 (positions PixiJS sprites)
+        5. destroyExpired()              (tears down nodes/edges past their lifetime)
 ```
+
+`addData` / `removeData` on the instance do not mutate the graph synchronously — they enqueue work that `processPendingData` (`src/core/contextManager/`) applies incrementally over subsequent frames to avoid frame spikes.
 
 ### State — `GraphStoresContainer`
 
@@ -59,7 +63,7 @@ There are two parallel representations:
 
 `simulate_one_frame_of_FDL` (`src/simulation/forcesSimulation.ts`) implements force-directed layout:
 - **Pull** along edges toward ideal distance (edge `length` × adjacency count factor)
-- **Push** between unconnected nodes within `pushThreshold`
+- **Push** between nodes, approximated each frame via a freshly-built quadtree (`src/simulation/quadtree.ts`, Barnes-Hut style) instead of all-pairs
 - **Gravity** pulls all nodes toward origin beyond `GRAVITY_FREE_RADIUS`
 - Force constants live in `src/core/defaultGraphOptions.ts`
 

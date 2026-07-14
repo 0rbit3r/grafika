@@ -3,10 +3,13 @@ import { XAndY } from "../../api/dataTypes";
 import { MIN_ZOOM, MAX_ZOOM } from "../../core/defaultGraphOptions";
 import { Viewport } from "./viewport";
 
-// Camera-travel tuning. The viewport moves along a parabolic arc in
-// (position, ln(zoom)) space: for a far jump it bows out (zooms out), drifts
-// across, then bows back in. Near jumps degenerate to a plain smooth glide.
-const FILL_FRACTION = 0.85;   // fraction of the screen the pan span fills at the arc apex
+// Camera-travel tuning. The viewport follows the van Wijk & Nuij (2003) optimal
+// smooth pan-zoom path: for a far jump it bows out (zooms out), drifts across,
+// then bows back in, while provably keeping both endpoints framed throughout.
+// Near jumps degenerate to a plain smooth glide.
+const RHO = 1.4;              // van Wijk curvature (~sqrt2); lower => more zoom-out on far jumps
+const RHO2 = RHO * RHO;
+const RHO4 = RHO2 * RHO2;
 const COMFORT_ZOOM_CAP = 1.5; // max zoom for "all" — guards the single-node runaway
 const MIN_SPAN = 400;         // floor on bbox span (world units) so span->0 can't blow up
 const EPS = 1e-3;             // floor on pan distance
@@ -24,7 +27,10 @@ const SETTLE_THRESHOLD = 0.999;
 // Settle phase: gentle log-space follow of the (still-moving) target.
 const SETTLE_RATE = 0.01;
 
-const LN_MIN_ZOOM = Math.log(MIN_ZOOM);
+// Per-frame EMA rate that low-passes the live target before flight/settle read
+// it. High enough to track genuine graph growth, low enough to reject the
+// transient bbox spikes from a node appearing/leaving for a few frames.
+const TARGET_SMOOTH_RATE = 0.01;
 
 interface TargetPose {
     pos: XAndY;
@@ -48,43 +54,76 @@ export const handleViewportFocus = ($states: GraphStoresContainer) => {
         focus.startW = Math.log(viewport.zoom);
         focus.progress = 0;
         focus.phase = "flight";
+        // Seed the smoothed pose at the raw target so the first frame isn't a lurch.
+        focus.smoothedTarget = { pos: { x: target.pos.x, y: target.pos.y }, w: target.w };
     }
 
+    // Low-pass the live target. Everything downstream reads this, not `target`,
+    // so noise in the live bbox is filtered before it reaches the camera.
+    const smoothed = focus.smoothedTarget!;
+    const smoothRate = 1 - Math.pow(1 - TARGET_SMOOTH_RATE, deltaFrames);
+    smoothed.pos.x += (target.pos.x - smoothed.pos.x) * smoothRate;
+    smoothed.pos.y += (target.pos.y - smoothed.pos.y) * smoothRate;
+    smoothed.w += (target.w - smoothed.w) * smoothRate;
+
     if (focus.phase === "settle") {
-        settleFollow(viewport, target, deltaFrames);
+        settleFollow(viewport, smoothed, deltaFrames);
         return;
     }
 
     const startPos = focus.startPos!;
     const startW = focus.startW!;
 
-    // Arc geometry — recomputed each frame so a moving target adapts.
-    const panDistance = Math.hypot(target.pos.x - startPos.x, target.pos.y - startPos.y);
-    const screenMin = Math.min(viewport.width, viewport.height);
-    const wFit = Math.log(FILL_FRACTION * screenMin / Math.max(panDistance, EPS));
-    const wLinearMid = (startW + target.w) / 2;
-    const wApex = Math.max(LN_MIN_ZOOM, wLinearMid - Math.max(0, wLinearMid - wFit));
-    const dip = wLinearMid - wApex; // 0 for near targets => straight glide
-
     // Asymptotic advance: fast launch, ever-decelerating soft approach.
     // Exponential-decay form so the per-frame rate stays correct under variable
-    // framerate (a plain `* deltaFrames` would diverge for large steps).
+    // framerate (a plain `* deltaFrames` would diverge for large steps). The
+    // normalized progress p drives the path's s-parameter; the van Wijk path
+    // shape is independent of this timing layer.
     focus.progress += (1 - focus.progress) * (1 - Math.pow(1 - APPROACH_RATE, deltaFrames));
+    const p = focus.progress;
 
-    // Write the absolute pose along the arc at the new progress. Pan is a plain
-    // lerp — the asymptotic progress already supplies the ease-out, so adding a
-    // smoothstep on top would over-slow the landing.
-    const t = focus.progress;
-    viewport.position.x = startPos.x + (target.pos.x - startPos.x) * t;
-    viewport.position.y = startPos.y + (target.pos.y - startPos.y) * t;
-    viewport.zoom = clampZoom(Math.exp(arcZoom(startW, target.w, dip, t)));
+    // Van Wijk path in world units, recomputed each frame so a moving target
+    // adapts. The viewport's visible world width is screenMin / zoom; pan
+    // distance is already in world units, so the two are dimensionally
+    // consistent. Path runs from the fixed journey start to the smoothed target.
+    const screenMin = Math.min(viewport.width, viewport.height);
+    const w0 = screenMin / Math.exp(startW);
+    const w1 = screenMin / Math.exp(smoothed.w);
+    const dx = smoothed.pos.x - startPos.x;
+    const dy = smoothed.pos.y - startPos.y;
+    const d1 = Math.hypot(dx, dy);
+
+    if (d1 < EPS) {
+        // Pure zoom, no pan — the general form is singular here, so glide the
+        // zoom in log space and hold the (shared) center.
+        viewport.position.x = smoothed.pos.x;
+        viewport.position.y = smoothed.pos.y;
+        viewport.zoom = clampZoom(Math.exp(startW + (smoothed.w - startW) * p));
+    } else {
+        const b0 = (w1 * w1 - w0 * w0 + RHO4 * d1 * d1) / (2 * w0 * RHO2 * d1);
+        const b1 = (w1 * w1 - w0 * w0 - RHO4 * d1 * d1) / (2 * w1 * RHO2 * d1);
+        const r0 = Math.log(Math.sqrt(b0 * b0 + 1) - b0);
+        const r1 = Math.log(Math.sqrt(b1 * b1 + 1) - b1);
+        const S = (r1 - r0) / RHO;
+
+        if (!isFinite(S) || Math.abs(S) < EPS) {
+            // Start ~= target: snap to the target pose.
+            viewport.position.x = smoothed.pos.x;
+            viewport.position.y = smoothed.pos.y;
+            viewport.zoom = clampZoom(Math.exp(smoothed.w));
+        } else {
+            const s = p * S;
+            const coshr0 = Math.cosh(r0);
+            const u = w0 / (RHO2 * d1) * (coshr0 * Math.tanh(RHO * s + r0) - Math.sinh(r0));
+            viewport.position.x = startPos.x + u * dx; // u in [0,1], = 1 at s = S
+            viewport.position.y = startPos.y + u * dy;
+            const w = w0 * coshr0 / Math.cosh(RHO * s + r0);
+            viewport.zoom = clampZoom(screenMin / w);
+        }
+    }
 
     if (focus.progress >= SETTLE_THRESHOLD) focus.phase = "settle";
 };
-
-// Parabola in log-zoom space: linear interpolation minus a downward bow.
-const arcZoom = (startW: number, targetW: number, dip: number, t: number) =>
-    startW + (targetW - startW) * t - dip * 4 * t * (1 - t);
 
 const settleFollow = (viewport: Viewport, target: TargetPose, deltaFrames: number) => {
     const rate = 1 - Math.pow(1 - SETTLE_RATE, deltaFrames);
@@ -116,7 +155,7 @@ const resolveTarget = ($states: GraphStoresContainer): TargetPose | null => {
         const span = Math.max(maxX - minX, maxY - minY, MIN_SPAN);
         const fill = focus.padding !== undefined
             ? (1 - focus.padding)
-            : nodes.size > 3 ? 0.95 : 0.5;
+            : nodes.size > 3 ? 0.95 : 0.6;
         const zoom = Math.min(COMFORT_ZOOM_CAP, clampZoom(fill * screenMin / span));
         return { pos: { x: (minX + maxX) / 2, y: (minY + maxY) / 2 }, w: Math.log(zoom) };
     }
