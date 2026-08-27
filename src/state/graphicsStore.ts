@@ -7,6 +7,7 @@ import { Emitter } from "mitt";
 import { InteractionEvents } from "../api/events";
 import { DEFAULT_EDGE_ALPHA } from "../core/defaultGraphOptions";
 import { RenderedNode } from "../core/renderedNode";
+import { createSpriteTextureCache, SpriteTextureCache } from "../graphics/sprites/textureCache";
 
 export interface GraphicsStore {
   viewport: Viewport;
@@ -28,6 +29,8 @@ export interface GraphicsStore {
   } | null;
 
   app: Application;
+  // pre-rendered textures, owned by this instance's renderer — never shared across instances
+  spriteTextures: SpriteTextureCache;
   nodeContainer: Container;
   edgeContainer: Container;
   textContainer: Container;
@@ -52,6 +55,7 @@ export function createGraphicsStore
 
   return {
     app: app,
+    spriteTextures: createSpriteTextureCache(),
     viewportFocus: null,
 
     nodeContainer: new Container(),

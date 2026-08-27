@@ -4,7 +4,9 @@ import { filterInPlace } from "../../util/filterInPlace";
 import { RenderedEdge } from "../renderedEdge";
 import { NEW_NODE_FADE_OUT_FRAMES } from "../defaultGraphOptions";
 
-export function removeDataByIds($states: GraphStoresContainer, dataToRemove?: Data, onFinished?: () => void) {
+// Resolves once every removed node has finished fading out and was destroyed.
+// Requires the ticker to be running; disposing the instance settles the promise early.
+export function removeDataByIds($states: GraphStoresContainer, dataToRemove?: Data): Promise<void> {
     if (!dataToRemove)
         dataToRemove = {
             edges: Array.from($states.context.notRenderedEdgesById.values()).map(e => ({ sourceId: e.sourceId, targetId: e.targetId }))
@@ -15,11 +17,14 @@ export function removeDataByIds($states: GraphStoresContainer, dataToRemove?: Da
     if (dataToRemove.nodes === undefined) dataToRemove.nodes = [];
     if (dataToRemove.edges === undefined) dataToRemove.edges = [];
 
+    const removeNodeIds = new Set(dataToRemove.nodes.map(n => n.id));
+    const removeEdgeKeys = new Set(dataToRemove.edges.map(e => `${e.sourceId}->${e.targetId}`));
+
     // Schedule fade-out for deleted nodes; stagger TTLs so at most 10 expire per frame
-    filterInPlace($states.context.pendingNodes, n => !dataToRemove.nodes?.find(r => r.id === n.id));
+    filterInPlace($states.context.pendingNodes, n => !removeNodeIds.has(n.id));
 
     const nodesToFade = [...$states.context.renderedNodes.values()].filter(existingNode =>
-        (dataToRemove.nodes?.find(n => n.id === existingNode.id)));
+        removeNodeIds.has(existingNode.id));
 
     nodesToFade.forEach((node, i) => {
         const batchOffset = Math.floor(i / 10);
@@ -63,7 +68,7 @@ export function removeDataByIds($states: GraphStoresContainer, dataToRemove?: Da
 
     for (const [key, ne] of $states.context.notRenderedEdgesById) {
         if (dyingNodeIds.has(ne.sourceId) || dyingNodeIds.has(ne.targetId)
-            || dataToRemove.edges?.find(e => e.sourceId === ne.sourceId && e.targetId === ne.targetId) !== undefined) {
+            || removeEdgeKeys.has(key)) {
             $states.context.notRenderedEdgesById.delete(key);
             $states.context.notRenderedEdgesByNodeId.get(ne.sourceId)?.delete(ne);
             $states.context.notRenderedEdgesByNodeId.get(ne.targetId)?.delete(ne);
@@ -71,18 +76,17 @@ export function removeDataByIds($states: GraphStoresContainer, dataToRemove?: Da
     }
 
     // Drain any addTrackers waiting on nodes that are now being removed.
-    // Does NOT fire callbacks here — processPendingData fires them on the next tick,
-    // preventing synchronous re-entrancy if a callback calls back into removeData.
-    const allRemovedIds = new Set(dataToRemove.nodes?.map(n => n.id) ?? []);
-    if (allRemovedIds.size > 0) {
+    // Does NOT settle promises here — processPendingData does that on the next tick,
+    // preventing synchronous re-entrancy if a continuation calls back into removeData.
+    if (removeNodeIds.size > 0) {
         $states.context.addTrackers.forEach(tracker =>
-            allRemovedIds.forEach(id => tracker.pendingIds.delete(id))
+            removeNodeIds.forEach(id => tracker.pendingIds.delete(id))
         );
     }
 
-    if (onFinished) {
+    return new Promise<void>(resolve => {
         // Always push — even if nodesToFade is empty (pendingIds will be an empty Set),
-        // processPendingData fires it on the next tick rather than synchronously here.
-        $states.context.removeTrackers.push({ pendingIds: new Set(nodesToFade.map(n => n.id)), callback: onFinished });
-    }
+        // processPendingData resolves it on the next tick rather than synchronously here.
+        $states.context.removeTrackers.push({ pendingIds: new Set(nodesToFade.map(n => n.id)), callback: resolve });
+    });
 }

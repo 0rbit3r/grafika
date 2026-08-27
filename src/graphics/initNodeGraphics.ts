@@ -11,6 +11,7 @@ import tinycolor from "tinycolor2";
 
 export const initNodeGraphics = (node: RenderedNode, $states: GraphStoresContainer) => {
     const app = $states.graphics.app;
+    const textureCache = $states.graphics.spriteTextures;
     if ($states.debug.logToConsole) console.log("initializing node " + node.id);
 
     node.sprite?.removeAllListeners();
@@ -18,7 +19,7 @@ export const initNodeGraphics = (node: RenderedNode, $states: GraphStoresContain
     node.isLoadedOnScreen = false;
 
     // baseSprite is purely visual — the container handles interaction
-    const baseSprite = getNodeSprite(app, node);
+    const baseSprite = getNodeSprite(app, textureCache, node);
     baseSprite.eventMode = 'none';
     if (node.shape === NodeShape.TextOnly || node.shape === NodeShape.TextOnlyHighlighted) {
         baseSprite.alpha = 0;
@@ -34,19 +35,19 @@ export const initNodeGraphics = (node: RenderedNode, $states: GraphStoresContain
     container.addChild(baseSprite);
 
     if (node.glowEffect) {
-        const glow = getGlowSprite(app);
+        const glow = getGlowSprite(app, textureCache);
         glow.tint = node.color;
         container.addChild(glow);
     }
     if (node.hollowEffect) {
-        const hole = getHollowHoleSprite(app);
+        const hole = getHollowHoleSprite(app, textureCache);
         container.addChild(hole);
-        const rim = getHollowRimSprite(app);
+        const rim = getHollowRimSprite(app, textureCache);
         rim.tint = node.color;
         container.addChild(rim);
     }
     if (node.blinkEffect) {
-        const blinkSprite = getBlinkSprite(app);
+        const blinkSprite = getBlinkSprite(app, textureCache);
         container.addChild(blinkSprite);
         node.blinkingSprite = blinkSprite;
     }

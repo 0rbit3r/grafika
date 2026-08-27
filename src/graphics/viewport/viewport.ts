@@ -93,6 +93,19 @@ export class Viewport {
         }
     }
 
+    // used for programmatic, absolute viewport writes (position is already the
+    // world coordinate centered on screen, so no anchor correction is needed)
+    public setPosition = (position: XAndY) => {
+        this.position.x = position.x;
+        this.position.y = position.y;
+        this.interactionEvents.emit("viewportMoved", { x: this.position.x, y: this.position.y });
+    }
+
+    public setZoom = (newZoom: number) => {
+        this.zoom = Math.min(MAX_ZOOM, Math.max(MIN_ZOOM, newZoom));
+        this.interactionEvents.emit("viewportZoomed", this.zoom);
+    }
+
     // used for user interactivity
     updateZoom = (newZoom: number, globalCoors: XAndY) => {
         newZoom = Math.min(MAX_ZOOM, Math.max(MIN_ZOOM, newZoom));

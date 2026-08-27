@@ -1,0 +1,15 @@
+[ ] architecture
+    [ ] async dispose?
+[ ] rust-based FDL
+    [ ] implement it first
+    [ ] use it in wasm webworker
+[ ] Encapsulate core graph logic   
+    into a testable module
+[ ] tests
+    [ ] create a test project
+    [ ] add a bunch of tests myself
+    [ ] let ai write some too
+    [ ] headless automated tests
+[ ] check todo.md and port relevant tasks here:
+    here
+[ ] bugs        

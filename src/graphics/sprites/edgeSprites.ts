@@ -1,6 +1,7 @@
-import { Application, Graphics, Sprite, Texture } from "pixi.js";
+import { Application, Graphics, Sprite } from "pixi.js";
 import { EdgeType } from "../../api/dataTypes";
 import { RenderedEdge } from "../../core/renderedEdge";
+import { SpriteTextureCache } from "./textureCache";
 
 export const EDGE_SPRITE_LENGTH = 800;
 const ARROWHEAD_LENGTH = EDGE_SPRITE_LENGTH / 4;
@@ -9,27 +10,8 @@ export const TAPERED_EDGE_WIDTH = EDGE_SPRITE_LENGTH / 5;
 const ARROWHEAD_WIDTH = EDGE_SPRITE_LENGTH / 20;
 const LINE_EDGE_WIDTH = EDGE_SPRITE_LENGTH / 20;
 
-interface BaseTexturesContainer {
-    arrowEdge: Texture | undefined;
-    lineEdge: Texture | undefined;
-    taperedEdge: Texture | undefined;
-    curvedEdge: Texture | undefined;
-    animated: Texture[] | undefined;
-}
-
-const baseTextures: BaseTexturesContainer = {
-    lineEdge: undefined,
-    arrowEdge: undefined,
-    taperedEdge: undefined,
-    curvedEdge: undefined,
-    animated: undefined
-}
-
-export const invalidateEdgeSpriteTextureCache = () => {
-    (Object.keys(baseTextures) as (keyof typeof baseTextures)[]).forEach(key => baseTextures[key] = undefined);
-};
-
-export function getEdgeSprite(app: Application, edge: RenderedEdge): Sprite | null {
+export function getEdgeSprite(app: Application, textureCache: SpriteTextureCache, edge: RenderedEdge): Sprite | null {
+    const baseTextures = textureCache.edge;
     let sprite: Sprite = null!;
 
     switch (edge.type) {

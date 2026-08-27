@@ -2,40 +2,13 @@ import { Application, Circle, Graphics, Sprite, Texture } from "pixi.js";
 import { NodeShape } from "../../api/dataTypes";
 import { NODE_BORDER_THICKNESS } from "../../core/defaultGraphOptions";
 import { RenderedNode } from "../../core/renderedNode";
+import { SpriteTextureCache } from "./textureCache";
 
 export const NODE_SPRITE_RADIUS = 200;
 export const TEXT_BOX_CORNER_RADIUS = 10;
 
-interface BaseTexturesContainer {
-    circle: Texture | undefined;
-    square: Texture | undefined;
-    diamond: Texture | undefined;
-    upTriangle: Texture | undefined;
-    downTriangle: Texture | undefined;
-    cross: Texture | undefined;
-    heart: Texture | undefined;
-    textBox: Texture | undefined;
-    textCard: Texture | undefined;
-}
-
-const baseTextures: BaseTexturesContainer = {
-    circle: undefined,
-    square: undefined,
-    diamond: undefined,
-    upTriangle: undefined,
-    downTriangle: undefined,
-    cross: undefined,
-    heart: undefined,
-
-    textBox: undefined,
-    textCard: undefined,
-}
-
-export const invalidateNodeSpriteTextureCache = () => {
-    (Object.keys(baseTextures) as (keyof typeof baseTextures)[]).forEach(key => baseTextures[key] = undefined);
-};
-
-export function getNodeSprite(app: Application, node: RenderedNode): Sprite {
+export function getNodeSprite(app: Application, textureCache: SpriteTextureCache, node: RenderedNode): Sprite {
+    const baseTextures = textureCache.node;
     let sprite: Sprite = null!;
     switch (node.shape) {
         default:

@@ -4,9 +4,8 @@ import { GraphStoresContainer } from "../state/storesContainer";
 import { EdgeType, NodeShape } from "../api/dataTypes";
 import { NEW_NODE_FADE_IN_FRAMES, NEW_NODE_FADE_OUT_FRAMES, NEW_NODE_INVISIBLE_FOR, NODE_BORDER_THICKNESS, ZOOM_TEXT_INVISIBLE_THRESHOLD, ZOOM_TEXT_VISIBLE_THRESHOLD } from "../core/defaultGraphOptions";
 import { initOverlay } from "./overlay/initOverlay";
-import { NODE_SPRITE_RADIUS, invalidateNodeSpriteTextureCache } from "./sprites/nodeSprites";
-import { EDGE_SPRITE_LENGTH, TAPERED_EDGE_WIDTH, invalidateEdgeSpriteTextureCache } from "./sprites/edgeSprites";
-import { invalidateEffectTextureCache } from "./sprites/effectSprites";
+import { NODE_SPRITE_RADIUS } from "./sprites/nodeSprites";
+import { EDGE_SPRITE_LENGTH, TAPERED_EDGE_WIDTH } from "./sprites/edgeSprites";
 import { handleOverlay } from "./overlay/handleOverlay";
 import { handleNodeLoading, handleEdgeLoading } from "./dynamicLoader";
 import { initBackdrop } from "./backdrop/initBackdrop";
@@ -44,10 +43,6 @@ export const initGraphics = async (app: Application, $states: GraphStoresContain
     zSortedContainer.addChild(textContainer);
     zSortedContainer.addChild(edgeContainer);
     zSortedContainer.addChild(debugContainer);
-
-    invalidateNodeSpriteTextureCache();
-    invalidateEffectTextureCache();
-    invalidateEdgeSpriteTextureCache();
 
     let $simulation = $states.simulation;
     let $debug = $states.debug;

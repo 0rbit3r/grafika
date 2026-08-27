@@ -15,13 +15,14 @@ import { destroyExpired } from "../core/contextManager/destroyExpired";
 import { getNodeProxy } from "./proxyNode";
 import { getEdgeProxy } from "./proxyEdge";
 
-export async function addGrafika(element: HTMLElement, settings: GrafikaSettings, onFinished?: () => void): Promise<GrafikaInstance> {
+export async function addGrafika(element: HTMLElement, settings: GrafikaSettings): Promise<GrafikaInstance> {
 
     const app = new Application();
     await app.init({
         background: settings.graphics?.backgroundColor ?? '#000000',
         resizeTo: element,
         antialias: settings.graphics?.antialiasing ?? false,
+        autoStart: false, // the consumer controls the ticker via instance.start()/stop()
 
         autoDensity: true, // todo: i have a hunch this might mess up drag containers relative size to viewport or other things,
         resolution: window.devicePixelRatio // this and the above are needed for the canvas not to look like shit on mobile
@@ -52,9 +53,7 @@ export async function addGrafika(element: HTMLElement, settings: GrafikaSettings
     resizeObserver.observe(element);
 
 
-    addData($states, settings.data ?? { edges: [], nodes: [] }, onFinished);
-
-    app.ticker.autoStart = false;
+    addData($states, settings.data ?? { edges: [], nodes: [] });
 
     // testProxy($states);
 
@@ -85,8 +84,8 @@ export async function addGrafika(element: HTMLElement, settings: GrafikaSettings
         id: id.toString(),
         interactionEvents: interactionEvents,
 
-        addData: (data: Data, onFinished?: () => void) => { if (!isDisposed) addData($states, data, onFinished) },
-        removeData: (data?: Data, onFinished?: () => void) => { if (!isDisposed) removeDataByIds($states, data, onFinished) },
+        addData: (data: Data) => isDisposed ? Promise.resolve() : addData($states, data),
+        removeData: (data?: Data) => isDisposed ? Promise.resolve() : removeDataByIds($states, data),
         getData: () => {
             if (isDisposed) return { edges: [], nodes: [], unusedEdges: [] };
             return {
@@ -95,7 +94,12 @@ export async function addGrafika(element: HTMLElement, settings: GrafikaSettings
                 unusedEdges: Array.from($states.context.notRenderedEdgesById.values())
             }
         },
-        getViewport: () => ({ position: $states.graphics.viewport.position, zoom: $states.graphics.viewport.zoom }),
+        getViewport: () => ({ position: { ...$states.graphics.viewport.position }, zoom: $states.graphics.viewport.zoom }),
+        setViewport: (viewport) => {
+            if (isDisposed) return;
+            if (viewport.position !== undefined) $states.graphics.viewport.setPosition(viewport.position);
+            if (viewport.zoom !== undefined) $states.graphics.viewport.setZoom(viewport.zoom);
+        },
 
         start: () => { if (!isDisposed) app.ticker.start() },
         stop: () => { if (!isDisposed) app.ticker.stop() },
@@ -121,7 +125,7 @@ export async function addGrafika(element: HTMLElement, settings: GrafikaSettings
         },
         tick: (frames: number) => {
             if (isDisposed) return;
-            for (let i = 0; i <= frames; i++) handleTick();
+            for (let i = 0; i < frames; i++) handleTick();
             app.renderer.render(app.stage);
         },
         focusOn: (what, padding?) => {

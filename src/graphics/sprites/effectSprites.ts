@@ -1,28 +1,9 @@
-import { Application, Graphics, Sprite, Texture } from "pixi.js";
+import { Application, Graphics, Sprite } from "pixi.js";
 import { NODE_SPRITE_RADIUS } from "./nodeSprites";
+import { SpriteTextureCache } from "./textureCache";
 
-interface BaseTexturesContainer {
-    hollowRim: Texture | undefined;
-    hollowHole: Texture | undefined;
-    glow: Texture | undefined;
-    blink: Texture | undefined;
-}
-
-const baseTextures: BaseTexturesContainer = {
-    hollowRim: undefined,
-    hollowHole: undefined,
-    glow: undefined,
-    blink: undefined
-}
-
-export const invalidateEffectTextureCache = () => {
-    baseTextures.hollowRim = undefined;
-    baseTextures.hollowHole = undefined;
-    baseTextures.glow = undefined;
-    baseTextures.blink = undefined;
-};
-
-export const getGlowSprite = (app: Application) => {
+export const getGlowSprite = (app: Application, textureCache: SpriteTextureCache) => {
+    const baseTextures = textureCache.effect;
     let sprite: Sprite = null!;
     if (!baseTextures.glow || baseTextures.glow.destroyed) {
         const graphics = new Graphics();
@@ -41,7 +22,8 @@ export const getGlowSprite = (app: Application) => {
     return sprite;
 }
 
-export const getHollowRimSprite = (app: Application) => {
+export const getHollowRimSprite = (app: Application, textureCache: SpriteTextureCache) => {
+    const baseTextures = textureCache.effect;
     let sprite: Sprite = null!;
     if (!baseTextures.hollowRim || baseTextures.hollowRim.destroyed) {
         const graphics = new Graphics();
@@ -57,7 +39,8 @@ export const getHollowRimSprite = (app: Application) => {
 }
 
 // We need to make the hole from two parts because the inside has background color, whilst the rim is tinted to node color
-export const getHollowHoleSprite = (app: Application) => {
+export const getHollowHoleSprite = (app: Application, textureCache: SpriteTextureCache) => {
+    const baseTextures = textureCache.effect;
     let sprite: Sprite = null!;
     if (!baseTextures.hollowHole || baseTextures.hollowHole.destroyed) {
         const graphics = new Graphics();
@@ -72,7 +55,8 @@ export const getHollowHoleSprite = (app: Application) => {
     return sprite;
 }
 
-export const getBlinkSprite = (app: Application) => {
+export const getBlinkSprite = (app: Application, textureCache: SpriteTextureCache) => {
+    const baseTextures = textureCache.effect;
     let sprite: Sprite = null!;
     if (!baseTextures.blink || baseTextures.blink.destroyed) {
         const graphics = new Graphics();

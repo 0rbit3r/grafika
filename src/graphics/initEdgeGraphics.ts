@@ -4,7 +4,7 @@ import { getEdgeSprite } from "./sprites/edgeSprites";
 
 export const initEdgeGraphics = (edge: RenderedEdge, $states: GraphStoresContainer) => {
     const $graphics = $states.graphics;
-    const sprite = getEdgeSprite($graphics.app, edge);
+    const sprite = getEdgeSprite($graphics.app, $graphics.spriteTextures, edge);
     edge.sprite?.destroy();
     edge.sprite = sprite;
     edge.isLoadedOnScreen = false;

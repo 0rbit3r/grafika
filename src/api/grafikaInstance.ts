@@ -9,10 +9,15 @@ export interface GrafikaInstance {
     interactionEvents: Emitter<InteractionEvents>;
 
     // data management
-    addData: (data: Data, onFinished?: () => void) => void;
-    removeData: (data?: Data, onFinished?: () => void) => void;
+    // Both resolve once the data has been fully processed (adds are drained from the
+    // pending queue / removed nodes have finished fading out). Processing happens on
+    // ticks, so the promises only settle while the ticker runs (or via tick());
+    // dispose() settles anything still outstanding.
+    addData: (data: Data) => Promise<void>;
+    removeData: (data?: Data) => Promise<void>;
     getData: () => DataProxy;
     getViewport: () => { position: XAndY, zoom: number };
+    setViewport: (viewport: Partial<{ position: XAndY, zoom: number }>) => void;
 
     // Renders a single frame
     render: () => void;

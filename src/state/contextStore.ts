@@ -18,8 +18,8 @@ export interface ContextStore {
     proxyNodesMap: WeakMap<RenderedNode, ProxyNode>;
     proxyEdgesMap: WeakMap<RenderedEdge, ProxyEdge>;
 
-    addTrackers: CompletionTracker[];    // fired when all nodes from an addData call are rendered
-    removeTrackers: CompletionTracker[]; // fired when all nodes from a removeData call are destroyed
+    addTrackers: CompletionTracker[];    // resolve the addData promise when all nodes from the call are rendered
+    removeTrackers: CompletionTracker[]; // resolve the removeData promise when all nodes from the call are destroyed
 }
 
 export function createContextStore(): ContextStore {
@@ -42,7 +42,7 @@ export function createContextStore(): ContextStore {
     };
 }
 
-// used for onFinished callbacks for adding/removing data
+// completion signal for addData/removeData promises — callback is the promise's resolve
 export interface CompletionTracker {
     pendingIds: Set<string>;
     callback: () => void;
